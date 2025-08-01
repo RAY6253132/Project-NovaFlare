@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaFlare Gacha</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+        }
+        .container {
+            background-color: #3a3a3a;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.1em;
+            color: #fff;
+        }
+        #crystals {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to NovaFlare Gacha!</h1>
+        <p id="crystals">Loading Crystals...</p>
+        <button onclick="pullGacha()">Perform Pull (100 SNC)</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // This will hold the base URL of your Flask backend
+        // For local testing: http://localhost:5000
+        // For deployment: Your actual server URL
+        const BACKEND_URL = 'http://localhost:5000';
+
+        // Function to fetch and display user crystals
+            async function fetchCrystals() {
+                try {
+                    const response = await fetch(`${BACKEND_URL}/get_user_data`);
+                    const userData = await response.json();
+                    document.getElementById('crystals').innerText = `Crystals: ${userData.star_night_crystals}`;
+                } catch (error) {
+                    console.error('Error fetching crystals:', error);
+                    document.getElementById('crystals').innerText = "Crystals: Error loading";
+                }
+            }
+
+        // Function to handle the gacha pull
+        async function pullGacha() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerText = "Pulling...";
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/pull_gacha`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ pull_type: 'single' })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    let charactersHtml = data.pulled_characters.map(char => 
+                        `<li>${char.name} (${char.rarity}-Star)</li>`
+                    ).join('');
+                    resultDiv.innerHTML = `<h3>Pulled!</h3><ul>${charactersHtml}</ul><p>Remaining Crystals: ${data.remaining_crystals}</p>`;
+                } else {
+                    resultDiv.innerText = `Error: ${data.message}`;
+                }
+                fetchCrystals(); // Refresh crystal count after pull
+            } catch (error) {
+                console.error('Error during gacha pull:', error);
+                resultDiv.innerText = 'An error occurred during the pull. Check console.';
+            }
+        }
+
+        // Initial load
+        fetchCrystals();
+    </script>
+</body>
+</html>
