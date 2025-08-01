@@ -1,11 +1,12 @@
 import os
 import random # We'll need this for gacha pulls!
-from flask import Flask, jsonify, request, render_template # Added render_template
+from flask import Flask, jsonify, request, render_template
+from flask_cors import CORS # Add this import
 from firebase_admin import credentials, firestore, initialize_app
 import json # Make sure this is imported
 
-# Initialize Flask App
 app = Flask(__name__)
+CORS(app) # Enable CORS for all routes
 
 # --- Firebase Initialization ---
 # IMPORTANT: The local path is only a fallback for local development.
