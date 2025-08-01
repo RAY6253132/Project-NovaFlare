@@ -2,6 +2,8 @@ import os
 import random # We'll need this for gacha pulls!
 from flask import Flask, jsonify, request, render_template # Added render_template
 from firebase_admin import credentials, firestore, initialize_app
+import json
+
 
 # Initialize Flask App
 app = Flask(__name__)
@@ -17,9 +19,18 @@ if not os.path.exists(FIREBASE_SERVICE_ACCOUNT_KEY_PATH):
     raise FileNotFoundError(f"Service account key not found at {FIREBASE_SERVICE_ACCOUNT_KEY_PATH}. Please ensure it's in the same directory as app.py and the name is correct.")
 
 # Initialize Firebase Admin SDK
-cred = credentials.Certificate(FIREBASE_SERVICE_ACCOUNT_KEY_PATH)
-firebase_admin_app = initialize_app(cred)
-db = firestore.client() # This is your Firestore client object!
+# Check if running on Render (or if the environment variable is set)
+if os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON"):
+    # Load credentials from environment variable (JSON string)
+    cred_json_str = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
+    cred_json = json.loads(cred_json_str) # Parse the JSON string
+    cred = credentials.Certificate(cred_json)
+else:
+    # Fallback to local file for local development
+    cred = credentials.Certificate("novaflare-8ef00-firebase-adminsdk-fbsvc-3043593dc0.json")
+
+firebase_admin.initialize_app(cred)
+db = firestore.client()
 
 # --- Placeholder Character Data (for Gacha Pool) ---
 # In a real game, this would likely be loaded from Firestore or a config.
