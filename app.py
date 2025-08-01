@@ -2,34 +2,53 @@ import os
 import random # We'll need this for gacha pulls!
 from flask import Flask, jsonify, request, render_template # Added render_template
 from firebase_admin import credentials, firestore, initialize_app
-import json
-
+import json # Make sure this is imported
 
 # Initialize Flask App
 app = Flask(__name__)
 
 # --- Firebase Initialization ---
-# IMPORTANT: Replace 'YOUR_SERVICE_ACCOUNT_KEY_FILENAME.json' with the ACTUAL filename
-# of the JSON key file you downloaded from Firebase.
-# Make sure this file is in the same directory as your app.py file.
-FIREBASE_SERVICE_ACCOUNT_KEY_PATH = 'novaflare-8ef00-firebase-adminsdk-fbsvc-3043593dc0.json' # <-- REPLACE THIS EXACT STRING!
+# IMPORTANT: The local path is only a fallback for local development.
+# On Render, it will use the FIREBASE_SERVICE_ACCOUNT_JSON environment variable.
 
-# Check if the file exists (good practice for debugging)
-if not os.path.exists(FIREBASE_SERVICE_ACCOUNT_KEY_PATH):
-    raise FileNotFoundError(f"Service account key not found at {FIREBASE_SERVICE_ACCOUNT_KEY_PATH}. Please ensure it's in the same directory as app.py and the name is correct.")
-
-# Initialize Firebase Admin SDK
-# Check if running on Render (or if the environment variable is set)
+# Try to load credentials from environment variable first (for Render deployment)
 if os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON"):
-    # Load credentials from environment variable (JSON string)
-    cred_json_str = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
-    cred_json = json.loads(cred_json_str) # Parse the JSON string
-    cred = credentials.Certificate(cred_json)
+    try:
+        cred_json_str = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
+        cred_json = json.loads(cred_json_str)
+        cred = credentials.Certificate(cred_json)
+        initialize_app(cred) # Use initialize_app directly, as it's imported
+        print("Firebase initialized from environment variable.")
+    except Exception as e:
+        print(f"Error initializing Firebase from environment variable: {e}")
+        # Fallback to local file if env var parsing fails, or for local dev
+        FIREBASE_SERVICE_ACCOUNT_KEY_PATH = 'novaflare-8ef00-firebase-adminsdk-fbsvc-3043593dc0.json'
+        if os.path.exists(FIREBASE_SERVICE_ACCOUNT_KEY_PATH):
+            cred = credentials.Certificate(FIREBASE_SERVICE_ACCOUNT_KEY_PATH)
+            initialize_app(cred) # Use initialize_app directly
+            print("Firebase initialized from local file (fallback due to env var issue).")
+        else:
+            raise FileNotFoundError(
+                f"Service account key not found locally at {FIREBASE_SERVICE_ACCOUNT_KEY_PATH} "
+                "and not available as environment variable. "
+                "Ensure FIREBASE_SERVICE_ACCOUNT_JSON is set on Render or "
+                "the JSON file is present locally for development."
+            )
 else:
-    # Fallback to local file for local development
-    cred = credentials.Certificate("novaflare-8ef00-firebase-adminsdk-fbsvc-3043593dc0.json")
+    # Fallback to local file for local development if no env var is set
+    FIREBASE_SERVICE_ACCOUNT_KEY_PATH = 'novaflare-8ef00-firebase-adminsdk-fbsvc-3043593dc0.json'
+    if os.path.exists(FIREBASE_SERVICE_ACCOUNT_KEY_PATH):
+        cred = credentials.Certificate(FIREBASE_SERVICE_ACCOUNT_KEY_PATH)
+        initialize_app(cred) # Use initialize_app directly
+        print("Firebase initialized from local file.")
+    else:
+        raise FileNotFoundError(
+            f"Service account key not found locally at {FIREBASE_SERVICE_ACCOUNT_KEY_PATH} "
+            "and not available as environment variable. "
+            "Ensure FIREBASE_SERVICE_ACCOUNT_JSON is set on Render or "
+            "the JSON file is present locally for development."
+        )
 
-firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 # --- Placeholder Character Data (for Gacha Pool) ---
@@ -38,7 +57,7 @@ db = firestore.client()
 CHARACTER_POOL = [
     # 5-Star Characters
     {"id": "c001_elara", "name": "Elara, Cyber Mage", "rarity": 5, "class": "DPS", "element": "Cyber"},
-    {"id": "c002_titan", "name": "Titan, Mech Knight", "rarity": 5, "class": "DPS", "class": "DPS", "element": "Mech"},
+    {"id": "c002_titan", "name": "Titan, Mech Knight", "rarity": 5, "class": "DPS", "element": "Mech"},
     # 4-Star Characters
     {"id": "c003_aura", "name": "Aura, Chrono Healer", "rarity": 4, "class": "Support", "element": "Time"},
     {"id": "c004_glitch", "name": "Glitch, Rogue Hacker", "rarity": 4, "class": "Sub DPS", "element": "Data"},
@@ -180,7 +199,7 @@ def pull_gacha():
             "star_night_crystals": 5000, # Give them some starting currency
             "owned_characters": [],
             "gacha_pity_4_star": 0,
-            "gacha_pity_5_star": 0
+            "gacha_pacha_5_star": 0
         }
         user_ref.set(user_data)
     else:
@@ -247,6 +266,6 @@ def pull_gacha():
 
 # --- Run the Flask App ---
 if __name__ == '__main__':
-    # For local development, set host to '0.0.0.0' to be accessible from outside (e.g., if testing from another device)
-    # Ensure debug=True is ONLY for development, not production.
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Render provides the PORT as an environment variable
+    port = int(os.environ.get("PORT", 5000)) # Default to 5000 for local dev
+    app.run(debug=True, host='0.0.0.0', port=port)
