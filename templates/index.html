@@ -35,6 +35,7 @@
             cursor: pointer;
             font-size: 16px;
             margin-top: 15px;
+            margin: 5px; /* Added a small margin for buttons */
         }
         button:hover {
             background-color: #0056b3;
@@ -50,12 +51,13 @@
             margin-bottom: 10px;
         }
     </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>Welcome to NovaFlare Gacha!</h1>
         <p id="crystals">Loading Crystals...</p>
-        <button onclick="pullGacha()">Perform Pull (100 SNC)</button>
+        <button onclick="pullGacha('single')">Perform Pull (100 SNC)</button>
         <button onclick="pullGacha('multi')">Perform 10x Pull (900 SNC)</button>
         <div id="result"></div>
     </div>
@@ -65,15 +67,36 @@
         // and use it as the API base URL.
         const BACKEND_URL = window.location.origin; 
 
+        // Function to get Telegram initData safely
+        function getTelegramInitData() {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
+                return window.Telegram.WebApp.initData;
+            }
+            return null;
+        }
+
         // Function to fetch and display user crystals
         async function fetchCrystals() {
             try {
-                const response = await fetch(`${BACKEND_URL}/get_user_data`);
+                const headers = {};
+                const initData = getTelegramInitData();
+                if (initData) {
+                    headers['X-Telegram-Init-Data'] = initData;
+                }
+
+                const response = await fetch(`${BACKEND_URL}/get_user_data`, { headers: headers });
+                
+                if (!response.ok) {
+                    // Handle non-200 responses, e.g., 401 Unauthorized
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+
                 const userData = await response.json();
                 document.getElementById('crystals').innerText = `Crystals: ${userData.star_night_crystals}`;
             } catch (error) {
                 console.error('Error fetching crystals:', error);
-                document.getElementById('crystals').innerText = "Crystals: Error loading";
+                document.getElementById('crystals').innerText = `Crystals: Error: ${error.message}`;
             }
         }
 
@@ -83,13 +106,25 @@
             resultDiv.innerText = "Pulling...";
 
             try {
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                const initData = getTelegramInitData();
+                if (initData) {
+                    headers['X-Telegram-Init-Data'] = initData;
+                }
+
                 const response = await fetch(`${BACKEND_URL}/pull_gacha`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: headers,
                     body: JSON.stringify({ pull_type: pullType })
                 });
+
+                if (!response.ok) {
+                    // Handle non-200 responses, e.g., 401 Unauthorized, 400 Not enough crystals
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
 
                 const data = await response.json();
 
@@ -104,7 +139,7 @@
                 fetchCrystals(); // Refresh crystal count after pull
             } catch (error) {
                 console.error('Error during gacha pull:', error);
-                resultDiv.innerText = 'An error occurred during the pull. Check console.';
+                resultDiv.innerText = `An error occurred during the pull: ${error.message}`; // More specific error message
             }
         }
 
