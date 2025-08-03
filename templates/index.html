@@ -4,147 +4,193 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NovaFlare Gacha</title>
+    <!-- Include Telegram Web App Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #2c2c2c;
-            color: #e0e0e0;
-        }
-        .container {
-            background-color: #3a3a3a;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            text-align: center;
-        }
-        h1 {
-            color: #4CAF50;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 15px;
-            margin: 5px; /* Added a small margin for buttons */
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #result {
-            margin-top: 20px;
-            font-size: 1.1em;
             color: #fff;
+            position: relative;
+            background-color: #1a1a2e; /* Fallback color */
+            
+            /* Background Image styling */
+            background-image: url("{{ url_for('static', filename='novaflare_bg.jpg') }}"); /* Make sure filename matches your image */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
-        #crystals {
-            font-size: 1.2em;
+
+        .homepage-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            max-width: 500px;
+            height: 80vh;
+            background: rgba(25, 25, 40, 0.75);
+            backdrop-filter: blur(8px);
+            border: 2px solid #3a3a5e;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            font-size: 2.5rem;
             font-weight: bold;
-            margin-bottom: 10px;
+            color: #76c7c0;
+            text-shadow: 0 0 10px #76c7c0;
+            margin-top: 20px;
+            letter-spacing: 2px;
         }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .menu-button {
+            background-color: #3a3a5e;
+            color: #fff;
+            padding: 15px 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .menu-button:hover {
+            background-color: #4a4a7a;
+            transform: translateY(-2px);
+        }
+
+        /* Gacha button special styling */
+        .gacha-button {
+            background-color: #e63946;
+            color: #fff;
+            grid-column: 1 / -1; /* Make it full width */
+            font-size: 1.2rem;
+        }
+
+        .gacha-button:hover {
+            background-color: #c72c38;
+        }
+
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #2a2a44;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #e63946;
+        }
+
+        .modal-close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-close:hover,
+        .modal-close:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
     </style>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to NovaFlare Gacha!</h1>
-        <p id="crystals">Loading Crystals...</p>
-        <button onclick="pullGacha('single')">Perform Pull (100 SNC)</button>
-        <button onclick="pullGacha('multi')">Perform 10x Pull (900 SNC)</button>
-        <div id="result"></div>
+    <div class="homepage-container">
+        <h1 class="logo">NovaFlare</h1>
+        
+        <div class="button-grid">
+            <button class="menu-button gacha-button" onclick="launchGame()">Gacha</button>
+            <button class="menu-button" onclick="showDevelopmentMessage('Events')">Events</button>
+            <button class="menu-button" onclick="showDevelopmentMessage('Mail')">Mail</button>
+            <button class="menu-button" onclick="showDevelopmentMessage('Characters')">Characters</button>
+            <button class="menu-button" onclick="showDevelopmentMessage('Inventory')">Inventory</button>
+            <button class="menu-button" onclick="showDevelopmentMessage('Profile')">Profile</button>
+            <button class="menu-button" onclick="showDevelopmentMessage('Shop')">Shop</button>
+        </div>
+        
     </div>
 
+    <!-- The custom modal for "In Development" messages -->
+    <div id="developmentModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle"></h3>
+            <p>This feature is currently in development. Stay tuned for future updates!</p>
+        </div>
+    </div>
+    
     <script>
-        // This will dynamically get the current host (e.g., https://project-novaflare.onrender.com)
-        // and use it as the API base URL.
-        const BACKEND_URL = window.location.origin; 
-
-        // Function to get Telegram initData safely
-        function getTelegramInitData() {
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
-                return window.Telegram.WebApp.initData;
-            }
-            return null;
-        }
-
-        // Function to fetch and display user crystals
-        async function fetchCrystals() {
-            try {
-                const headers = {};
-                const initData = getTelegramInitData();
-                if (initData) {
-                    headers['X-Telegram-Init-Data'] = initData;
-                }
-
-                const response = await fetch(`${BACKEND_URL}/get_user_data`, { headers: headers });
-                
-                if (!response.ok) {
-                    // Handle non-200 responses, e.g., 401 Unauthorized
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-                }
-
-                const userData = await response.json();
-                document.getElementById('crystals').innerText = `Crystals: ${userData.star_night_crystals}`;
-            } catch (error) {
-                console.error('Error fetching crystals:', error);
-                document.getElementById('crystals').innerText = `Crystals: Error: ${error.message}`;
+        function launchGame() {
+            // Check if running inside Telegram Web App and use a relative path
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.location.href = '/game';
+            } else {
+                // For direct browser access, still redirect but with a warning
+                alert("This app is designed to run within Telegram. Redirecting to the Gacha page...");
+                window.location.href = '/game';
             }
         }
-
-        // Function to handle the gacha pull
-        async function pullGacha(pullType = 'single') {
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerText = "Pulling...";
-
-            try {
-                const headers = {
-                    'Content-Type': 'application/json'
-                };
-                const initData = getTelegramInitData();
-                if (initData) {
-                    headers['X-Telegram-Init-Data'] = initData;
-                }
-
-                const response = await fetch(`${BACKEND_URL}/pull_gacha`, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify({ pull_type: pullType })
-                });
-
-                if (!response.ok) {
-                    // Handle non-200 responses, e.g., 401 Unauthorized, 400 Not enough crystals
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (data.status === 'success') {
-                    let charactersHtml = data.pulled_characters.map(char => 
-                        `<li>${char.name} (${char.rarity}-Star)</li>`
-                    ).join('');
-                    resultDiv.innerHTML = `<h3>Pulled!</h3><ul>${charactersHtml}</ul><p>Remaining Crystals: ${data.remaining_crystals}</p>`;
-                } else {
-                    resultDiv.innerText = `Error: ${data.message}`;
-                }
-                fetchCrystals(); // Refresh crystal count after pull
-            } catch (error) {
-                console.error('Error during gacha pull:', error);
-                resultDiv.innerText = `An error occurred during the pull: ${error.message}`; // More specific error message
-            }
+        
+        // Function to show the custom modal
+        function showDevelopmentMessage(featureName) {
+            document.getElementById('modalTitle').innerText = featureName;
+            document.getElementById('developmentModal').style.display = 'flex';
         }
 
-        // Initial load
-        fetchCrystals();
+        // Function to close the custom modal
+        function closeModal() {
+            document.getElementById('developmentModal').style.display = 'none';
+        }
+        
+        // Close modal when user clicks outside the modal content
+        window.onclick = function(event) {
+            const modal = document.getElementById('developmentModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
     </script>
 </body>
 </html>
