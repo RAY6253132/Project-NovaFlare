@@ -4,249 +4,520 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NovaFlare Gacha</title>
-    <!-- Include Telegram Web App Script -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117;
+            color: #f0f0f0;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            height: 100vh;
+        }
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+            .sidebar {
+                flex-direction: row;
+                justify-content: space-around;
+                width: 100%;
+                height: auto;
+                padding: 0.5rem;
+            }
+        }
+        .sidebar {
+            background-color: #1a2c3a;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #1e1e1e;
-            color: #f0f0f0;
-            text-align: center;
+            padding-top: 2rem;
+            border-right: 2px solid #2a415a;
         }
-
-        .container {
-            background-color: #2a2a2a;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
-            width: 90%;
+        .sidebar-item {
+            width: 100%;
+            text-align: center;
+            padding: 1rem 0.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border-left: 4px solid transparent;
+            font-weight: 600;
+        }
+        .sidebar-item.active {
+            border-left-color: #007BFF;
+            background-color: #2a415a;
+            color: #007BFF;
+        }
+        .sidebar-item.unavailable {
+            color: #555;
+            cursor: not-allowed;
+            border-left-color: transparent;
+            pointer-events: none; /* Disable all events */
+        }
+        .gacha-bg-standard {
+            background-image: url('https://placehold.co/1200x600/1e1e1e/76c7c0?text=Standard+Banner');
+            background-size: cover;
+            background-position: center;
             position: relative;
         }
-
-        h1 {
-            color: #76c7c0;
-            margin-bottom: 20px;
+        .gacha-bg-limited {
+            background-image: url('https://placehold.co/1200x600/800080/ffc0cb?text=Limited+Banner');
+            background-size: cover;
+            background-position: center;
+            position: relative;
         }
-
-        .crystal-display {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-            color: #fff;
+        .glow {
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #007BFF, 0 0 20px #007BFF;
         }
-
-        .pull-button-group {
+        .pull-button-x1 {
+            background-image: linear-gradient(to right, #4c2c62, #6b3e8e);
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .pull-button-x1:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .pull-button-x10 {
+            background-image: linear-gradient(to right, #b48500, #ffc83d);
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .pull-button-x10:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .rarity-5 { color: #FFD700; text-shadow: 0 0 5px #FFD700; }
+        .rarity-4 { color: #A020F0; text-shadow: 0 0 5px #A020F0; }
+        .rarity-3 { color: #00BFFF; text-shadow: 0 0 5px #00BFFF; }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
         }
-
-        .pull-button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: bold;
+        .shop-button {
+            background-color: #1a2c3a;
             color: #fff;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .pull-button:hover {
-            transform: translateY(-2px);
-        }
-
-        .single-pull {
-            background-color: #007bff;
-        }
-
-        .multi-pull {
-            background-color: #28a745;
-        }
-
-        #results-container {
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .result-item {
-            margin-bottom: 10px;
-            padding: 8px;
-            border-radius: 4px;
-        }
-
-        .rarity-5 { background-color: #ffd700; color: #333; }
-        .rarity-4 { background-color: #c0c0c0; color: #333; }
-        .rarity-3 { background-color: #cd7f32; color: #333; }
-
-        .result-name {
-            font-weight: bold;
-        }
-
-        .message-box {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            color: #fff;
-            background-color: #4a4a4a;
-            display: none; /* Initially hidden */
-        }
-        
-        .back-button-container {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-        }
-
-        .back-button {
-            background-color: #555;
-            color: white;
-            border: none;
-            padding: 10px 15px;
             border-radius: 50%;
-            font-size: 1.2em;
+            width: 4rem;
+            height: 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.2s ease-in-out;
             cursor: pointer;
-            transition: background-color 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            z-index: 20;
         }
-        .back-button:hover {
-            background-color: #777;
+        .shop-button:hover {
+            background-color: #2a415a;
+            transform: scale(1.1);
+        }
+        .shop-icon {
+            width: 2rem;
+            height: 2rem;
         }
     </style>
 </head>
 <body>
-    <div class="back-button-container">
-        <button class="back-button" onclick="goToHomepage()">&#8592;</button>
-    </div>
 
-    <div class="container">
-        <h1>NovaFlare Gacha</h1>
-        <div id="crystal-count" class="crystal-display">Loading crystals...</div>
-        
-        <div class="pull-button-group">
-            <button class="pull-button single-pull" onclick="pullGacha('single')">Perform Pull (100 SNC)</button>
-            <button class="pull-button multi-pull" onclick="pullGacha('multi')">Perform 10x Pull (900 SNC)</button>
+    <div class="container bg-gray-900">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <h2 class="text-xl font-bold mb-8">Banners</h2>
+            <div id="tab-standard" class="sidebar-item active">Standard</div>
+            <div id="tab-limited" class="sidebar-item unavailable">Limited</div>
+            <button onclick="window.location.href='/'" class="mt-auto mb-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Back</button>
         </div>
 
-        <div id="results-container">
-            <!-- Pulled characters will be displayed here -->
-        </div>
+        <!-- Main Content Area -->
+        <div class="flex-1 p-8 overflow-y-auto">
+            <!-- Top Right HUD -->
+            <div class="flex flex-col sm:flex-row justify-end items-center mb-6 space-x-0 sm:space-x-4 space-y-2 sm:space-y-0">
+                <p class="text-lg bg-gray-800 rounded-full px-4 py-2 border border-gray-700 w-full sm:w-auto">
+                    <span id="crystal-count" class="font-bold text-yellow-300">Loading...</span> <span class="text-gray-400">SNC</span>
+                </p>
+                <p class="text-lg bg-gray-800 rounded-full px-4 py-2 border border-gray-700 w-full sm:w-auto">
+                    <span id="lumen-orb-count" class="font-bold text-purple-300">Loading...</span> <span class="text-gray-400">Lumen Orbs</span>
+                </p>
+                <p class="text-lg bg-gray-800 rounded-full px-4 py-2 border border-gray-700 w-full sm:w-auto">
+                    <span id="halo-orb-count" class="font-bold text-pink-300">Loading...</span> <span class="text-gray-400">Halo Orbs</span>
+                </p>
+                 <p class="text-lg bg-gray-800 rounded-full px-4 py-2 border border-gray-700 w-full sm:w-auto">
+                    <span id="auric-crescent-count" class="font-bold text-green-300">Loading...</span> <span class="text-gray-400">AC</span>
+                </p>
+            </div>
+            
+            <!-- Standard Banner Content -->
+            <div class="max-w-4xl mx-auto tab-content active relative" id="standard-banner-content">
+                <div class="relative w-full h-[400px] rounded-lg shadow-xl overflow-hidden mb-6">
+                    <div class="gacha-bg-standard w-full h-full"></div>
+                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-end justify-between p-8">
+                        <div class="text-white">
+                            <h2 class="text-3xl font-bold">Standard Banner</h2>
+                            <p class="text-lg text-gray-300">A permanent collection of heroes and weapons.</p>
+                        </div>
+                        <div class="pity-info text-right text-sm">
+                             <p id="standard-pity-5-message" class="text-yellow-300 font-bold mb-1"></p>
+                             <p id="standard-pity-4-message" class="text-purple-300 font-bold"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center space-y-4 mt-8">
+                    <div class="flex justify-center space-x-6">
+                         <button id="pull-single-standard-orb" class="pull-button-x1 text-white font-bold py-3 px-6 rounded-full text-lg">
+                            Single Pull
+                        </button>
+                        <button id="pull-multi-standard-orb" class="pull-button-x10 text-white font-bold py-3 px-6 rounded-full text-lg">
+                            10 Pulls
+                        </button>
+                    </div>
+                </div>
+                <button onclick="showShopModal()" class="shop-button absolute bottom-4 left-4">
+                    <svg class="shop-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                </button>
+            </div>
 
-        <div id="message-box" class="message-box"></div>
+            <!-- Limited Banner Content (currently unavailable) -->
+            <div class="max-w-4xl mx-auto tab-content relative" id="limited-banner-content">
+                <div class="relative w-full h-[400px] rounded-lg shadow-xl overflow-hidden mb-6">
+                    <div class="gacha-bg-limited w-full h-full"></div>
+                    <div class="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center p-8">
+                        <div class="text-center text-white">
+                            <h2 class="text-4xl font-bold glow">Whispered Tales</h2>
+                            <p class="text-xl text-gray-300 mt-2">This banner is currently unavailable.</p>
+                        </div>
+                    </div>
+                </div>
+                 <button onclick="showShopModal()" class="shop-button absolute bottom-4 left-4">
+                    <svg class="shop-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Pull Results Section -->
+            <div id="results-container" class="mt-8 max-w-4xl mx-auto">
+                <h2 class="text-2xl font-bold text-center mb-4">Pull Results</h2>
+                <div id="results-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                    <!-- Pull results will be dynamically added here -->
+                </div>
+            </div>
+        </div>
     </div>
+    
+    <!-- Message Box -->
+    <div id="message-box" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-900 border border-gray-700 rounded-lg shadow-xl p-6 z-50 text-center hidden">
+        <p id="message-text" class="text-lg mb-4"></p>
+        <button onclick="document.getElementById('message-box').classList.add('hidden')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">Close</button>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-900 border border-gray-700 rounded-lg shadow-xl p-8 max-w-sm w-full">
+            <p id="confirmation-text" class="text-lg text-center mb-6"></p>
+            <div class="flex justify-around space-x-4">
+                <button id="confirm-yes" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-full">Yes</button>
+                <button id="confirm-no" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shop Modal -->
+    <div id="shop-modal" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-900 border border-gray-700 rounded-lg shadow-xl p-8 max-w-2xl w-full">
+             <button onclick="hideShopModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl font-bold">&times;</button>
+             <h2 class="text-3xl font-bold text-center mb-6">Shop</h2>
+             <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                    <h3 class="text-xl font-bold mb-4">Buy Lumen Orbs with SNC</h3>
+                    <div class="space-y-4">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full w-full" onclick="handleShopExchange('buy_lumen_1')">
+                            1 Lumen Orb (70 SNC)
+                        </button>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full w-full" onclick="handleShopExchange('buy_lumen_10')">
+                            10 Lumen Orbs (595 SNC) - 15% Discount
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                    <h3 class="text-xl font-bold mb-4">Buy Halo Orbs with SNC</h3>
+                     <div class="space-y-4">
+                        <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full w-full" onclick="handleShopExchange('buy_halo_1')">
+                            1 Halo Orb (100 SNC)
+                        </button>
+                        <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full w-full" onclick="handleShopExchange('buy_halo_10')">
+                            10 Halo Orbs (900 SNC) - 10% Discount
+                        </button>
+                    </div>
+                </div>
+                 <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 col-span-full">
+                    <h3 class="text-xl font-bold mb-4">Exchange Orbs with Auric Crescents</h3>
+                     <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full w-full sm:w-auto" onclick="handleShopExchange('exchange_lumen')">
+                            1 Lumen Orb (20 AC)
+                        </button>
+                        <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full w-full sm:w-auto" onclick="handleShopExchange('exchange_halo')">
+                            1 Halo Orb (20 AC)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script>
-        // Use window.location.origin to get the base URL dynamically.
-        const BACKEND_URL = window.location.origin;
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pity constants (should match the backend)
+            const PITY_4_STAR = 10;
+            const PITY_5_STAR = 90;
 
-        // Fetch user data when the page loads.
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchUserData();
-        });
+            function showMessage(text) {
+                const messageBox = document.getElementById('message-box');
+                document.getElementById('message-text').textContent = text;
+                messageBox.classList.remove('hidden');
+            }
 
-        // Function to fetch and display user data (crystals).
-        async function fetchUserData() {
-            try {
-                const url = `${BACKEND_URL}/get_user_data`;
-                console.log('Fetching user data from:', url);
+            // Function to update the pity message on the page
+            function updatePityMessage(bannerType, pity_4, pity_5) {
+                const fiveStarMessageElement = document.getElementById(`${bannerType}-pity-5-message`);
+                const fourStarMessageElement = document.getElementById(`${bannerType}-pity-4-message`);
                 
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'X-Telegram-Init-Data': window.Telegram.WebApp.initData
+                const remaining_5 = PITY_5_STAR - pity_5;
+                const remaining_4 = PITY_4_STAR - pity_4;
+
+                fiveStarMessageElement.textContent = `5-Rank Signal guaranteed in ${remaining_5} Pulls`;
+                fourStarMessageElement.textContent = `A-Rank or higher Signal guaranteed in ${remaining_4} Pulls`;
+            }
+
+            // Function to fetch and display the current currency counts and pity
+            async function fetchUserStats() {
+                try {
+                    const initData = window.Telegram.WebApp.initData;
+                    const response = await fetch('/get_user_data', {
+                        method: 'GET',
+                        headers: {
+                            'X-Telegram-Init-Data': initData
+                        }
+                    });
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        document.getElementById('crystal-count').textContent = data.star_night_crystals;
+                        document.getElementById('lumen-orb-count').textContent = data.lumen_orbs;
+                        document.getElementById('halo-orb-count').textContent = data.halo_orbs;
+                        document.getElementById('auric-crescent-count').textContent = data.auric_crescents;
+                        updatePityMessage('standard', data.pity_counters.standard['4_star'], data.pity_counters.standard['5_star']);
+                        // We do not update the pity for the limited banner as it is unavailable
+                    } else {
+                        showMessage('Error fetching user data: ' + data.message);
                     }
-                });
-                
-                const responseText = await response.text();
-                if (!response.ok) {
-                     // Check if the response is an error with a JSON body
-                    let errorData = {};
-                    try {
-                        errorData = JSON.parse(responseText);
-                    } catch (e) {
-                        console.error('Failed to parse error JSON, showing raw text:', responseText);
-                        showMessageBox(`Server error: ${responseText}`, 'error');
+                } catch (error) {
+                    console.error('Error:', error);
+                    showMessage('Failed to connect to the server.');
+                }
+            }
+
+            // Function to perform a gacha pull after all checks
+            async function performGachaPull(pullType, bannerType) {
+                try {
+                    const initData = window.Telegram.WebApp.initData;
+                    const response = await fetch('/pull_gacha', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Telegram-Init-Data': initData
+                        },
+                        body: JSON.stringify({ pull_type: pullType, banner_type: bannerType })
+                    });
+                    const data = await response.json();
+
+                    if (data.status === 'success') {
+                        // Update UI with new data
+                        document.getElementById('crystal-count').textContent = data.remaining_crystals;
+                        document.getElementById('lumen-orb-count').textContent = data.remaining_lumen_orbs;
+                        document.getElementById('halo-orb-count').textContent = data.remaining_halo_orbs;
+                        document.getElementById('auric-crescent-count').textContent = data.remaining_auric_crescents;
+                        // The pity counters in the response are already for the specific banner type
+                        const pity4 = data.pity_4_star;
+                        const pity5 = data.pity_5_star;
+                        updatePityMessage(bannerType, pity4, pity5);
+                        displayResults(data.pulled_items);
+                    } else {
+                        showMessage(data.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showMessage('Failed to perform gacha pull.');
+                }
+            }
+
+            // Function to handle a gacha pull with confirmation logic
+            async function handlePull(pullType, bannerType) {
+                try {
+                    const initData = window.Telegram.WebApp.initData;
+                    const response = await fetch('/get_user_data', {
+                        method: 'GET',
+                        headers: {
+                            'X-Telegram-Init-Data': initData
+                        }
+                    });
+                    const user_data_response = await response.json();
+                    
+                    if (user_data_response.status !== 'success') {
+                        showMessage(user_data_response.message);
                         return;
                     }
-                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
-                }
-
-                try {
-                    const data = JSON.parse(responseText);
-                    if (data.status === 'success') {
-                        document.getElementById('crystal-count').innerText = `Crystals: ${data.star_night_crystals}`;
+                    
+                    const user_data = user_data_response;
+                    
+                    const is_multi_pull = pullType === 'multi';
+                    const orb_cost = is_multi_pull ? 10 : 1;
+                    let orb_type, snc_cost, orb_name;
+                    
+                    if (bannerType === 'standard') {
+                        orb_type = 'lumen_orbs';
+                        orb_name = 'Lumen Orb';
+                        snc_cost = is_multi_pull ? 595 : 70;
                     } else {
-                        showMessageBox(data.message, 'error');
+                        // Limited banner is disabled, so this code should not be reached
+                        return;
                     }
-                } catch (jsonError) {
-                    console.error('Failed to parse JSON. Received:', responseText);
-                    throw jsonError;
+                    
+                    // Check for orbs first
+                    if (user_data[orb_type] >= orb_cost) {
+                        performGachaPull(pullType, bannerType);
+                    } else if (user_data.star_night_crystals >= snc_cost) {
+                        // Not enough orbs, but enough SNC. Show confirmation modal.
+                        const confirmationModal = document.getElementById('confirmation-modal');
+                        const confirmationText = document.getElementById('confirmation-text');
+                        
+                        confirmationText.textContent = `You don't have enough ${orb_name}s. Would you like to use ${snc_cost} SNC to perform this pull?`;
+                        confirmationModal.classList.remove('hidden');
+
+                        document.getElementById('confirm-yes').onclick = () => {
+                            confirmationModal.classList.add('hidden');
+                            performGachaPull(pullType, bannerType);
+                        };
+
+                        document.getElementById('confirm-no').onclick = () => {
+                            confirmationModal.classList.add('hidden');
+                        };
+                    } else {
+                        // Not enough of either currency
+                        showMessage(`Not enough ${orb_name}s or SNC for this pull.`);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showMessage('Failed to perform gacha pull.');
                 }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-                showMessageBox(`Error loading crystals: ${error.message}`, 'error');
             }
-        }
 
-        // Function to handle the gacha pull logic.
-        async function pullGacha(pullType) {
-            showMessageBox('Pulling...', 'info');
+            // Function to handle shop exchanges
+            async function handleShopExchange(exchangeType) {
+                try {
+                    const initData = window.Telegram.WebApp.initData;
+                    const response = await fetch('/exchange_shop', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Telegram-Init-Data': initData
+                        },
+                        body: JSON.stringify({ exchange_type: exchangeType })
+                    });
+                    const data = await response.json();
 
-            try {
-                const response = await fetch(`${BACKEND_URL}/pull_gacha`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Telegram-Init-Data': window.Telegram.WebApp.initData
-                    },
-                    body: JSON.stringify({ pull_type: pullType })
+                    if (data.status === 'success') {
+                        document.getElementById('crystal-count').textContent = data.star_night_crystals;
+                        document.getElementById('lumen-orb-count').textContent = data.lumen_orbs;
+                        document.getElementById('halo-orb-count').textContent = data.halo_orbs;
+                        document.getElementById('auric-crescent-count').textContent = data.auric_crescents;
+                        showMessage('Exchange successful!');
+                    } else {
+                        showMessage(data.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showMessage('Failed to perform exchange.');
+                }
+            }
+
+            // Function to display the pull results
+            function displayResults(items) {
+                const grid = document.getElementById('results-grid');
+                grid.innerHTML = '';
+
+                items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = `p-4 rounded-lg text-center border-2 border-gray-600 transition transform hover:scale-105 duration-200`;
+                    
+                    const rarityColorClass = {
+                        5: 'rarity-5',
+                        4: 'rarity-4',
+                        3: 'rarity-3'
+                    }[item.rarity];
+                    
+                    itemDiv.innerHTML = `
+                        <img src="https://placehold.co/100x150/${rarityColorClass.split('-')[1]}/ffffff?text=${item.name.replace(/\s/g, '+')}" alt="${item.name}" class="w-full h-auto rounded-md mb-2">
+                        <p class="font-bold ${rarityColorClass}">${item.name}</p>
+                        <p class="text-sm text-gray-400">${item.rarity}★</p>
+                    `;
+                    grid.appendChild(itemDiv);
                 });
-
-                const data = await response.json();
-                if (data.status === 'success') {
-                    document.getElementById('crystal-count').innerText = `Crystals: ${data.remaining_crystals}`;
-                    displayPulledCharacters(data.pulled_characters);
-                    showMessageBox('Pull successful!', 'success');
-                } else {
-                    showMessageBox(`Error: ${data.message}`, 'error');
-                }
-            } catch (error) {
-                console.error('An error occurred during the pull:', error);
-                showMessageBox('An unexpected error occurred', 'error');
             }
-        }
 
-        // Function to display the results of a gacha pull.
-        function displayPulledCharacters(characters) {
-            const container = document.getElementById('results-container');
-            container.innerHTML = ''; // Clear previous results
-            characters.forEach(char => {
-                const item = document.createElement('div');
-                item.className = `result-item rarity-${char.rarity}`;
-                item.innerHTML = `<span class="result-name">${char.name}</span> - Rarity: ${char.rarity}`;
-                container.appendChild(item);
+            // Function to switch tabs
+            function openTab(bannerType) {
+                const tabs = document.querySelectorAll('.sidebar-item');
+                const contents = document.querySelectorAll('.tab-content');
+
+                tabs.forEach(tab => tab.classList.remove('active'));
+                contents.forEach(content => content.classList.remove('active'));
+
+                document.getElementById(`tab-${bannerType}`).classList.add('active');
+                document.getElementById(`${bannerType}-banner-content`).classList.add('active');
+            }
+
+            // Functions to show and hide the shop modal
+            function showShopModal() {
+                 document.getElementById('shop-modal').classList.remove('hidden');
+            }
+            function hideShopModal() {
+                 document.getElementById('shop-modal').classList.add('hidden');
+            }
+
+            // Attach event listeners for tabs
+            document.getElementById('tab-standard').addEventListener('click', () => openTab('standard'));
+            // The limited tab is unavailable, so we'll just show an info message
+            document.getElementById('tab-limited').addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent default behavior
+                // The unavailable class prevents this from being active, but we can add a message here for clarity
+                showMessage('The Limited Banner is currently unavailable.');
             });
-        }
-        
-        // Custom message box function to display feedback to the user.
-        function showMessageBox(message, type) {
-            const msgBox = document.getElementById('message-box');
-            msgBox.style.display = 'block';
-            msgBox.innerText = message;
-            // Additional styling can be added here based on 'type'
-        }
-        
-        // Function to navigate back to the homepage.
-        function goToHomepage() {
-            window.location.href = '/';
-        }
+
+            // Attach event listeners for buttons within the tabs
+            document.getElementById('pull-single-standard-orb').addEventListener('click', () => handlePull('single', 'standard'));
+            document.getElementById('pull-multi-standard-orb').addEventListener('click', () => handlePull('multi', 'standard'));
+
+            // Initial call to set up the page
+            fetchUserStats();
+            openTab('standard'); // Open the Standard Banner tab by default
+        });
     </script>
 </body>
 </html>
