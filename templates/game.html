@@ -310,12 +310,24 @@
             async function fetchUserStats() {
                 try {
                     const initData = window.Telegram.WebApp.initData;
+                    // Log the initData to help debug issues with Telegram Web App
+                    console.log('Telegram initData:', initData);
                     const response = await fetch('/get_user_data', {
                         method: 'GET',
                         headers: {
                             'X-Telegram-Init-Data': initData
                         }
                     });
+                    
+                    if (!response.ok) {
+                        // Log the full response status for more detail
+                        console.error('Failed to fetch user data. Status:', response.status, response.statusText);
+                        // A more detailed error message for the user
+                        const errorData = await response.text();
+                        showMessage('Error fetching user data: ' + (errorData || 'Failed to fetch user data'));
+                        return;
+                    }
+
                     const data = await response.json();
                     if (data.status === 'success') {
                         document.getElementById('crystal-count').textContent = data.star_night_crystals;
@@ -323,7 +335,6 @@
                         document.getElementById('halo-orb-count').textContent = data.halo_orbs;
                         document.getElementById('auric-crescent-count').textContent = data.auric_crescents;
                         updatePityMessage('standard', data.pity_counters.standard['4_star'], data.pity_counters.standard['5_star']);
-                        // We do not update the pity for the limited banner as it is unavailable
                     } else {
                         showMessage('Error fetching user data: ' + data.message);
                     }
