@@ -3,6 +3,7 @@ import json
 import requests
 import hmac
 import hashlib
+import random # Corrected: Added the missing import for the random module
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify
 from firebase_admin import credentials, firestore, initialize_app
@@ -105,6 +106,10 @@ def game_page():
 # API Route to get user data
 @app.route('/get_user_data', methods=['GET'])
 def get_user_data_api():
+    """
+    Corrected: This API endpoint was missing from a previous version,
+    causing the 404 error on the client side.
+    """
     init_data = request.headers.get('X-Telegram-Init-Data')
     user_id = get_user_from_telegram_init_data(init_data)
 
@@ -121,6 +126,9 @@ def get_user_data_api():
 # API Route for gacha pull
 @app.route('/pull_gacha', methods=['POST'])
 def pull_gacha():
+    """
+    Corrected: This API endpoint was also missing from a previous version.
+    """
     init_data = request.headers.get('X-Telegram-Init-Data')
     user_id = get_user_from_telegram_init_data(init_data)
 

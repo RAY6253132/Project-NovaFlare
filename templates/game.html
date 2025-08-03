@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NovaFlare Gacha</title>
+    <!-- Include Telegram Web App Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,138 +15,238 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #2c2c2c;
-            color: #e0e0e0;
-        }
-        .container {
-            background-color: #3a3a3a;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #1e1e1e;
+            color: #f0f0f0;
             text-align: center;
         }
+
+        .container {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+        }
+
         h1 {
-            color: #4CAF50;
+            color: #76c7c0;
+            margin-bottom: 20px;
         }
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 15px;
-            margin: 5px; /* Added a small margin for buttons */
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #result {
-            margin-top: 20px;
-            font-size: 1.1em;
+
+        .crystal-display {
+            font-size: 1.2em;
+            margin-bottom: 20px;
             color: #fff;
         }
-        #crystals {
-            font-size: 1.2em;
+
+        .pull-button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .pull-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
             font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .pull-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .single-pull {
+            background-color: #007bff;
+        }
+
+        .multi-pull {
+            background-color: #28a745;
+        }
+
+        #results-container {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .result-item {
             margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .rarity-5 { background-color: #ffd700; color: #333; }
+        .rarity-4 { background-color: #c0c0c0; color: #333; }
+        .rarity-3 { background-color: #cd7f32; color: #333; }
+
+        .result-name {
+            font-weight: bold;
+        }
+
+        .message-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            color: #fff;
+            background-color: #4a4a4a;
+            display: none; /* Initially hidden */
+        }
+        
+        .back-button-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .back-button {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .back-button:hover {
+            background-color: #777;
         }
     </style>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
+    <div class="back-button-container">
+        <button class="back-button" onclick="goToHomepage()">&#8592;</button>
+    </div>
+
     <div class="container">
-        <h1>Welcome to NovaFlare Gacha!</h1>
-        <p id="crystals">Loading Crystals...</p>
-        <button onclick="pullGacha('single')">Perform Pull (100 SNC)</button>
-        <button onclick="pullGacha('multi')">Perform 10x Pull (900 SNC)</button>
-        <div id="result"></div>
+        <h1>NovaFlare Gacha</h1>
+        <div id="crystal-count" class="crystal-display">Loading crystals...</div>
+        
+        <div class="pull-button-group">
+            <button class="pull-button single-pull" onclick="pullGacha('single')">Perform Pull (100 SNC)</button>
+            <button class="pull-button multi-pull" onclick="pullGacha('multi')">Perform 10x Pull (900 SNC)</button>
+        </div>
+
+        <div id="results-container">
+            <!-- Pulled characters will be displayed here -->
+        </div>
+
+        <div id="message-box" class="message-box"></div>
     </div>
 
     <script>
-        // This will dynamically get the current host (e.g., https://project-novaflare.onrender.com)
-        // and use it as the API base URL.
-        const BACKEND_URL = window.location.origin; 
+        // Use window.location.origin to get the base URL dynamically.
+        const BACKEND_URL = window.location.origin;
 
-        // Function to get Telegram initData safely
-        function getTelegramInitData() {
-            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
-                return window.Telegram.WebApp.initData;
-            }
-            return null;
-        }
+        // Fetch user data when the page loads.
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchUserData();
+        });
 
-        // Function to fetch and display user crystals
-        async function fetchCrystals() {
+        // Function to fetch and display user data (crystals).
+        async function fetchUserData() {
             try {
-                const headers = {};
-                const initData = getTelegramInitData();
-                if (initData) {
-                    headers['X-Telegram-Init-Data'] = initData;
-                }
-
-                const response = await fetch(`${BACKEND_URL}/get_user_data`, { headers: headers });
+                const url = `${BACKEND_URL}/get_user_data`;
+                console.log('Fetching user data from:', url);
                 
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'X-Telegram-Init-Data': window.Telegram.WebApp.initData
+                    }
+                });
+                
+                const responseText = await response.text();
                 if (!response.ok) {
-                    // Handle non-200 responses, e.g., 401 Unauthorized
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                     // Check if the response is an error with a JSON body
+                    let errorData = {};
+                    try {
+                        errorData = JSON.parse(responseText);
+                    } catch (e) {
+                        console.error('Failed to parse error JSON, showing raw text:', responseText);
+                        showMessageBox(`Server error: ${responseText}`, 'error');
+                        return;
+                    }
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                 }
 
-                const userData = await response.json();
-                document.getElementById('crystals').innerText = `Crystals: ${userData.star_night_crystals}`;
+                try {
+                    const data = JSON.parse(responseText);
+                    if (data.status === 'success') {
+                        document.getElementById('crystal-count').innerText = `Crystals: ${data.star_night_crystals}`;
+                    } else {
+                        showMessageBox(data.message, 'error');
+                    }
+                } catch (jsonError) {
+                    console.error('Failed to parse JSON. Received:', responseText);
+                    throw jsonError;
+                }
             } catch (error) {
-                console.error('Error fetching crystals:', error);
-                document.getElementById('crystals').innerText = `Crystals: Error: ${error.message}`;
+                console.error('Error fetching user data:', error);
+                showMessageBox(`Error loading crystals: ${error.message}`, 'error');
             }
         }
 
-        // Function to handle the gacha pull
-        async function pullGacha(pullType = 'single') {
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerText = "Pulling...";
+        // Function to handle the gacha pull logic.
+        async function pullGacha(pullType) {
+            showMessageBox('Pulling...', 'info');
 
             try {
-                const headers = {
-                    'Content-Type': 'application/json'
-                };
-                const initData = getTelegramInitData();
-                if (initData) {
-                    headers['X-Telegram-Init-Data'] = initData;
-                }
-
                 const response = await fetch(`${BACKEND_URL}/pull_gacha`, {
                     method: 'POST',
-                    headers: headers,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Telegram-Init-Data': window.Telegram.WebApp.initData
+                    },
                     body: JSON.stringify({ pull_type: pullType })
                 });
 
-                if (!response.ok) {
-                    // Handle non-200 responses, e.g., 401 Unauthorized, 400 Not enough crystals
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-                }
-
                 const data = await response.json();
-
                 if (data.status === 'success') {
-                    let charactersHtml = data.pulled_characters.map(char => 
-                        `<li>${char.name} (${char.rarity}-Star)</li>`
-                    ).join('');
-                    resultDiv.innerHTML = `<h3>Pulled!</h3><ul>${charactersHtml}</ul><p>Remaining Crystals: ${data.remaining_crystals}</p>`;
+                    document.getElementById('crystal-count').innerText = `Crystals: ${data.remaining_crystals}`;
+                    displayPulledCharacters(data.pulled_characters);
+                    showMessageBox('Pull successful!', 'success');
                 } else {
-                    resultDiv.innerText = `Error: ${data.message}`;
+                    showMessageBox(`Error: ${data.message}`, 'error');
                 }
-                fetchCrystals(); // Refresh crystal count after pull
             } catch (error) {
-                console.error('Error during gacha pull:', error);
-                resultDiv.innerText = `An error occurred during the pull: ${error.message}`; // More specific error message
+                console.error('An error occurred during the pull:', error);
+                showMessageBox('An unexpected error occurred', 'error');
             }
         }
 
-        // Initial load
-        fetchCrystals();
+        // Function to display the results of a gacha pull.
+        function displayPulledCharacters(characters) {
+            const container = document.getElementById('results-container');
+            container.innerHTML = ''; // Clear previous results
+            characters.forEach(char => {
+                const item = document.createElement('div');
+                item.className = `result-item rarity-${char.rarity}`;
+                item.innerHTML = `<span class="result-name">${char.name}</span> - Rarity: ${char.rarity}`;
+                container.appendChild(item);
+            });
+        }
+        
+        // Custom message box function to display feedback to the user.
+        function showMessageBox(message, type) {
+            const msgBox = document.getElementById('message-box');
+            msgBox.style.display = 'block';
+            msgBox.innerText = message;
+            // Additional styling can be added here based on 'type'
+        }
+        
+        // Function to navigate back to the homepage.
+        function goToHomepage() {
+            window.location.href = '/';
+        }
     </script>
 </body>
 </html>
