@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NovaFlare Gacha</title>
+    <!-- Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Telegram Web App Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Inter Font from Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -113,7 +116,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 6px -1-2a rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             transition: all 0.2s ease-in-out;
             cursor: pointer;
             z-index: 20;
@@ -152,7 +155,7 @@
                 <p class="text-lg bg-gray-800 rounded-full px-4 py-2 border border-gray-700 w-full sm:w-auto">
                     <span id="halo-orb-count" class="font-bold text-pink-300">Loading...</span> <span class="text-gray-400">Halo Orbs</span>
                 </p>
-                 <p class="text-lg bg-gray-800 rounded-full px-4 py-2 border border-gray-700 w-full sm:w-auto">
+                <p class="text-lg bg-gray-800 rounded-full px-4 py-2 border border-gray-700 w-full sm:w-auto">
                     <span id="auric-crescent-count" class="font-bold text-green-300">Loading...</span> <span class="text-gray-400">AC</span>
                 </p>
             </div>
@@ -167,14 +170,14 @@
                             <p class="text-lg text-gray-300">A permanent collection of heroes and weapons.</p>
                         </div>
                         <div class="pity-info text-right text-sm">
-                             <p id="standard-pity-5-message" class="text-yellow-300 font-bold mb-1"></p>
-                             <p id="standard-pity-4-message" class="text-purple-300 font-bold"></p>
+                            <p id="standard-pity-5-message" class="text-yellow-300 font-bold mb-1"></p>
+                            <p id="standard-pity-4-message" class="text-purple-300 font-bold"></p>
                         </div>
                     </div>
                 </div>
                 <div class="flex flex-col items-center space-y-4 mt-8">
                     <div class="flex justify-center space-x-6">
-                         <button id="pull-single-standard-orb" class="pull-button-x1 text-white font-bold py-3 px-6 rounded-full text-lg">
+                        <button id="pull-single-standard-orb" class="pull-button-x1 text-white font-bold py-3 px-6 rounded-full text-lg">
                             Single Pull
                         </button>
                         <button id="pull-multi-standard-orb" class="pull-button-x10 text-white font-bold py-3 px-6 rounded-full text-lg">
@@ -202,7 +205,7 @@
                         </div>
                     </div>
                 </div>
-                 <button onclick="showShopModal()" class="shop-button absolute bottom-4 left-4">
+                <button onclick="showShopModal()" class="shop-button absolute bottom-4 left-4">
                     <svg class="shop-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="9" cy="21" r="1"></circle>
                         <circle cx="20" cy="21" r="1"></circle>
@@ -241,9 +244,9 @@
     <!-- Shop Modal -->
     <div id="shop-modal" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-gray-900 border border-gray-700 rounded-lg shadow-xl p-8 max-w-2xl w-full">
-             <button onclick="hideShopModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl font-bold">&times;</button>
-             <h2 class="text-3xl font-bold text-center mb-6">Shop</h2>
-             <div class="grid md:grid-cols-2 gap-6">
+            <button onclick="hideShopModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl font-bold">&times;</button>
+            <h2 class="text-3xl font-bold text-center mb-6">Shop</h2>
+            <div class="grid md:grid-cols-2 gap-6">
                 <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
                     <h3 class="text-xl font-bold mb-4">Buy Lumen Orbs with SNC</h3>
                     <div class="space-y-4">
@@ -257,7 +260,7 @@
                 </div>
                 <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
                     <h3 class="text-xl font-bold mb-4">Buy Halo Orbs with SNC</h3>
-                     <div class="space-y-4">
+                    <div class="space-y-4">
                         <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full w-full" onclick="handleShopExchange('buy_halo_1')">
                             1 Halo Orb (100 SNC)
                         </button>
@@ -266,9 +269,9 @@
                         </button>
                     </div>
                 </div>
-                 <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 col-span-full">
+                <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 col-span-full">
                     <h3 class="text-xl font-bold mb-4">Exchange Orbs with Auric Crescents</h3>
-                     <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
                         <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full w-full sm:w-auto" onclick="handleShopExchange('exchange_lumen')">
                             1 Lumen Orb (20 AC)
                         </button>
@@ -364,6 +367,7 @@
                         document.getElementById('lumen-orb-count').textContent = data.remaining_lumen_orbs;
                         document.getElementById('halo-orb-count').textContent = data.remaining_halo_orbs;
                         document.getElementById('auric-crescent-count').textContent = data.remaining_auric_crescents;
+                        
                         // The pity counters in the response are already for the specific banner type
                         const pity4 = data.pity_4_star;
                         const pity5 = data.pity_5_star;
@@ -459,6 +463,7 @@
                         document.getElementById('halo-orb-count').textContent = data.halo_orbs;
                         document.getElementById('auric-crescent-count').textContent = data.auric_crescents;
                         showMessage('Exchange successful!');
+                        hideShopModal();
                     } else {
                         showMessage(data.message);
                     }
@@ -505,16 +510,15 @@
             }
 
             // Functions to show and hide the shop modal
-            function showShopModal() {
-                 document.getElementById('shop-modal').classList.remove('hidden');
+            window.showShopModal = function() {
+                document.getElementById('shop-modal').classList.remove('hidden');
             }
-            function hideShopModal() {
-                 document.getElementById('shop-modal').classList.add('hidden');
+            window.hideShopModal = function() {
+                document.getElementById('shop-modal').classList.add('hidden');
             }
 
             // Attach event listeners for tabs
             document.getElementById('tab-standard').addEventListener('click', () => openTab('standard'));
-            // The limited tab is unavailable, so we'll just show an info message
             document.getElementById('tab-limited').addEventListener('click', (event) => {
                 event.preventDefault(); // Prevent default behavior
                 // The unavailable class prevents this from being active, but we can add a message here for clarity
