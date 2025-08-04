@@ -8,8 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-
-        /* Base styles for mobile/portrait view (mobile-first) */
+        
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
@@ -19,20 +18,21 @@
             position: relative;
         }
 
+        /* --- Mobile-First Layout (Default) --- */
         .main-game-container {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             padding: 1rem;
             box-sizing: border-box;
+            gap: 1rem;
         }
-
-        /* Top Bar - Mobile */
+        
+        /* Top Bar */
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
         }
         .top-bar .currency-display {
             display: flex;
@@ -52,20 +52,19 @@
             margin-right: 4px;
         }
 
-        /* Gacha Main Content - Mobile */
+        /* Gacha Content */
         .gacha-main-content {
             display: flex;
             flex-direction: column;
             flex-grow: 1;
-            position: relative;
+            gap: 1rem;
         }
-        .banner-image {
+        .banner-art-container {
             width: 100%;
             height: 200px; /* Fixed height for mobile banner */
             background-size: cover;
             background-position: center;
             border-radius: 10px;
-            margin-bottom: 1rem;
         }
         .banner-info-panel {
             background: rgba(0, 0, 0, 0.5);
@@ -73,18 +72,22 @@
             border-radius: 10px;
             display: flex;
             flex-direction: column;
+            gap: 0.5rem;
         }
         .banner-details {
             font-size: 0.8rem;
             color: #ccc;
         }
-        .gacha-pool-images {
-            display: none; /* Hide on mobile to save space */
+        
+        /* Buttons */
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
         .pull-buttons {
             display: flex;
             gap: 0.5rem;
-            margin-top: 1rem;
         }
         .pull-button {
             flex-grow: 1;
@@ -93,26 +96,15 @@
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
+            text-align: center;
         }
         .pull-button.single { background-color: #457b9d; color: white; }
         .pull-button.multi { background-color: #e63946; color: white; }
         
-        /* Sidebar - Hidden on mobile by default */
-        .left-sidebar {
-            display: none;
-        }
-        
-        /* Utility buttons - Mobile */
-        .bottom-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1rem;
-            gap: 1rem;
-        }
         .utility-buttons {
             display: flex;
             gap: 0.5rem;
+            justify-content: space-between;
         }
         .utility-button {
             background-color: #3a3a5e;
@@ -121,12 +113,13 @@
             border-radius: 8px;
             font-size: 0.8rem;
             font-weight: bold;
+            flex-grow: 1;
         }
-
-        /* --- Desktop/Landscape Styles (Min-width: 1024px) --- */
+        
+        /* --- Desktop/Landscape Styles --- */
         @media (min-width: 1024px) {
             body {
-                overflow: hidden; /* Prevent scrolling on desktop */
+                overflow: hidden;
             }
             .main-game-container {
                 display: grid;
@@ -134,6 +127,7 @@
                 grid-template-rows: 60px 1fr 60px;
                 height: 100vh;
                 padding: 0;
+                gap: 0;
             }
             
             /* Top Bar - Desktop */
@@ -143,13 +137,12 @@
                 background: rgba(0, 0, 0, 0.4);
                 backdrop-filter: blur(5px);
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                margin-bottom: 0;
                 padding: 0 1rem;
             }
-            .top-bar .currency-item {
+            .currency-item {
                 font-size: 0.8rem;
             }
-
+            
             /* Left Sidebar - Desktop */
             .left-sidebar {
                 display: flex;
@@ -187,15 +180,16 @@
                 flex-direction: row;
                 padding: 1rem;
                 align-items: center;
+                gap: 1rem;
             }
-            .banner-image {
+            .banner-art-container {
                 position: absolute;
-                width: calc(100% - 116px); /* Adjust for padding and info panel */
+                width: calc(100% - 116px);
                 height: calc(100% - 2rem);
                 background-size: cover;
                 background-position: center;
                 border-radius: 10px;
-                margin-bottom: 0;
+                z-index: 1;
             }
             .banner-info-panel {
                 width: 300px;
@@ -205,43 +199,36 @@
                 backdrop-filter: blur(5px);
                 padding: 1rem;
                 border-radius: 10px;
-                z-index: 10; /* Bring to front */
+                z-index: 10;
                 justify-content: space-between;
             }
-            .gacha-pool-images {
-                display: flex; /* Show on desktop */
-                justify-content: space-around;
-                gap: 10px;
-                margin-top: auto;
-            }
-            .gacha-pool-images img {
-                width: 80px;
-                height: 80px;
-                border-radius: 8px;
-                border: 2px solid #5a5a7e;
-            }
             
-            /* Bottom Bar - Desktop */
-            .bottom-bar {
+            /* Buttons - Desktop */
+            .buttons-container {
                 grid-column: 1 / -1;
                 grid-row: 3;
                 background: rgba(0, 0, 0, 0.4);
                 backdrop-filter: blur(5px);
                 border-top: 1px solid rgba(255, 255, 255, 0.1);
-                margin-top: 0;
                 padding: 0 1rem;
+                flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
             }
+            .pull-buttons {
+                gap: 1rem;
+                flex-grow: 0;
+            }
+            .utility-buttons {
+                gap: 1rem;
+                flex-grow: 0;
+            }
+            .utility-button {
+                flex-grow: 0;
+            }
         }
         
-        /* Pull Results Modal (from previous response) */
-        .results-modal { /* ... */ }
-        .results-modal-content { /* ... */ }
-        .results-grid { /* ... */ }
-        .result-card { /* ... */ }
-        .result-card.rarity-5 { /* ... */ }
-        /* ... (all other modal styles remain) ... */
+        /* ... (all modal styles from previous responses) ... */
     </style>
 </head>
 <body>
@@ -259,32 +246,17 @@
             </div>
         </div>
 
-        <div class="left-sidebar">
-            <div class="sidebar-item active" onclick="switchBanner('standard')">
-                <span class="text-xl">&#x2728;</span>
-                <span>Standard</span>
-            </div>
-            <div class="sidebar-item" onclick="switchBanner('limited')">
-                <span class="text-xl">&#x1f525;</span>
-                <span>Limited</span>
-            </div>
-        </div>
-
         <div class="gacha-main-content">
-            <div class="banner-image" id="bannerImage"></div>
+            <div class="banner-art-container" id="bannerImage"></div>
             <div class="banner-info-panel">
                 <h3 id="bannerTitle" class="text-xl md:text-3xl font-bold mb-2">Standard Banner</h3>
                 <p id="bannerSubtitle" class="text-xs text-gray-400 mb-4">A permanent collection of heroes and more.</p>
                 <div id="bannerDetails" class="banner-details">
                     </div>
-                <div class="gacha-pool-images mt-auto">
-                    <img src="https://via.placeholder.com/80x80?text=SSR" alt="SSR Pool">
-                    <img src="https://via.placeholder.com/80x80?text=SR" alt="SR Pool">
-                </div>
             </div>
         </div>
         
-        <div class="bottom-bar">
+        <div class="buttons-container">
             <div class="utility-buttons">
                 <button class="utility-button" onclick="openShopModal()">Signal Shop</button>
                 <button class="utility-button">Details</button>
@@ -294,63 +266,8 @@
                 <button class="pull-button multi" onclick="pullGacha('multi', 'standard')">10 Signal Searches</button>
             </div>
         </div>
+
     </div>
     
-    <div id="shopModal" class="modal">
-        </div>
-    
-    <div id="pullResultsModal" class="results-modal">
-        </div>
-
-    <script>
-        // --- ALL JAVASCRIPT FUNCTIONS HERE ---
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchUserData();
-            // Check screen width and set initial banner layout
-            if (window.innerWidth >= 1024) {
-                switchBanner('standard');
-            } else {
-                // Mobile view, no sidebar to activate
-                updateBannerContent('standard');
-            }
-        });
-        
-        // Function to update the banner's content based on type
-        function updateBannerContent(bannerType) {
-            const bannerTitle = document.getElementById('bannerTitle');
-            const bannerSubtitle = document.getElementById('bannerSubtitle');
-            const bannerDetails = document.getElementById('bannerDetails');
-            const bannerImage = document.getElementById('bannerImage');
-            const singlePullBtn = document.querySelector('.pull-button.single');
-            const multiPullBtn = document.querySelector('.pull-button.multi');
-
-            if (bannerType === 'standard') {
-                bannerTitle.innerText = "Standard Banner";
-                bannerSubtitle.innerText = "A permanent collection of heroes and more.";
-                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Standard+Banner+Art")';
-                singlePullBtn.onclick = () => pullGacha('single', 'standard');
-                multiPullBtn.onclick = () => pullGacha('multi', 'standard');
-            } else if (bannerType === 'limited') {
-                bannerTitle.innerText = "Whispered Tales";
-                bannerSubtitle.innerText = "Rate up for selected A-Rank and Limited S-Rank Signals!";
-                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Limited+Banner+Art")';
-                bannerDetails.innerHTML = `<p>Remaining 04d 00h</p><p>4-Rank or higher Signal guaranteed in 9 Searches</p><p>5-Rank Signal guaranteed in 18 Searches</p>`;
-                singlePullBtn.onclick = () => pullGacha('single', 'limited');
-                multiPullBtn.onclick = () => pullGacha('multi', 'limited');
-            }
-        }
-        
-        // Combined switchBanner function for responsive design
-        function switchBanner(bannerType) {
-            // Only update sidebar if it's visible (desktop)
-            if (window.innerWidth >= 1024) {
-                document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
-                document.querySelector(`.sidebar-item[onclick*="'${bannerType}'"]`).classList.add('active');
-            }
-            updateBannerContent(bannerType);
-        }
-
-        // ... (other functions like fetchUserData, updateCurrencyDisplay, updatePityCounters, pullGacha, displayPullResults, closeResultsModal, openShopModal, closeShopModal, exchangeCurrency remain the same as in previous responses) ...
-    </script>
-</body>
+    </body>
 </html>
