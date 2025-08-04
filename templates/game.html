@@ -14,7 +14,7 @@
             margin: 0;
             background-color: #1a1a2e;
             color: white;
-            overflow-x: hidden;
+            overflow: hidden; /* Prevent scrolling */
             position: relative;
         }
 
@@ -38,6 +38,7 @@
             backdrop-filter: blur(5px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 0 0.5rem;
+            z-index: 20;
         }
         .top-bar .currency-display {
             display: flex;
@@ -46,7 +47,8 @@
         .currency-item {
             display: flex;
             align-items: center;
-            background: rgba(42, 42, 68, 0.6);
+            background: linear-gradient(180deg, #3a3a5e 0%, #2a2a44 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             padding: 3px 6px;
             border-radius: 20px;
             font-size: 0.65rem;
@@ -70,6 +72,7 @@
             background-color: rgba(26, 26, 46, 0.7);
             backdrop-filter: blur(5px);
             padding-top: 0.5rem;
+            z-index: 10;
         }
         .sidebar-item {
             width: 50px;
@@ -85,10 +88,12 @@
             border-radius: 8px;
             transition: all 0.2s ease;
             font-size: 0.6rem;
+            background: linear-gradient(180deg, rgba(60, 60, 100, 0.5) 0%, rgba(42, 42, 68, 0.5) 100%);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         .sidebar-item:hover, .sidebar-item.active {
             border-color: #007BFF;
-            background-color: rgba(60, 60, 100, 0.5);
+            background: linear-gradient(180deg, rgba(0, 123, 255, 0.7) 0%, rgba(0, 100, 200, 0.7) 100%);
         }
         .sidebar-item .text-xl {
             font-size: 1.1rem;
@@ -98,31 +103,47 @@
         .gacha-main-content {
             grid-column: 2;
             grid-row: 2;
-            padding: 0.5rem;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
         }
         .banner-art-container {
             width: 100%;
-            height: 150px;
+            height: 100%;
             background-size: cover;
             background-position: center;
-            border-radius: 10px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
         .banner-info-panel {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 0.5rem;
+            position: relative;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            padding: 0.75rem;
             border-radius: 10px;
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
+            gap: 0.5rem;
+            z-index: 5;
+            height: fit-content;
+            margin: auto 0.5rem 0.5rem auto;
+            width: calc(100% - 1rem);
+            box-sizing: border-box;
         }
         .banner-info-panel h3 {
             font-size: 1rem;
+            font-weight: bold;
         }
         .banner-info-panel p {
             font-size: 0.7rem;
+        }
+        .banner-details {
+            font-size: 0.7rem;
+            color: #ccc;
         }
 
         /* Buttons Container */
@@ -137,6 +158,7 @@
             flex-direction: column;
             justify-content: center;
             gap: 0.5rem;
+            z-index: 20;
         }
         .pull-buttons {
             display: flex;
@@ -150,9 +172,22 @@
             border-radius: 6px;
             cursor: pointer;
             text-align: center;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
         }
-        .pull-button.single { background-color: #457b9d; color: white; }
-        .pull-button.multi { background-color: #e63946; color: white; }
+        .pull-button:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+        .pull-button.single { 
+            background: linear-gradient(180deg, #457b9d 0%, #356a8e 100%); 
+            color: white; 
+            box-shadow: 0 3px 0 #2a5573;
+        }
+        .pull-button.multi { 
+            background: linear-gradient(180deg, #e63946 0%, #c42b37 100%); 
+            color: white; 
+            box-shadow: 0 3px 0 #9c222e;
+        }
         
         .utility-buttons {
             display: flex;
@@ -160,13 +195,14 @@
             justify-content: space-between;
         }
         .utility-button {
-            background-color: #3a3a5e;
+            background: linear-gradient(180deg, #3a3a5e 0%, #2a2a44 100%);
             color: white;
             padding: 0.5rem 0.5rem;
             border-radius: 6px;
             font-size: 0.75rem;
             font-weight: bold;
             flex-grow: 1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         /* --- Desktop/Landscape Styles --- */
@@ -203,21 +239,23 @@
             }
             .gacha-main-content {
                 padding: 1rem;
-                flex-direction: row;
-                align-items: center;
-                gap: 1rem;
+                position: relative;
             }
             .banner-art-container {
+                width: 100%;
+                height: 100%;
+                border-radius: 10px;
                 position: absolute;
-                width: calc(100% - 116px);
-                height: calc(100% - 2rem);
+                top: 0;
+                left: 0;
             }
             .banner-info-panel {
-                width: 300px;
+                width: 350px;
                 height: calc(100% - 2rem);
-                margin-left: auto;
-                padding: 1rem;
+                margin: auto 1rem 1rem auto;
+                padding: 1.5rem;
                 justify-content: space-between;
+                box-sizing: border-box;
             }
             .banner-info-panel h3 {
                 font-size: 1.5rem;
@@ -235,12 +273,14 @@
             }
             .pull-button {
                 font-size: 0.9rem;
+                padding: 0.75rem 1rem;
             }
             .utility-buttons {
                 gap: 1rem;
             }
             .utility-button {
                 font-size: 0.8rem;
+                padding: 0.75rem 1rem;
             }
         }
         
@@ -388,21 +428,31 @@
         </div>
 
         <div class="left-sidebar">
-            <div class="sidebar-item active" onclick="switchBanner('standard')">
+            <div class="sidebar-item active" onclick="switchBanner('standard_character')">
                 <span class="text-xl">&#x2728;</span>
                 <span>Standard</span>
             </div>
-            <div class="sidebar-item" onclick="switchBanner('limited')">
+            <div class="sidebar-item" onclick="switchBanner('limited_character_1')">
                 <span class="text-xl">&#x1f525;</span>
                 <span>Limited</span>
+            </div>
+            <div class="sidebar-item" onclick="switchBanner('limited_character_2')">
+                <span class="text-xl">&#x1f525;</span>
+                <span>Limited</span>
+            </div>
+            <div class="sidebar-item" onclick="switchBanner('standard_weapon')">
+                <span class="text-xl">&#x2694;&#xfe0f;</span>
+                <span>Weapon</span>
             </div>
         </div>
 
         <div class="gacha-main-content">
             <div class="banner-art-container" id="bannerImage"></div>
             <div class="banner-info-panel">
-                <h3 id="bannerTitle" class="font-bold">Standard Banner</h3>
-                <p id="bannerSubtitle" class="text-gray-400">A permanent collection of heroes and more.</p>
+                <div>
+                    <h3 id="bannerTitle" class="font-bold">Standard Character Banner</h3>
+                    <p id="bannerSubtitle" class="text-gray-400">A permanent collection of heroes and more.</p>
+                </div>
                 <div id="bannerDetails" class="banner-details">
                     </div>
             </div>
@@ -414,8 +464,8 @@
                 <button class="utility-button">Details</button>
             </div>
             <div class="pull-buttons">
-                <button class="pull-button single" onclick="pullGacha('single', 'standard')">Single Signal Search (100 SNC)</button>
-                <button class="pull-button multi" onclick="pullGacha('multi', 'standard')">10 Signal Searches (10 Lumen Orbs)</button>
+                <button class="pull-button single" onclick="pullGacha('single', currentBanner)">Single Signal Search (100 SNC)</button>
+                <button class="pull-button multi" onclick="pullGacha('multi', currentBanner)">10 Signal Searches (10 Lumen Orbs)</button>
             </div>
         </div>
     </div>
@@ -440,11 +490,11 @@
     </div>
     
     <script>
-        let currentBanner = 'standard';
+        let currentBanner = 'standard_character';
         
         document.addEventListener('DOMContentLoaded', () => {
             fetchUserData();
-            switchBanner('standard');
+            switchBanner(currentBanner);
         });
 
         // Function to fetch user data from the backend
@@ -566,12 +616,12 @@
             const singlePullBtn = document.querySelector('.pull-button.single');
             const multiPullBtn = document.querySelector('.pull-button.multi');
 
-            if (bannerType === 'standard') {
+            if (bannerType === 'standard_character') {
                 lumenCurrencyItem.style.display = 'flex';
                 haloCurrencyItem.style.display = 'none';
                 singlePullBtn.innerText = "Single Signal Search (100 SNC)";
                 multiPullBtn.innerText = "10 Signal Searches (10 Lumen Orbs)";
-            } else if (bannerType === 'limited') {
+            } else if (bannerType === 'limited_character_1' || bannerType === 'limited_character_2' || bannerType === 'standard_weapon') {
                 lumenCurrencyItem.style.display = 'none';
                 haloCurrencyItem.style.display = 'flex';
                 singlePullBtn.innerText = "Single Signal Search (100 SNC)";
@@ -585,16 +635,26 @@
             const bannerDetails = document.getElementById('bannerDetails');
             const bannerImage = document.getElementById('bannerImage');
             
-            if (bannerType === 'standard') {
-                bannerTitle.innerText = "Standard Banner";
+            if (bannerType === 'standard_character') {
+                bannerTitle.innerText = "Standard Character Banner";
                 bannerSubtitle.innerText = "A permanent collection of heroes and more.";
-                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Standard+Banner+Art")';
-                bannerDetails.innerHTML = ``;
-            } else if (bannerType === 'limited') {
-                bannerTitle.innerText = "Whispered Tales";
-                bannerSubtitle.innerText = "Rate up for selected A-Rank and Limited S-Rank Signals!";
-                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Limited+Banner+Art")';
+                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Standard+Character+Banner+Art")';
+                bannerDetails.innerHTML = `<p>5-Rank Signal guaranteed in 90 Searches</p><p>4-Rank or higher Signal guaranteed in 10 Searches</p>`;
+            } else if (bannerType === 'limited_character_1') {
+                bannerTitle.innerText = "Whispered Tales: Character 1";
+                bannerSubtitle.innerText = "Rate up for a selected A-Rank and Limited S-Rank Signals!";
+                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Limited+Character+1+Banner+Art")';
                 bannerDetails.innerHTML = `<p>Remaining 04d 00h</p><p>4-Rank or higher Signal guaranteed in 9 Searches</p><p>5-Rank Signal guaranteed in 18 Searches</p>`;
+            } else if (bannerType === 'limited_character_2') {
+                bannerTitle.innerText = "Whispered Tales: Character 2";
+                bannerSubtitle.innerText = "Rate up for a selected A-Rank and Limited S-Rank Signals!";
+                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Limited+Character+2+Banner+Art")';
+                bannerDetails.innerHTML = `<p>Remaining 04d 00h</p><p>4-Rank or higher Signal guaranteed in 9 Searches</p><p>5-Rank Signal guaranteed in 18 Searches</p>`;
+            } else if (bannerType === 'standard_weapon') {
+                bannerTitle.innerText = "Standard Weapon Banner";
+                bannerSubtitle.innerText = "A permanent collection of weapons and more.";
+                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Standard+Weapon+Banner+Art")';
+                bannerDetails.innerHTML = `<p>5-Rank Signal guaranteed in 90 Searches</p><p>4-Rank or higher Signal guaranteed in 10 Searches</p>`;
             }
             updateDisplayForBanner(bannerType);
         }
