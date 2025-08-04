@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NovaFlare Gacha</title>
-    <!-- Include Telegram Web App Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
         body {
             font-family: 'Inter', sans-serif;
             display: flex;
@@ -20,7 +21,7 @@
             background-color: #1a1a2e; /* Fallback color */
             
             /* Background Image styling */
-            background-image: url("{{ url_for('static', filename='novaflare_bg.png') }}"); /* Corrected file extension to .png */
+            background-image: url("{{ url_for('static', filename='novaflare_bg.png') }}");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -33,13 +34,20 @@
             align-items: center;
             width: 90%;
             max-width: 500px;
-            height: 80vh;
+            min-height: 80vh; 
+            height: auto;
             background: rgba(25, 25, 40, 0.75);
             backdrop-filter: blur(8px);
             border: 2px solid #3a3a5e;
             border-radius: 15px;
             padding: 20px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .homepage-container {
+                padding: 10px; /* Smaller padding on mobile */
+            }
         }
 
         .logo {
@@ -56,6 +64,12 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             width: 100%;
+        }
+
+        @media (max-width: 480px) {
+            .button-grid {
+                grid-template-columns: 1fr; /* Single column on very small screens */
+            }
         }
         
         .menu-button {
@@ -152,7 +166,6 @@
         
     </div>
 
-    <!-- The custom modal for "In Development" messages -->
     <div id="developmentModal" class="modal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal()">&times;</span>

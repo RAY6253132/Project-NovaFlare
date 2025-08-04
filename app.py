@@ -66,28 +66,10 @@ def validate_telegram_init_data(init_data):
             key, value = item.split('=', 1)
             data_dict[key] = unquote(value)
 
-        # For production, implement full cryptographic validation like this:
-        # data_check_string = []
-        # for key in sorted(data_dict.keys()):
-        #     if key != 'hash':
-        #         data_check_string.append(f"{key}={data_dict[key]}")
-        # data_check_string = "\n".join(data_check_string)
-        # secret_key = hmac.new("WebAppData".encode(), BOT_TOKEN.encode(), hashlib.sha256).digest()
-        # calculated_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
-
-        # received_hash = data_dict.get('hash')
-
-        # if calculated_hash == received_hash:
-        #     user_info = json.loads(data_dict['user'])
-        #     return user_info['id'], data_dict
-        # else:
-        #     print("Init Data Validation Failed!")
-        #     return None, None
-
         # Simplified validation for development (REMOVE FOR PRODUCTION)
         user_info = json.loads(data_dict['user'])
         return user_info['id'], data_dict
-    except (KeyError, json.JSONDecodeError, AttributeError): # Added AttributeError for safer parsing
+    except (KeyError, json.JSONDecodeError, AttributeError):
         return None, None
 
 def get_or_create_user(user_id):
@@ -113,46 +95,31 @@ def get_pull_result(banner_type, pity_4, pity_5):
     """
     Calculates the outcome of a single gacha pull based on probabilities and pity.
     """
-    # Use a copy of the Gacha pool to prevent modification
     pool = list(GACHA_POOL[banner_type])
 
-    # Check for hard pity first
     if pity_5 >= GACHA_RATES[banner_type][5]["hard_pity"] - 1:
-        # Guaranteed 5-star
         return random.choice([item for item in pool if item["rarity"] == 5])
     if pity_4 >= GACHA_RATES[banner_type][4]["hard_pity"] - 1:
-        # Guaranteed 4-star
         return random.choice([item for item in pool if item["rarity"] >= 4])
 
-    # Soft pity check for 5-star
     roll_rate_5 = GACHA_RATES[banner_type][5]["base_rate"]
     if pity_5 >= GACHA_RATES[banner_type][5]["pity_start"]:
-        # Increase probability linearly after soft pity starts
         soft_pity_pulls = pity_5 - GACHA_RATES[banner_type][5]["pity_start"] + 1
         roll_rate_5 += 0.05 * soft_pity_pulls
 
-    # Generate a random number to determine the rarity
     roll = random.random()
 
-    # Determine the rarity based on rates
     if roll < roll_rate_5:
-        # 5-Star pull
         return random.choice([item for item in pool if item["rarity"] == 5])
     elif roll < (GACHA_RATES[banner_type][4]["base_rate"] + roll_rate_5):
-        # 4-Star pull
         return random.choice([item for item in pool if item["rarity"] == 4])
     else:
-        # 3-Star pull (or whatever is left)
         return random.choice([item for item in pool if item["rarity"] == 3])
 
 # --- FLASK ROUTES ---
 
 @app.route('/get_user_data', methods=['GET'])
 def get_user_data():
-    """
-    API endpoint to fetch a user's current currency and pity status.
-    Requires 'X-Telegram-Init-Data' header for authentication.
-    """
     init_data = request.headers.get('X-Telegram-Init-Data')
     if not init_data:
         return show_message("Missing Telegram init data.")
@@ -174,10 +141,6 @@ def get_user_data():
 
 @app.route('/pull_gacha', methods=['POST'])
 def pull_gacha():
-    """
-    API endpoint to perform a gacha pull.
-    Requires 'X-Telegram-Init-Data' header and a JSON body.
-    """
     init_data = request.headers.get('X-Telegram-Init-Data')
     if not init_data:
         return show_message("Missing Telegram init data.")
@@ -200,19 +163,14 @@ def pull_gacha():
     num_pulls = 10 if pull_type == 'multi' else 1
     orb_type = "lumen_orbs" if banner_type == "standard" else "halo_orbs"
 
-    # Check for limited banner availability
     if banner_type == "limited":
         return show_message("The Limited Banner is currently unavailable.")
 
-    # Check if user has enough orbs
     if user[orb_type] >= cost_orb:
         user[orb_type] -= cost_orb
-        # pulls_remaining = num_pulls # This variable is not used
         currency_used = orb_type
-    # Check if user has enough SNC to convert
     elif user["star_night_crystals"] >= cost_snc:
         user["star_night_crystals"] -= cost_snc
-        # pulls_remaining = num_pulls # This variable is not used
         currency_used = "star_night_crystals"
     else:
         return show_message("Insufficient currency for this pull.")
@@ -222,7 +180,6 @@ def pull_gacha():
     pity_5 = user["pity_counters"][banner_type]["5_star"]
 
     for _ in range(num_pulls):
-        # Increment pity counters before the pull
         pity_4 += 1
         pity_5 += 1
 
@@ -230,13 +187,11 @@ def pull_gacha():
         pulled_items.append(result)
         user["inventory"].append(result)
 
-        # Reset pity counters if a high-rarity item is pulled
         if result["rarity"] >= 4:
             pity_4 = 0
         if result["rarity"] == 5:
             pity_5 = 0
 
-    # Save the updated pity counters back to the user data
     user["pity_counters"][banner_type]["4_star"] = pity_4
     user["pity_counters"][banner_type]["5_star"] = pity_5
 
@@ -253,10 +208,6 @@ def pull_gacha():
 
 @app.route('/exchange_shop', methods=['POST'])
 def exchange_shop():
-    """
-    API endpoint to handle currency exchanges in the shop.
-    Requires 'X-Telegram-Init-Data' header and a JSON body.
-    """
     init_data = request.headers.get('X-Telegram-Init-Data')
     if not init_data:
         return show_message("Missing Telegram init data.")
@@ -319,12 +270,12 @@ def exchange_shop():
 @app.route('/')
 def serve_index_html():
     """Serves the main HTML file (homepage)."""
-    return render_template('index.html') # Changed to index.html
+    return render_template('index.html')
 
 @app.route('/game')
 def serve_game_html():
     """Serves the main HTML file for the gacha game."""
-    return render_template('game.html') # New route for game.html
+    return render_template('game.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
