@@ -2,378 +2,289 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gacha Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NovaFlare Gacha</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
+        /* Base styles for a full-screen landscape game UI */
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
-            background-color: #1a1a2e; /* Fallback color */
+            background-color: #1a1a2e; /* Fallback for a game-like dark theme */
             color: white;
-            overflow: hidden; /* Prevent body scroll */
-            position: relative;
+            overflow: hidden; /* Crucial for a fixed-size game UI */
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* --- New Responsive CSS for Layout --- */
-        .container {
+        /* Landscape-specific layout for the entire game */
+        .main-game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
             display: grid;
-            grid-template-columns: 100px 1fr; /* Default for desktop */
-            height: 100vh;
+            grid-template-columns: 100px 1fr;
+            grid-template-rows: 60px 1fr 60px;
             background-color: #1a1a2e;
             color: white;
         }
 
-        /* Media query for mobile screens */
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr; /* Stack elements vertically */
-                grid-template-rows: auto 1fr;
+        /* Forced landscape mode styling for mobile devices */
+        @media (orientation: portrait) {
+            body {
+                transform: rotate(90deg);
+                transform-origin: 50% 50%;
+                width: 100vh;
+                height: 100vw;
+                overflow: hidden;
             }
         }
 
-        .sidebar {
-            background-color: #2a2a44;
+        /* --- UI Component Styles --- */
+        
+        /* Top Bar */
+        .top-bar {
+            grid-column: 1 / -1; /* Spans across all columns */
+            grid-row: 1;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            padding: 1rem 0;
-            border-right: 2px solid #2a415a;
+            padding: 0 1rem;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                flex-direction: row; /* Make sidebar horizontal on mobile */
-                width: 100%;
-                height: auto;
-                justify-content: space-around;
-                border-right: none;
-                border-bottom: 2px solid #2a415a;
-                order: -1; /* Place sidebar at the top of the grid */
-            }
-        }
-
-        .sidebar-item {
-            width: 100%;
-            padding: 1rem 0;
-            cursor: pointer;
-            text-align: center;
-            border-left: 4px solid transparent;
-            transition: background-color 0.3s, border-left-color 0.3s;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar-item {
-                padding: 0.5rem;
-                border-left: none; /* Remove left border on mobile */
-                border-bottom: 4px solid transparent;
-            }
-        }
-
-        .sidebar-item:hover {
-            background-color: #3b3b5b;
-        }
-
-        .sidebar-item.active {
-            border-left-color: #007BFF;
-            background-color: #3b3b5b;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar-item.active {
-                border-left-color: transparent;
-                border-bottom-color: #007BFF;
-            }
-        }
-
-        /* --- Back Button --- */
-        .back-button {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 100;
-            background-color: #e63946;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 50%;
-            font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .back-button:hover {
-            transform: scale(1.05);
-        }
-
-        .gacha-main {
-            padding: 2rem;
-            overflow-y: auto; /* Enable scrolling for the main content area */
+        .top-bar .currency-display {
             display: flex;
-            flex-direction: column;
+            gap: 1rem;
+        }
+        .top-bar .currency-item {
+            background: rgba(42, 42, 68, 0.6);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
             align-items: center;
+        }
+        .top-bar .currency-item img {
+            width: 20px; /* Placeholder for currency icons */
+            height: 20px;
+            margin-right: 5px;
         }
         
-        .gacha-banner-container {
-            width: 100%;
-            max-width: 800px;
-            background: rgba(25, 25, 40, 0.75);
-            backdrop-filter: blur(8px);
-            border: 2px solid #3a3a5e;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-            margin-bottom: 2rem;
+        /* Left Sidebar */
+        .left-sidebar {
+            grid-column: 1;
+            grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 1rem;
+            background-color: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(5px);
+        }
+        .sidebar-item {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .sidebar-item:hover, .sidebar-item.active {
+            border-color: #007BFF;
+            background-color: rgba(60, 60, 100, 0.5);
         }
 
-        /* --- Other Styles (as before) --- */
-        .currency-display {
-            font-size: 0.9rem;
-            color: #ccc;
-            text-align: right;
+        /* Main Gacha Content */
+        .gacha-main-content {
+            grid-column: 2;
+            grid-row: 2;
+            display: flex;
+            position: relative;
+            padding: 1rem;
+        }
+        
+        .banner-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            filter: brightness(0.7);
+        }
+        
+        .gacha-banner {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        /* Info Panel on the right */
+        .banner-info-panel {
+            width: 300px;
+            min-width: 250px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-left: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .banner-info-panel h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #76c7c0;
             margin-bottom: 1rem;
         }
-
-        .pull-buttons {
+        .banner-details {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+        }
+        .gacha-pool-images {
             display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1rem;
+            justify-content: space-around;
+            gap: 10px;
+            margin-top: auto;
+        }
+        .gacha-pool-images img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            border: 2px solid #5a5a7e;
         }
 
-        .pull-button {
+        /* Bottom Bar */
+        .bottom-bar {
+            grid-column: 1 / -1;
+            grid-row: 3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1rem;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .bottom-bar .pull-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        .bottom-bar .pull-button {
             padding: 0.75rem 1.5rem;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.2s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            flex-grow: 1; /* Make buttons expand to fill space */
+            transition: background-color 0.2s;
         }
+        .bottom-bar .utility-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        .utility-button {
+            background-color: #3a3a5e;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        /* Gacha Pull Button Colors */
         .pull-button.single {
+            background-color: #457b9d;
+            color: white;
+        }
+        .pull-button.multi {
             background-color: #e63946;
             color: white;
         }
-        .pull-button.single:hover {
-            background-color: #c72c38;
-            transform: translateY(-2px);
-        }
-        .pull-button.multi {
-            background-color: #457b9d;
-            color: white;
-        }
-        .pull-button.multi:hover {
-            background-color: #38667b;
-            transform: translateY(-2px);
-        }
-        .limited-banner .pull-button {
-            background-color: #6c757d;
-            cursor: not-allowed;
-        }
-
-        #pullResults {
-            margin-top: 2rem;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1rem;
-            max-width: 100%;
-        }
-
-        .result-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            background-color: #2a2a44;
-            padding: 10px;
-            border-radius: 10px;
-            width: 100px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s;
-        }
-        .result-item:hover {
-            transform: scale(1.05);
-        }
-        .result-item-name {
-            font-weight: bold;
-            margin-top: 5px;
-        }
-
-        .rarity-5 { color: #FFD700; }
-        .rarity-4 { color: #8A2BE2; }
-        .rarity-3 { color: #808080; }
-
-        /* --- Shop Modal --- */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6);
-            backdrop-filter: blur(3px);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #2a2a44;
-            padding: 2rem;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            text-align: center;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .modal-close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .modal-close:hover,
-        .modal-close:focus {
-            color: #fff;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .shop-item {
-            background-color: #3a3a5e;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .shop-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 10;
-            background-color: #457b9d;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 50%;
-            font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .shop-button:hover {
-            transform: scale(1.05);
-        }
+        
+        /* ... (Keep the styles for the Pull Results and Shop modals from the previous response) ... */
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <div class="sidebar-item active" onclick="switchBanner('standard')">Standard</div>
-            <div class="sidebar-item" onclick="switchBanner('limited')">Limited</div>
+    <div class="main-game-container">
+        
+        <div class="top-bar">
+            <a href="/" class="text-3xl">&#x2302;</a> <div class="currency-display" id="currencyDisplay">
+                <div class="currency-item"><img src="https://via.placeholder.com/20" alt="SNC"> <span id="snc-count">1000</span></div>
+                <div class="currency-item"><img src="https://via.placeholder.com/20" alt="Lumen"> <span id="lumen-count">5</span></div>
+                <div class="currency-item"><img src="https://via.placeholder.com/20" alt="Halo"> <span id="halo-count">0</span></div>
+            </div>
+            <div class="user-info">
+                <span id="user-id">0000000</span>
+            </div>
         </div>
 
-        <div class="gacha-main">
-            <div class="currency-display" id="currencyDisplay">
-                <p>1000 SNC</p>
-                <p>5 Lumen Orbs</p>
-                <p>0 Halo Orbs</p>
-                <p>0 AC</p>
+        <div class="left-sidebar">
+            <div class="sidebar-item active" onclick="switchBanner('standard')">
+                <span class="text-xl">&#x2728;</span>
+                <span>Standard</span>
             </div>
-
-            <div class="gacha-banner-container standard-banner" id="standardBanner">
-                <h2 class="text-3xl font-bold text-center text-blue-400 mb-4">Standard Banner</h2>
-                <div class="banner-details mb-4 text-center">
-                    <p>5-Rank Signal guaranteed in 90 Pulls</p>
-                    <p>4-Rank or higher Signal guaranteed in 10 Pulls</p>
-                </div>
-                <div class="pull-buttons">
-                    <button class="pull-button single" onclick="pullGacha('single', 'standard')">Single Pull</button>
-                    <button class="pull-button multi" onclick="pullGacha('multi', 'standard')">10 Pulls</button>
-                </div>
+            <div class="sidebar-item" onclick="switchBanner('limited')">
+                <span class="text-xl">&#x1f525;</span>
+                <span>Limited</span>
             </div>
-
-            <div class="gacha-banner-container limited-banner" id="limitedBanner" style="display:none;">
-                <h2 class="text-3xl font-bold text-center text-red-400 mb-4">Limited Banner</h2>
-                <div class="banner-details mb-4 text-center">
-                    <p>This banner is currently unavailable.</p>
-                </div>
-                <div class="pull-buttons">
-                    <button class="pull-button single" disabled>Single Pull</button>
-                    <button class="pull-button multi" disabled>10 Pulls</button>
-                </div>
-            </div>
-
-            <h3 class="text-2xl font-bold text-center mt-8 mb-4">Pull Results</h3>
-            <div id="pullResults">
-                </div>
         </div>
+
+        <div class="gacha-main-content">
+            <div class="banner-image" id="bannerImage"></div>
+
+            <div class="banner-info-panel">
+                <h3 id="bannerTitle">Standard Banner</h3>
+                <p id="bannerSubtitle" class="text-xs text-gray-400">A permanent collection of heroes and more.</p>
+                <div id="bannerDetails" class="banner-details">
+                    </div>
+                <div class="gacha-pool-images mt-auto">
+                    <img src="https://via.placeholder.com/80x80?text=SSR" alt="SSR Pool">
+                    <img src="https://via.placeholder.com/80x80?text=SR" alt="SR Pool">
+                </div>
+            </div>
+        </div>
+        
+        <div class="bottom-bar">
+            <div class="utility-buttons">
+                <button class="utility-button" onclick="openShopModal()">Signal Shop</button>
+                <button class="utility-button">Details</button>
+            </div>
+            <div class="pull-buttons">
+                <button class="pull-button single" onclick="pullGacha('single', 'standard')">Single Signal Search</button>
+                <button class="pull-button multi" onclick="pullGacha('multi', 'standard')">10 Signal Searches</button>
+            </div>
+        </div>
+
     </div>
 
     <div id="shopModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeShopModal()">&times;</span>
-            <h3 class="text-2xl font-bold mb-4 text-blue-300">Shop</h3>
-            <div class="shop-item">
-                <div>Buy 1 Lumen Orb</div>
-                <button onclick="exchangeCurrency('buy_lumen_1')">70 SNC</button>
-            </div>
-            <div class="shop-item">
-                <div>Buy 10 Lumen Orbs</div>
-                <button onclick="exchangeCurrency('buy_lumen_10')">595 SNC</button>
-            </div>
-            <div class="shop-item">
-                <div>Buy 1 Halo Orb</div>
-                <button onclick="exchangeCurrency('buy_halo_1')">100 SNC</button>
-            </div>
-            <div class="shop-item">
-                <div>Buy 10 Halo Orbs</div>
-                <button onclick="exchangeCurrency('buy_halo_10')">900 SNC</button>
-            </div>
-            <div class="shop-item">
-                <div>Exchange 1 Lumen Orb</div>
-                <button onclick="exchangeCurrency('exchange_lumen')">20 AC</button>
-            </div>
-            <div class="shop-item">
-                <div>Exchange 1 Halo Orb</div>
-                <button onclick="exchangeCurrency('exchange_halo')">20 AC</button>
-            </div>
         </div>
-    </div>
-
-    <div class="shop-button" onclick="openShopModal()">
-        &#x1F6D2;
-    </div>
     
-    <a href="/" class="back-button">
-        &#x2190;
-    </a>
+    <div id="pullResultsModal" class="results-modal">
+        </div>
 
     <script src="{{ url_for('static', filename='game.js') }}"></script>
     <script>
-        // Your JavaScript functions here
-        function launchGame() {
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.ready();
-                window.location.href = '/game';
-            } else {
-                alert("This app is designed to run within Telegram. Redirecting to the Gacha page...");
-                window.location.href = '/game';
-            }
-        }
+        // --- ALL JAVASCRIPT FUNCTIONS HERE (ADAPTED FOR NEW UI) ---
         
-        // The rest of your JavaScript from game.html
         document.addEventListener('DOMContentLoaded', () => {
             fetchUserData();
+            switchBanner('standard'); // Set initial banner
         });
 
         // Function to fetch user data from the backend
@@ -381,16 +292,13 @@
             const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
             if (!initData) {
                 console.error("Telegram init data is not available.");
-                // For testing purposes, you might mock user data here
-                updateCurrencyDisplay({ star_night_crystals: 1000, lumen_orbs: 5, halo_orbs: 0, auric_crescents: 0 }, { standard: { '4_star': 0, '5_star': 0 }, limited: { '4_star': 0, '5_star': 0 } });
+                updateCurrencyDisplay({ star_night_crystals: 1000, lumen_orbs: 5, halo_orbs: 0, auric_crescents: 0 });
                 return;
             }
 
             fetch('/get_user_data', {
                 method: 'GET',
-                headers: {
-                    'X-Telegram-Init-Data': initData
-                }
+                headers: { 'X-Telegram-Init-Data': initData }
             })
             .then(response => response.json())
             .then(data => {
@@ -401,138 +309,9 @@
                     console.error("Failed to fetch user data:", data.message);
                 }
             })
-            .catch(error => {
-                console.error("Error fetching user data:", error);
-            });
+            .catch(error => console.error("Error fetching user data:", error));
         }
-        
-        // Function to update the currency display on the page
+
+        // Function to update the currency display on the new top bar
         function updateCurrencyDisplay(data) {
-            document.getElementById('currencyDisplay').innerHTML = `
-                <p>${data.star_night_crystals} SNC</p>
-                <p>${data.lumen_orbs} Lumen Orbs</p>
-                <p>${data.halo_orbs} Halo Orbs</p>
-                <p>${data.auric_crescents} AC</p>
-            `;
-        }
-
-        // Function to update pity counter display
-        function updatePityCounters(pity) {
-            const standardPityText = `5-Rank Signal guaranteed in ${90 - pity.standard['5_star']} Pulls`;
-            const standardPityText4 = `4-Rank or higher Signal guaranteed in ${10 - pity.standard['4_star']} Pulls`;
-            document.querySelector('#standardBanner .banner-details').innerHTML = `<p>${standardPityText}</p><p>${standardPityText4}</p>`;
-        }
-
-        // Function to perform a gacha pull
-        function pullGacha(pullType, bannerType) {
-            const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
-            if (!initData) {
-                alert("Please open this app inside Telegram to play.");
-                return;
-            }
-            
-            fetch('/pull_gacha', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Telegram-Init-Data': initData
-                },
-                body: JSON.stringify({ pull_type: pullType, banner_type: bannerType })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    displayPullResults(data.pulled_items);
-                    updateCurrencyDisplay({
-                        star_night_crystals: data.remaining_crystals,
-                        lumen_orbs: data.remaining_lumen_orbs,
-                        halo_orbs: data.remaining_halo_orbs,
-                        auric_crescents: data.remaining_auric_crescents
-                    });
-                    updatePityCounters({
-                        standard: { '4_star': data.pity_4_star, '5_star': data.pity_5_star }
-                    });
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => {
-                console.error("Error pulling gacha:", error);
-            });
-        }
-        
-        // Function to display the gacha pull results
-        function displayPullResults(items) {
-            const resultsContainer = document.getElementById('pullResults');
-            resultsContainer.innerHTML = ''; // Clear previous results
-            items.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.className = `result-item rarity-${item.rarity}`;
-                itemElement.innerHTML = `<span class="text-3xl">&#x2b50;</span><p class="result-item-name">${item.name}</p>`;
-                resultsContainer.appendChild(itemElement);
-            });
-        }
-        
-        // Function to switch between banners
-        function switchBanner(bannerType) {
-            const standardBanner = document.getElementById('standardBanner');
-            const limitedBanner = document.getElementById('limitedBanner');
-
-            const standardTab = document.querySelector('.sidebar-item:nth-child(1)');
-            const limitedTab = document.querySelector('.sidebar-item:nth-child(2)');
-
-            if (bannerType === 'standard') {
-                standardBanner.style.display = 'block';
-                limitedBanner.style.display = 'none';
-                standardTab.classList.add('active');
-                limitedTab.classList.remove('active');
-            } else {
-                standardBanner.style.display = 'none';
-                limitedBanner.style.display = 'block';
-                standardTab.classList.remove('active');
-                limitedTab.classList.add('active');
-            }
-        }
-        
-        // Shop Modal Functions
-        function openShopModal() {
-            document.getElementById('shopModal').style.display = 'flex';
-        }
-
-        function closeShopModal() {
-            document.getElementById('shopModal').style.display = 'none';
-        }
-
-        // Shop Exchange Function
-        function exchangeCurrency(exchangeType) {
-            const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
-            if (!initData) {
-                alert("Please open this app inside Telegram to use the shop.");
-                return;
-            }
-
-            fetch('/exchange_shop', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Telegram-Init-Data': initData
-                },
-                body: JSON.stringify({ exchange_type: exchangeType })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    updateCurrencyDisplay(data);
-                    alert("Exchange successful!");
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => {
-                console.error("Error during exchange:", error);
-                alert("An error occurred during the exchange.");
-            });
-        }
-    </script>
-</body>
-</html>
+            document.getElementById('snc-count').innerText}
