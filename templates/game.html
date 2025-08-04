@@ -18,83 +18,136 @@
             position: relative;
         }
 
-        /* --- Mobile-First Layout (Default) --- */
+        /* --- Global Grid Layout --- */
         .main-game-container {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 70px 1fr; /* Compact sidebar for mobile */
+            grid-template-rows: 50px 1fr 50px;
             min-height: 100vh;
-            padding: 1rem;
-            box-sizing: border-box;
-            gap: 1rem;
+            gap: 0;
         }
         
         /* Top Bar */
         .top-bar {
+            grid-column: 1 / -1;
+            grid-row: 1;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0 0.5rem;
         }
         .top-bar .currency-display {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.25rem;
         }
         .currency-item {
             display: flex;
             align-items: center;
             background: rgba(42, 42, 68, 0.6);
-            padding: 5px 10px;
+            padding: 3px 6px;
             border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.65rem;
         }
         .currency-item img {
-            width: 16px;
-            height: 16px;
-            margin-right: 4px;
+            width: 14px;
+            height: 14px;
+            margin-right: 2px;
+        }
+        .user-info {
+            font-size: 0.6rem;
         }
 
-        /* Gacha Content */
-        .gacha-main-content {
+        /* Left Sidebar (Permanent) */
+        .left-sidebar {
+            grid-column: 1;
+            grid-row: 2;
             display: flex;
             flex-direction: column;
-            flex-grow: 1;
-            gap: 1rem;
+            align-items: center;
+            background-color: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(5px);
+            padding-top: 0.5rem;
+        }
+        .sidebar-item {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-size: 0.6rem;
+        }
+        .sidebar-item:hover, .sidebar-item.active {
+            border-color: #007BFF;
+            background-color: rgba(60, 60, 100, 0.5);
+        }
+        .sidebar-item .text-xl {
+            font-size: 1.1rem;
+        }
+        
+        /* Main Content */
+        .gacha-main-content {
+            grid-column: 2;
+            grid-row: 2;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
         .banner-art-container {
             width: 100%;
-            height: 200px; /* Fixed height for mobile banner */
+            height: 150px;
             background-size: cover;
             background-position: center;
             border-radius: 10px;
         }
         .banner-info-panel {
             background: rgba(0, 0, 0, 0.5);
-            padding: 1rem;
+            padding: 0.5rem;
             border-radius: 10px;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.25rem;
         }
-        .banner-details {
-            font-size: 0.8rem;
-            color: #ccc;
+        .banner-info-panel h3 {
+            font-size: 1rem;
         }
-        
-        /* Buttons */
+        .banner-info-panel p {
+            font-size: 0.7rem;
+        }
+
+        /* Buttons Container */
         .buttons-container {
+            grid-column: 1 / -1;
+            grid-row: 3;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0 0.5rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            justify-content: center;
+            gap: 0.5rem;
         }
         .pull-buttons {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.25rem;
         }
         .pull-button {
             flex-grow: 1;
-            padding: 0.75rem 1rem;
-            font-size: 0.9rem;
+            padding: 0.5rem 0.5rem;
+            font-size: 0.75rem;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             text-align: center;
         }
@@ -103,82 +156,54 @@
         
         .utility-buttons {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.25rem;
             justify-content: space-between;
         }
         .utility-button {
             background-color: #3a3a5e;
             color: white;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            font-size: 0.8rem;
+            padding: 0.5rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
             font-weight: bold;
             flex-grow: 1;
         }
-        
+
         /* --- Desktop/Landscape Styles --- */
         @media (min-width: 1024px) {
-            body {
-                overflow: hidden;
-            }
             .main-game-container {
-                display: grid;
-                grid-template-columns: 100px 1fr;
+                grid-template-columns: 100px 1fr; /* Wider sidebar for PC */
                 grid-template-rows: 60px 1fr 60px;
-                height: 100vh;
-                padding: 0;
-                gap: 0;
             }
-            
-            /* Top Bar - Desktop */
             .top-bar {
-                grid-column: 1 / -1;
-                grid-row: 1;
-                background: rgba(0, 0, 0, 0.4);
-                backdrop-filter: blur(5px);
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
                 padding: 0 1rem;
             }
             .currency-item {
                 font-size: 0.8rem;
+                padding: 5px 10px;
             }
-            
-            /* Left Sidebar - Desktop */
+            .currency-item img {
+                width: 16px;
+                height: 16px;
+            }
+            .user-info {
+                font-size: 0.8rem;
+            }
             .left-sidebar {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                grid-column: 1;
-                grid-row: 2;
-                background-color: rgba(26, 26, 46, 0.7);
-                backdrop-filter: blur(5px);
                 padding-top: 1rem;
             }
             .sidebar-item {
                 width: 80px;
                 height: 80px;
                 margin-bottom: 1rem;
-                cursor: pointer;
-                text-align: center;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                border: 2px solid transparent;
-                border-radius: 8px;
-                transition: all 0.2s ease;
+                font-size: 0.75rem;
             }
-            .sidebar-item:hover, .sidebar-item.active {
-                border-color: #007BFF;
-                background-color: rgba(60, 60, 100, 0.5);
+            .sidebar-item .text-xl {
+                font-size: 1.5rem;
             }
-            
-            /* Main Content - Desktop */
             .gacha-main-content {
-                grid-column: 2;
-                grid-row: 2;
-                flex-direction: row;
                 padding: 1rem;
+                flex-direction: row;
                 align-items: center;
                 gap: 1rem;
             }
@@ -186,71 +211,198 @@
                 position: absolute;
                 width: calc(100% - 116px);
                 height: calc(100% - 2rem);
-                background-size: cover;
-                background-position: center;
-                border-radius: 10px;
-                z-index: 1;
             }
             .banner-info-panel {
                 width: 300px;
                 height: calc(100% - 2rem);
                 margin-left: auto;
-                background: rgba(0, 0, 0, 0.5);
-                backdrop-filter: blur(5px);
                 padding: 1rem;
-                border-radius: 10px;
-                z-index: 10;
                 justify-content: space-between;
             }
-            
-            /* Buttons - Desktop */
+            .banner-info-panel h3 {
+                font-size: 1.5rem;
+            }
+            .banner-info-panel p {
+                font-size: 0.8rem;
+            }
             .buttons-container {
-                grid-column: 1 / -1;
-                grid-row: 3;
-                background: rgba(0, 0, 0, 0.4);
-                backdrop-filter: blur(5px);
-                border-top: 1px solid rgba(255, 255, 255, 0.1);
                 padding: 0 1rem;
                 flex-direction: row;
                 justify-content: space-between;
-                align-items: center;
             }
             .pull-buttons {
                 gap: 1rem;
-                flex-grow: 0;
+            }
+            .pull-button {
+                font-size: 0.9rem;
             }
             .utility-buttons {
                 gap: 1rem;
-                flex-grow: 0;
             }
             .utility-button {
-                flex-grow: 0;
+                font-size: 0.8rem;
             }
         }
         
-        /* ... (all modal styles from previous responses) ... */
+        /* --- Pull Results Modal (Unchanged) --- */
+        .results-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .results-modal-content {
+            background-color: #2a2a44;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .result-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #3a3a5e;
+            border-radius: 8px;
+            padding: 0.5rem;
+            position: relative;
+        }
+        .result-card .item-image {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        .result-card .item-name {
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+        .result-card .item-count {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.7);
+            padding: 2px 6px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+        }
+        .result-card .new-badge {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: #e63946;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 5px;
+            font-size: 0.6rem;
+            font-weight: bold;
+        }
+        .rarity-label {
+            font-size: 0.7rem;
+            font-weight: bold;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.7);
+            padding: 2px 5px;
+            border-radius: 5px;
+        }
+        .rarity-label.ssr { color: gold; }
+        .rarity-label.sr { color: #8a2be2; }
+        .rarity-label.r { color: #457b9d; }
+        .rarity-5 { box-shadow: 0 0 10px gold; }
+        .rarity-4 { box-shadow: 0 0 10px #8a2be2; }
+
+        /* --- Shop Modal (Unchanged) --- */
+        .modal {
+            position: fixed;
+            z-index: 200;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #2a2a44;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+        }
     </style>
 </head>
 <body>
     <div class="main-game-container">
         
         <div class="top-bar">
-            <a href="/" class="text-3xl">&#x2302;</a>
+            <a href="/" class="text-2xl">&#x2302;</a>
             <div class="currency-display" id="currencyDisplay">
-                <div class="currency-item"><img src="https://via.placeholder.com/16" alt="SNC"> <span id="snc-count">1000</span></div>
-                <div class="currency-item"><img src="https://via.placeholder.com/16" alt="Lumen"> <span id="lumen-count">5</span></div>
-                <div class="currency-item"><img src="https://via.placeholder.com/16" alt="Halo"> <span id="halo-count">0</span></div>
+                <div class="currency-item">
+                    <img src="{{ url_for('static', filename='snc_icon.png') }}" alt="SNC"> 
+                    <span id="snc-count">1000</span>
+                </div>
+                <div class="currency-item" id="lumen-currency-item">
+                    <img src="{{ url_for('static', filename='lumen_icon.png') }}" alt="Lumen"> 
+                    <span id="lumen-count">5</span>
+                </div>
+                <div class="currency-item" id="halo-currency-item">
+                    <img src="{{ url_for('static', filename='halo_icon.png') }}" alt="Halo"> 
+                    <span id="halo-count">0</span>
+                </div>
             </div>
             <div class="user-info">
                 <span id="user-id">0000000</span>
             </div>
         </div>
 
+        <div class="left-sidebar">
+            <div class="sidebar-item active" onclick="switchBanner('standard')">
+                <span class="text-xl">&#x2728;</span>
+                <span>Standard</span>
+            </div>
+            <div class="sidebar-item" onclick="switchBanner('limited')">
+                <span class="text-xl">&#x1f525;</span>
+                <span>Limited</span>
+            </div>
+        </div>
+
         <div class="gacha-main-content">
             <div class="banner-art-container" id="bannerImage"></div>
             <div class="banner-info-panel">
-                <h3 id="bannerTitle" class="text-xl md:text-3xl font-bold mb-2">Standard Banner</h3>
-                <p id="bannerSubtitle" class="text-xs text-gray-400 mb-4">A permanent collection of heroes and more.</p>
+                <h3 id="bannerTitle" class="font-bold">Standard Banner</h3>
+                <p id="bannerSubtitle" class="text-gray-400">A permanent collection of heroes and more.</p>
                 <div id="bannerDetails" class="banner-details">
                     </div>
             </div>
@@ -262,12 +414,209 @@
                 <button class="utility-button">Details</button>
             </div>
             <div class="pull-buttons">
-                <button class="pull-button single" onclick="pullGacha('single', 'standard')">Single Signal Search</button>
-                <button class="pull-button multi" onclick="pullGacha('multi', 'standard')">10 Signal Searches</button>
+                <button class="pull-button single" onclick="pullGacha('single', 'standard')">Single Signal Search (100 SNC)</button>
+                <button class="pull-button multi" onclick="pullGacha('multi', 'standard')">10 Signal Searches (10 Lumen Orbs)</button>
             </div>
         </div>
-
     </div>
     
-    </body>
+    <div id="shopModal" class="modal">
+        <div class="modal-content">
+            <span onclick="closeShopModal()" class="close-button">&times;</span>
+            <h2 class="text-xl font-bold mb-4">Signal Shop</h2>
+            <p>Exchange Auric Crescents for Signals.</p>
+            <button class="bg-indigo-600 text-white p-2 rounded-md mt-4" onclick="exchangeCurrency('lumen')">10 Auric Crescents for 1 Lumen Orb</button>
+            <button class="bg-indigo-600 text-white p-2 rounded-md mt-4" onclick="exchangeCurrency('halo')">100 Auric Crescents for 1 Halo Orb</button>
+        </div>
+    </div>
+
+    <div id="pullResultsModal" class="results-modal">
+        <div class="results-modal-content">
+            <button onclick="closeResultsModal()" class="close-button">&times;</button>
+            <h2 class="text-2xl font-bold mb-4">Draw Results</h2>
+            <div id="resultsGrid" class="results-grid">
+                </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentBanner = 'standard';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchUserData();
+            switchBanner('standard');
+        });
+
+        // Function to fetch user data from the backend
+        function fetchUserData() {
+            const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
+            if (!initData) {
+                console.error("Telegram init data is not available.");
+                updateCurrencyDisplay({ star_night_crystals: 1000, lumen_orbs: 5, halo_orbs: 0 });
+                return;
+            }
+            fetch('/get_user_data', {
+                method: 'GET',
+                headers: { 'X-Telegram-Init-Data': initData }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    updateCurrencyDisplay(data);
+                    updatePityCounters(data.pity_counters);
+                    document.getElementById('user-id').innerText = data.user_id;
+                } else {
+                    console.error("Failed to fetch user data:", data.message);
+                }
+            })
+            .catch(error => console.error("Error fetching user data:", error));
+        }
+
+        // Function to update the currency display on the new top bar
+        function updateCurrencyDisplay(data) {
+            document.getElementById('snc-count').innerText = data.star_night_crystals;
+            document.getElementById('lumen-count').innerText = data.lumen_orbs;
+            document.getElementById('halo-count').innerText = data.halo_orbs;
+        }
+
+        // Function to update pity counters display on the right info panel
+        function updatePityCounters(pity) {
+            const bannerDetails = document.getElementById('bannerDetails');
+            const standardPityText5 = `5-Rank Signal guaranteed in ${90 - pity.standard['5_star']} Searches`;
+            const standardPityText4 = `4-Rank or higher Signal guaranteed in ${10 - pity.standard['4_star']} Searches`;
+            bannerDetails.innerHTML = `<p>${standardPityText5}</p><p>${standardPityText4}</p>`;
+        }
+
+        // Function to perform a gacha pull
+        function pullGacha(pullType, bannerType) {
+            const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
+            if (!initData) {
+                alert("Please open this app inside Telegram to play.");
+                return;
+            }
+            fetch('/pull_gacha', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Telegram-Init-Data': initData
+                },
+                body: JSON.stringify({ pull_type: pullType, banner_type: bannerType })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    updateCurrencyDisplay({
+                        star_night_crystals: data.remaining_crystals,
+                        lumen_orbs: data.remaining_lumen_orbs,
+                        halo_orbs: data.remaining_halo_orbs,
+                        auric_crescents: data.remaining_auric_crescents
+                    });
+                    updatePityCounters({
+                        standard: { '4_star': data.pity_4_star, '5_star': data.pity_5_star }
+                    });
+                    displayPullResults(data.pulled_items);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error("Error pulling gacha:", error));
+        }
+        
+        function displayPullResults(items) {
+            const resultsGrid = document.getElementById('resultsGrid');
+            resultsGrid.innerHTML = '';
+            
+            const groupedItems = {};
+            items.forEach(item => {
+                const key = item.name + item.rarity;
+                if (!groupedItems[key]) {
+                    groupedItems[key] = { ...item, count: 0 };
+                }
+                groupedItems[key].count++;
+            });
+            Object.values(groupedItems).forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = `result-card rarity-${item.rarity}`;
+                
+                let rarityLabel = '';
+                if (item.rarity === 5) rarityLabel = 'SSR';
+                else if (item.rarity === 4) rarityLabel = 'SR';
+                else rarityLabel = 'R';
+                const itemImage = 'https://via.placeholder.com/100';
+                itemElement.innerHTML = `
+                    <div class="new-badge">NEW</div>
+                    <img src="${itemImage}" alt="${item.name}" class="item-image">
+                    <p class="rarity-label ${rarityLabel.toLowerCase()}">${rarityLabel}</p>
+                    <p class="item-name">${item.name}</p>
+                    ${item.count > 1 ? `<span class="item-count">x${item.count}</span>` : ''}
+                `;
+                resultsGrid.appendChild(itemElement);
+            });
+            document.getElementById('pullResultsModal').style.display = 'flex';
+        }
+        
+        function closeResultsModal() {
+            document.getElementById('pullResultsModal').style.display = 'none';
+        }
+
+        // A new function to handle the dynamic display of currencies and button text
+        function updateDisplayForBanner(bannerType) {
+            const lumenCurrencyItem = document.getElementById('lumen-currency-item');
+            const haloCurrencyItem = document.getElementById('halo-currency-item');
+            const singlePullBtn = document.querySelector('.pull-button.single');
+            const multiPullBtn = document.querySelector('.pull-button.multi');
+
+            if (bannerType === 'standard') {
+                lumenCurrencyItem.style.display = 'flex';
+                haloCurrencyItem.style.display = 'none';
+                singlePullBtn.innerText = "Single Signal Search (100 SNC)";
+                multiPullBtn.innerText = "10 Signal Searches (10 Lumen Orbs)";
+            } else if (bannerType === 'limited') {
+                lumenCurrencyItem.style.display = 'none';
+                haloCurrencyItem.style.display = 'flex';
+                singlePullBtn.innerText = "Single Signal Search (100 SNC)";
+                multiPullBtn.innerText = "10 Signal Searches (10 Halo Orbs)";
+            }
+        }
+
+        function updateBannerContent(bannerType) {
+            const bannerTitle = document.getElementById('bannerTitle');
+            const bannerSubtitle = document.getElementById('bannerSubtitle');
+            const bannerDetails = document.getElementById('bannerDetails');
+            const bannerImage = document.getElementById('bannerImage');
+            
+            if (bannerType === 'standard') {
+                bannerTitle.innerText = "Standard Banner";
+                bannerSubtitle.innerText = "A permanent collection of heroes and more.";
+                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Standard+Banner+Art")';
+                bannerDetails.innerHTML = ``;
+            } else if (bannerType === 'limited') {
+                bannerTitle.innerText = "Whispered Tales";
+                bannerSubtitle.innerText = "Rate up for selected A-Rank and Limited S-Rank Signals!";
+                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Limited+Banner+Art")';
+                bannerDetails.innerHTML = `<p>Remaining 04d 00h</p><p>4-Rank or higher Signal guaranteed in 9 Searches</p><p>5-Rank Signal guaranteed in 18 Searches</p>`;
+            }
+            updateDisplayForBanner(bannerType);
+        }
+
+        function switchBanner(bannerType) {
+            currentBanner = bannerType;
+            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`.sidebar-item[onclick*="'${bannerType}'"]`).classList.add('active');
+            updateBannerContent(bannerType);
+        }
+        
+        function openShopModal() {
+            document.getElementById('shopModal').style.display = 'flex';
+        }
+
+        function closeShopModal() {
+            document.getElementById('shopModal').style.display = 'none';
+        }
+        
+        function exchangeCurrency(exchangeType) {
+            alert(`Exchanging for ${exchangeType}! (Backend logic not yet implemented)`);
+        }
+    </script>
+</body>
 </html>
