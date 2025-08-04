@@ -14,7 +14,7 @@
             margin: 0;
             background-color: #1a1a2e;
             color: white;
-            overflow: hidden; /* Prevent scrolling */
+            overflow: hidden; /* Prevent scrolling on mobile */
             position: relative;
         }
 
@@ -22,7 +22,7 @@
         .main-game-container {
             display: grid;
             grid-template-columns: 70px 1fr; /* Compact sidebar for mobile */
-            grid-template-rows: 50px 1fr 50px;
+            grid-template-rows: 50px 1fr;
             min-height: 100vh;
             gap: 0;
         }
@@ -32,34 +32,13 @@
             grid-column: 1 / -1;
             grid-row: 1;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(5px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 0 0.5rem;
             z-index: 20;
-        }
-        .top-bar .currency-display {
-            display: flex;
-            gap: 0.25rem;
-        }
-        .currency-item {
-            display: flex;
-            align-items: center;
-            background: linear-gradient(180deg, #3a3a5e 0%, #2a2a44 100%);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            padding: 3px 6px;
-            border-radius: 20px;
-            font-size: 0.65rem;
-        }
-        .currency-item img {
-            width: 14px;
-            height: 14px;
-            margin-right: 2px;
-        }
-        .user-info {
-            font-size: 0.6rem;
         }
 
         /* Left Sidebar (Permanent) */
@@ -108,19 +87,62 @@
             flex-direction: column;
             position: relative;
             overflow: hidden;
-        }
-        .banner-art-container {
-            width: 100%;
-            height: 100%;
             background-size: cover;
             background-position: center;
+            height: 100%;
+        }
+
+        /* Overlaid UI elements */
+        .overlay-container {
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            box-sizing: border-box;
         }
-        .banner-info-panel {
-            position: relative;
+        
+        .overlay-top {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .currency-display {
+            display: flex;
+            gap: 0.25rem;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        .currency-item {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(180deg, #3a3a5e 0%, #2a2a44 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            padding: 3px 6px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+        }
+        .currency-item img {
+            width: 14px;
+            height: 14px;
+            margin-right: 2px;
+        }
+        .user-info {
+            font-size: 0.6rem;
+            margin-left: 0.5rem;
+        }
+        
+        .overlay-right-panel {
+            align-self: flex-end;
+            height: fit-content;
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
             padding: 0.75rem;
@@ -128,17 +150,16 @@
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
-            z-index: 5;
-            height: fit-content;
-            margin: auto 0.5rem 0.5rem auto;
             width: calc(100% - 1rem);
+            max-width: 300px;
             box-sizing: border-box;
+            margin-top: auto;
         }
-        .banner-info-panel h3 {
+        .overlay-right-panel h3 {
             font-size: 1rem;
             font-weight: bold;
         }
-        .banner-info-panel p {
+        .overlay-right-panel p {
             font-size: 0.7rem;
         }
         .banner-details {
@@ -146,21 +167,24 @@
             color: #ccc;
         }
 
-        /* Buttons Container */
-        .buttons-container {
-            grid-column: 1 / -1;
-            grid-row: 3;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(5px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 0 0.5rem;
+        .overlay-bottom {
+            width: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            gap: 0.5rem;
-            z-index: 20;
+            align-items: center;
         }
-        .pull-buttons {
+        .bottom-buttons {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .bottom-buttons .pull-buttons {
+            display: flex;
+            gap: 0.25rem;
+            flex-grow: 1;
+        }
+        .bottom-buttons .utility-buttons {
             display: flex;
             gap: 0.25rem;
         }
@@ -189,11 +213,6 @@
             box-shadow: 0 3px 0 #9c222e;
         }
         
-        .utility-buttons {
-            display: flex;
-            gap: 0.25rem;
-            justify-content: space-between;
-        }
         .utility-button {
             background: linear-gradient(180deg, #3a3a5e 0%, #2a2a44 100%);
             color: white;
@@ -201,7 +220,6 @@
             border-radius: 6px;
             font-size: 0.75rem;
             font-weight: bold;
-            flex-grow: 1;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
@@ -209,21 +227,10 @@
         @media (min-width: 1024px) {
             .main-game-container {
                 grid-template-columns: 100px 1fr; /* Wider sidebar for PC */
-                grid-template-rows: 60px 1fr 60px;
+                grid-template-rows: 60px 1fr;
             }
             .top-bar {
                 padding: 0 1rem;
-            }
-            .currency-item {
-                font-size: 0.8rem;
-                padding: 5px 10px;
-            }
-            .currency-item img {
-                width: 16px;
-                height: 16px;
-            }
-            .user-info {
-                font-size: 0.8rem;
             }
             .left-sidebar {
                 padding-top: 1rem;
@@ -239,37 +246,49 @@
             }
             .gacha-main-content {
                 padding: 1rem;
-                position: relative;
             }
-            .banner-art-container {
-                width: 100%;
-                height: 100%;
-                border-radius: 10px;
-                position: absolute;
-                top: 0;
-                left: 0;
+            .overlay-container {
+                padding: 1rem;
             }
-            .banner-info-panel {
-                width: 350px;
-                height: calc(100% - 2rem);
-                margin: auto 1rem 1rem auto;
-                padding: 1.5rem;
-                justify-content: space-between;
-                box-sizing: border-box;
+            .currency-display {
+                gap: 1rem;
             }
-            .banner-info-panel h3 {
-                font-size: 1.5rem;
+            .currency-item {
+                font-size: 0.8rem;
+                padding: 5px 10px;
             }
-            .banner-info-panel p {
+            .currency-item img {
+                width: 16px;
+                height: 16px;
+            }
+            .user-info {
                 font-size: 0.8rem;
             }
-            .buttons-container {
-                padding: 0 1rem;
+            .overlay-right-panel {
+                width: 350px;
+                height: calc(100% - 2rem);
+                padding: 1.5rem;
+                justify-content: space-between;
+                margin: auto 1rem 1rem auto;
+            }
+            .overlay-right-panel h3 {
+                font-size: 1.5rem;
+            }
+            .overlay-right-panel p {
+                font-size: 0.8rem;
+            }
+            .overlay-bottom {
                 flex-direction: row;
                 justify-content: space-between;
+                align-items: flex-end;
+                padding: 0 1rem 1rem;
+            }
+            .bottom-buttons {
+                width: auto;
             }
             .pull-buttons {
                 gap: 1rem;
+                order: 2;
             }
             .pull-button {
                 font-size: 0.9rem;
@@ -277,6 +296,7 @@
             }
             .utility-buttons {
                 gap: 1rem;
+                order: 1;
             }
             .utility-button {
                 font-size: 0.8rem;
@@ -408,23 +428,6 @@
         
         <div class="top-bar">
             <a href="/" class="text-2xl">&#x2302;</a>
-            <div class="currency-display" id="currencyDisplay">
-                <div class="currency-item">
-                    <img src="{{ url_for('static', filename='snc_icon.png') }}" alt="SNC"> 
-                    <span id="snc-count">1000</span>
-                </div>
-                <div class="currency-item" id="lumen-currency-item">
-                    <img src="{{ url_for('static', filename='lumen_icon.png') }}" alt="Lumen"> 
-                    <span id="lumen-count">5</span>
-                </div>
-                <div class="currency-item" id="halo-currency-item">
-                    <img src="{{ url_for('static', filename='halo_icon.png') }}" alt="Halo"> 
-                    <span id="halo-count">0</span>
-                </div>
-            </div>
-            <div class="user-info">
-                <span id="user-id">0000000</span>
-            </div>
         </div>
 
         <div class="left-sidebar">
@@ -446,26 +449,52 @@
             </div>
         </div>
 
-        <div class="gacha-main-content">
-            <div class="banner-art-container" id="bannerImage"></div>
-            <div class="banner-info-panel">
-                <div>
-                    <h3 id="bannerTitle" class="font-bold">Standard Character Banner</h3>
-                    <p id="bannerSubtitle" class="text-gray-400">A permanent collection of heroes and more.</p>
-                </div>
-                <div id="bannerDetails" class="banner-details">
+        <div class="gacha-main-content" id="bannerImage">
+            <div class="overlay-container">
+                <div class="overlay-top">
+                    <div class="currency-display" id="currencyDisplay">
+                        <div class="currency-item">
+                            <img src="{{ url_for('static', filename='snc_icon.png') }}" alt="SNC"> 
+                            <span id="snc-count">1000</span>
+                        </div>
+                        <div class="currency-item" id="lumen-currency-item">
+                            <img src="{{ url_for('static', filename='lumen_icon.png') }}" alt="Lumen"> 
+                            <span id="lumen-count">5</span>
+                        </div>
+                        <div class="currency-item" id="halo-currency-item">
+                            <img src="{{ url_for('static', filename='halo_icon.png') }}" alt="Halo"> 
+                            <span id="halo-count">0</span>
+                        </div>
                     </div>
-            </div>
-        </div>
-        
-        <div class="buttons-container">
-            <div class="utility-buttons">
-                <button class="utility-button" onclick="openShopModal()">Signal Shop</button>
-                <button class="utility-button">Details</button>
-            </div>
-            <div class="pull-buttons">
-                <button class="pull-button single" onclick="pullGacha('single', currentBanner)">Single Signal Search (100 SNC)</button>
-                <button class="pull-button multi" onclick="pullGacha('multi', currentBanner)">10 Signal Searches (10 Lumen Orbs)</button>
+                    <div class="user-info">
+                        <span id="user-id">0000000</span>
+                    </div>
+                </div>
+                
+                <div class="overlay-right-panel">
+                    <div>
+                        <h3 id="bannerTitle" class="font-bold">Standard Character Banner</h3>
+                        <p id="bannerSubtitle" class="text-gray-400">A permanent collection of heroes and more.</p>
+                    </div>
+                    <div id="bannerDetails" class="banner-details">
+                        </div>
+                </div>
+
+                <div class="overlay-bottom">
+                    <div class="bottom-buttons">
+                        <div class="utility-buttons">
+                            <button class="utility-button" onclick="openShopModal()">Shop</button>
+                            <button class="utility-button">Details</button>
+                            <button class="utility-button">History</button>
+                            <button class="utility-button" id="switchBannerBtn" onclick="switchToOtherBanner()">Switch To Weapon Banner</button>
+                        </div>
+                    </div>
+                    <div class="pull-buttons">
+                        <button class="pull-button single" onclick="pullGacha('single', currentBanner)">Single Signal Search (100 SNC)</button>
+                        <button class="pull-button multi" onclick="pullGacha('multi', currentBanner)">10 Signal Searches (10 Lumen Orbs)</button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -473,7 +502,7 @@
     <div id="shopModal" class="modal">
         <div class="modal-content">
             <span onclick="closeShopModal()" class="close-button">&times;</span>
-            <h2 class="text-xl font-bold mb-4">Signal Shop</h2>
+            <h2 class="text-xl font-bold mb-4">Shop</h2>
             <p>Exchange Auric Crescents for Signals.</p>
             <button class="bg-indigo-600 text-white p-2 rounded-md mt-4" onclick="exchangeCurrency('lumen')">10 Auric Crescents for 1 Lumen Orb</button>
             <button class="bg-indigo-600 text-white p-2 rounded-md mt-4" onclick="exchangeCurrency('halo')">100 Auric Crescents for 1 Halo Orb</button>
@@ -616,12 +645,12 @@
             const singlePullBtn = document.querySelector('.pull-button.single');
             const multiPullBtn = document.querySelector('.pull-button.multi');
 
-            if (bannerType === 'standard_character') {
+            if (bannerType === 'standard_character' || bannerType === 'standard_weapon') {
                 lumenCurrencyItem.style.display = 'flex';
                 haloCurrencyItem.style.display = 'none';
                 singlePullBtn.innerText = "Single Signal Search (100 SNC)";
                 multiPullBtn.innerText = "10 Signal Searches (10 Lumen Orbs)";
-            } else if (bannerType === 'limited_character_1' || bannerType === 'limited_character_2' || bannerType === 'standard_weapon') {
+            } else if (bannerType === 'limited_character_1' || bannerType === 'limited_character_2') {
                 lumenCurrencyItem.style.display = 'none';
                 haloCurrencyItem.style.display = 'flex';
                 singlePullBtn.innerText = "Single Signal Search (100 SNC)";
@@ -630,31 +659,40 @@
         }
 
         function updateBannerContent(bannerType) {
-            const bannerTitle = document.getElementById('bannerTitle');
-            const bannerSubtitle = document.getElementById('bannerSubtitle');
+            const bannerTitle = document.querySelector('.overlay-right-panel h3');
+            const bannerSubtitle = document.querySelector('.overlay-right-panel p');
             const bannerDetails = document.getElementById('bannerDetails');
             const bannerImage = document.getElementById('bannerImage');
+            const switchBtn = document.getElementById('switchBannerBtn');
             
             if (bannerType === 'standard_character') {
                 bannerTitle.innerText = "Standard Character Banner";
                 bannerSubtitle.innerText = "A permanent collection of heroes and more.";
                 bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Standard+Character+Banner+Art")';
                 bannerDetails.innerHTML = `<p>5-Rank Signal guaranteed in 90 Searches</p><p>4-Rank or higher Signal guaranteed in 10 Searches</p>`;
+                switchBtn.innerText = "Switch To Standard Weapon Banner";
+                switchBtn.onclick = () => switchBanner('standard_weapon');
             } else if (bannerType === 'limited_character_1') {
                 bannerTitle.innerText = "Whispered Tales: Character 1";
                 bannerSubtitle.innerText = "Rate up for a selected A-Rank and Limited S-Rank Signals!";
                 bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Limited+Character+1+Banner+Art")';
                 bannerDetails.innerHTML = `<p>Remaining 04d 00h</p><p>4-Rank or higher Signal guaranteed in 9 Searches</p><p>5-Rank Signal guaranteed in 18 Searches</p>`;
+                switchBtn.innerText = "Switch To Limited Weapon Banner";
+                switchBtn.onclick = () => switchBanner('standard_weapon'); // Assuming limited character banners share the same weapon banner
             } else if (bannerType === 'limited_character_2') {
                 bannerTitle.innerText = "Whispered Tales: Character 2";
                 bannerSubtitle.innerText = "Rate up for a selected A-Rank and Limited S-Rank Signals!";
                 bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Limited+Character+2+Banner+Art")';
                 bannerDetails.innerHTML = `<p>Remaining 04d 00h</p><p>4-Rank or higher Signal guaranteed in 9 Searches</p><p>5-Rank Signal guaranteed in 18 Searches</p>`;
+                switchBtn.innerText = "Switch To Limited Weapon Banner";
+                switchBtn.onclick = () => switchBanner('standard_weapon');
             } else if (bannerType === 'standard_weapon') {
                 bannerTitle.innerText = "Standard Weapon Banner";
                 bannerSubtitle.innerText = "A permanent collection of weapons and more.";
                 bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Standard+Weapon+Banner+Art")';
                 bannerDetails.innerHTML = `<p>5-Rank Signal guaranteed in 90 Searches</p><p>4-Rank or higher Signal guaranteed in 10 Searches</p>`;
+                switchBtn.innerText = "Switch To Standard Character Banner";
+                switchBtn.onclick = () => switchBanner('standard_character');
             }
             updateDisplayForBanner(bannerType);
         }
@@ -664,6 +702,14 @@
             document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
             document.querySelector(`.sidebar-item[onclick*="'${bannerType}'"]`).classList.add('active');
             updateBannerContent(bannerType);
+        }
+        
+        function switchToOtherBanner() {
+            if (currentBanner === 'standard_character' || currentBanner === 'limited_character_1' || currentBanner === 'limited_character_2') {
+                switchBanner('standard_weapon');
+            } else if (currentBanner === 'standard_weapon') {
+                switchBanner('standard_character');
+            }
         }
         
         function openShopModal() {
