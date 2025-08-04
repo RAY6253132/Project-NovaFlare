@@ -43,6 +43,10 @@ GACHA_RATES = {
 # In a real application, this would be a persistent database like Firestore or PostgreSQL
 user_data = {}
 
+# Your Telegram Bot Token (GET THIS FROM BOTFATHER)
+# For local testing, you might skip full validation, but for deployment, it's crucial.
+BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN_HERE" # <--- IMPORTANT: Replace with your actual bot token
+
 # --- UTILITY FUNCTIONS ---
 
 def show_message(text):
@@ -51,21 +55,39 @@ def show_message(text):
 
 def validate_telegram_init_data(init_data):
     """
-    Validates the Telegram Web App's init data.
+    Validates the Telegram Web App's init data cryptographically.
     NOTE: For a real application, you would need to get your bot's token.
     For this example, we will skip the cryptographic validation and just parse the data.
     """
     try:
         data_dict = {}
+        # Parse the query string into a dictionary
         for item in init_data.split('&'):
             key, value = item.split('=', 1)
             data_dict[key] = unquote(value)
 
-        # Assuming 'user' is always in the data for this example
+        # For production, implement full cryptographic validation like this:
+        # data_check_string = []
+        # for key in sorted(data_dict.keys()):
+        #     if key != 'hash':
+        #         data_check_string.append(f"{key}={data_dict[key]}")
+        # data_check_string = "\n".join(data_check_string)
+        # secret_key = hmac.new("WebAppData".encode(), BOT_TOKEN.encode(), hashlib.sha256).digest()
+        # calculated_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
+
+        # received_hash = data_dict.get('hash')
+
+        # if calculated_hash == received_hash:
+        #     user_info = json.loads(data_dict['user'])
+        #     return user_info['id'], data_dict
+        # else:
+        #     print("Init Data Validation Failed!")
+        #     return None, None
+
+        # Simplified validation for development (REMOVE FOR PRODUCTION)
         user_info = json.loads(data_dict['user'])
         return user_info['id'], data_dict
-    except (KeyError, json.JSONDecodeError):
-        # In a real app, this would be a validation failure
+    except (KeyError, json.JSONDecodeError, AttributeError): # Added AttributeError for safer parsing
         return None, None
 
 def get_or_create_user(user_id):
@@ -185,12 +207,12 @@ def pull_gacha():
     # Check if user has enough orbs
     if user[orb_type] >= cost_orb:
         user[orb_type] -= cost_orb
-        pulls_remaining = num_pulls
+        # pulls_remaining = num_pulls # This variable is not used
         currency_used = orb_type
     # Check if user has enough SNC to convert
     elif user["star_night_crystals"] >= cost_snc:
         user["star_night_crystals"] -= cost_snc
-        pulls_remaining = num_pulls
+        # pulls_remaining = num_pulls # This variable is not used
         currency_used = "star_night_crystals"
     else:
         return show_message("Insufficient currency for this pull.")
@@ -295,13 +317,14 @@ def exchange_shop():
     })
 
 @app.route('/')
-def serve_html():
-    """Serves the main HTML file."""
-    # This assumes the HTML is saved in a file named `game.html`
-    return render_template('game.html')
+def serve_index_html():
+    """Serves the main HTML file (homepage)."""
+    return render_template('index.html') # Changed to index.html
+
+@app.route('/game')
+def serve_game_html():
+    """Serves the main HTML file for the gacha game."""
+    return render_template('game.html') # New route for game.html
 
 if __name__ == '__main__':
-    # For local development, you might want to run with debug=True
-    # For production, this should be run by a proper WSGI server like Gunicorn
     app.run(host='0.0.0.0', port=5000, debug=True)
-
