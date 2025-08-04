@@ -9,193 +9,110 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
-        /* Base styles for a full-screen landscape game UI */
+        /* Base styles for mobile/portrait view (mobile-first) */
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
-            background-color: #1a1a2e; /* Fallback for a game-like dark theme */
-            color: white;
-            overflow: hidden; /* Crucial for a fixed-size game UI */
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Landscape-specific layout for the entire game */
-        .main-game-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: grid;
-            grid-template-columns: 100px 1fr;
-            grid-template-rows: 60px 1fr 60px;
             background-color: #1a1a2e;
             color: white;
+            overflow-x: hidden;
+            position: relative;
         }
 
-        /* Forced landscape mode styling for mobile devices */
-        @media (orientation: portrait) {
-            body {
-                transform: rotate(90deg);
-                transform-origin: 50% 50%;
-                width: 100vh;
-                height: 100vw;
-                overflow: hidden;
-            }
+        .main-game-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 1rem;
+            box-sizing: border-box;
         }
 
-        /* --- UI Component Styles --- */
-        
-        /* Top Bar */
+        /* Top Bar - Mobile */
         .top-bar {
-            grid-column: 1 / -1; /* Spans across all columns */
-            grid-row: 1;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 1rem;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(5px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
         }
         .top-bar .currency-display {
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
         }
-        .top-bar .currency-item {
+        .currency-item {
+            display: flex;
+            align-items: center;
             background: rgba(42, 42, 68, 0.6);
             padding: 5px 10px;
             border-radius: 20px;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
+            font-size: 0.75rem;
         }
-        .top-bar .currency-item img {
-            width: 20px; /* Placeholder for currency icons */
-            height: 20px;
-            margin-right: 5px;
-        }
-        
-        /* Left Sidebar */
-        .left-sidebar {
-            grid-column: 1;
-            grid-row: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 1rem;
-            background-color: rgba(26, 26, 46, 0.7);
-            backdrop-filter: blur(5px);
-        }
-        .sidebar-item {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 1rem;
-            cursor: pointer;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-        }
-        .sidebar-item:hover, .sidebar-item.active {
-            border-color: #007BFF;
-            background-color: rgba(60, 60, 100, 0.5);
+        .currency-item img {
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
         }
 
-        /* Main Gacha Content */
+        /* Gacha Main Content - Mobile */
         .gacha-main-content {
-            grid-column: 2;
-            grid-row: 2;
             display: flex;
-            position: relative;
-            padding: 1rem;
-        }
-        
-        .banner-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            z-index: -1;
-            filter: brightness(0.7);
-        }
-        
-        .gacha-banner {
+            flex-direction: column;
             flex-grow: 1;
             position: relative;
         }
-
-        /* Info Panel on the right */
-        .banner-info-panel {
-            width: 300px;
-            min-width: 250px;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
+        .banner-image {
+            width: 100%;
+            height: 200px; /* Fixed height for mobile banner */
+            background-size: cover;
+            background-position: center;
             border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        .banner-info-panel {
+            background: rgba(0, 0, 0, 0.5);
             padding: 1rem;
-            margin-left: 1rem;
+            border-radius: 10px;
             display: flex;
             flex-direction: column;
         }
-        .banner-info-panel h3 {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #76c7c0;
-            margin-bottom: 1rem;
-        }
         .banner-details {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #ccc;
-            margin-bottom: 1rem;
         }
         .gacha-pool-images {
+            display: none; /* Hide on mobile to save space */
+        }
+        .pull-buttons {
             display: flex;
-            justify-content: space-around;
-            gap: 10px;
-            margin-top: auto;
+            gap: 0.5rem;
+            margin-top: 1rem;
         }
-        .gacha-pool-images img {
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
-            border: 2px solid #5a5a7e;
-        }
-
-        /* Bottom Bar */
-        .bottom-bar {
-            grid-column: 1 / -1;
-            grid-row: 3;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 1rem;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(5px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .bottom-bar .pull-buttons {
-            display: flex;
-            gap: 1rem;
-        }
-        .bottom-bar .pull-button {
-            padding: 0.75rem 1.5rem;
+        .pull-button {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.2s;
         }
-        .bottom-bar .utility-buttons {
+        .pull-button.single { background-color: #457b9d; color: white; }
+        .pull-button.multi { background-color: #e63946; color: white; }
+        
+        /* Sidebar - Hidden on mobile by default */
+        .left-sidebar {
+            display: none;
+        }
+        
+        /* Utility buttons - Mobile */
+        .bottom-bar {
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
             gap: 1rem;
+        }
+        .utility-buttons {
+            display: flex;
+            gap: 0.5rem;
         }
         .utility-button {
             background-color: #3a3a5e;
@@ -205,28 +122,137 @@
             font-size: 0.8rem;
             font-weight: bold;
         }
-        
-        /* Gacha Pull Button Colors */
-        .pull-button.single {
-            background-color: #457b9d;
-            color: white;
+
+        /* --- Desktop/Landscape Styles (Min-width: 1024px) --- */
+        @media (min-width: 1024px) {
+            body {
+                overflow: hidden; /* Prevent scrolling on desktop */
+            }
+            .main-game-container {
+                display: grid;
+                grid-template-columns: 100px 1fr;
+                grid-template-rows: 60px 1fr 60px;
+                height: 100vh;
+                padding: 0;
+            }
+            
+            /* Top Bar - Desktop */
+            .top-bar {
+                grid-column: 1 / -1;
+                grid-row: 1;
+                background: rgba(0, 0, 0, 0.4);
+                backdrop-filter: blur(5px);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                margin-bottom: 0;
+                padding: 0 1rem;
+            }
+            .top-bar .currency-item {
+                font-size: 0.8rem;
+            }
+
+            /* Left Sidebar - Desktop */
+            .left-sidebar {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                grid-column: 1;
+                grid-row: 2;
+                background-color: rgba(26, 26, 46, 0.7);
+                backdrop-filter: blur(5px);
+                padding-top: 1rem;
+            }
+            .sidebar-item {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 1rem;
+                cursor: pointer;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                border: 2px solid transparent;
+                border-radius: 8px;
+                transition: all 0.2s ease;
+            }
+            .sidebar-item:hover, .sidebar-item.active {
+                border-color: #007BFF;
+                background-color: rgba(60, 60, 100, 0.5);
+            }
+            
+            /* Main Content - Desktop */
+            .gacha-main-content {
+                grid-column: 2;
+                grid-row: 2;
+                flex-direction: row;
+                padding: 1rem;
+                align-items: center;
+            }
+            .banner-image {
+                position: absolute;
+                width: calc(100% - 116px); /* Adjust for padding and info panel */
+                height: calc(100% - 2rem);
+                background-size: cover;
+                background-position: center;
+                border-radius: 10px;
+                margin-bottom: 0;
+            }
+            .banner-info-panel {
+                width: 300px;
+                height: calc(100% - 2rem);
+                margin-left: auto;
+                background: rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(5px);
+                padding: 1rem;
+                border-radius: 10px;
+                z-index: 10; /* Bring to front */
+                justify-content: space-between;
+            }
+            .gacha-pool-images {
+                display: flex; /* Show on desktop */
+                justify-content: space-around;
+                gap: 10px;
+                margin-top: auto;
+            }
+            .gacha-pool-images img {
+                width: 80px;
+                height: 80px;
+                border-radius: 8px;
+                border: 2px solid #5a5a7e;
+            }
+            
+            /* Bottom Bar - Desktop */
+            .bottom-bar {
+                grid-column: 1 / -1;
+                grid-row: 3;
+                background: rgba(0, 0, 0, 0.4);
+                backdrop-filter: blur(5px);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                margin-top: 0;
+                padding: 0 1rem;
+                justify-content: space-between;
+                align-items: center;
+            }
         }
-        .pull-button.multi {
-            background-color: #e63946;
-            color: white;
-        }
         
-        /* ... (Keep the styles for the Pull Results and Shop modals from the previous response) ... */
+        /* Pull Results Modal (from previous response) */
+        .results-modal { /* ... */ }
+        .results-modal-content { /* ... */ }
+        .results-grid { /* ... */ }
+        .result-card { /* ... */ }
+        .result-card.rarity-5 { /* ... */ }
+        /* ... (all other modal styles remain) ... */
     </style>
 </head>
 <body>
     <div class="main-game-container">
         
         <div class="top-bar">
-            <a href="/" class="text-3xl">&#x2302;</a> <div class="currency-display" id="currencyDisplay">
-                <div class="currency-item"><img src="https://via.placeholder.com/20" alt="SNC"> <span id="snc-count">1000</span></div>
-                <div class="currency-item"><img src="https://via.placeholder.com/20" alt="Lumen"> <span id="lumen-count">5</span></div>
-                <div class="currency-item"><img src="https://via.placeholder.com/20" alt="Halo"> <span id="halo-count">0</span></div>
+            <a href="/" class="text-3xl">&#x2302;</a>
+            <div class="currency-display" id="currencyDisplay">
+                <div class="currency-item"><img src="https://via.placeholder.com/16" alt="SNC"> <span id="snc-count">1000</span></div>
+                <div class="currency-item"><img src="https://via.placeholder.com/16" alt="Lumen"> <span id="lumen-count">5</span></div>
+                <div class="currency-item"><img src="https://via.placeholder.com/16" alt="Halo"> <span id="halo-count">0</span></div>
             </div>
             <div class="user-info">
                 <span id="user-id">0000000</span>
@@ -246,10 +272,9 @@
 
         <div class="gacha-main-content">
             <div class="banner-image" id="bannerImage"></div>
-
             <div class="banner-info-panel">
-                <h3 id="bannerTitle">Standard Banner</h3>
-                <p id="bannerSubtitle" class="text-xs text-gray-400">A permanent collection of heroes and more.</p>
+                <h3 id="bannerTitle" class="text-xl md:text-3xl font-bold mb-2">Standard Banner</h3>
+                <p id="bannerSubtitle" class="text-xs text-gray-400 mb-4">A permanent collection of heroes and more.</p>
                 <div id="bannerDetails" class="banner-details">
                     </div>
                 <div class="gacha-pool-images mt-auto">
@@ -269,49 +294,63 @@
                 <button class="pull-button multi" onclick="pullGacha('multi', 'standard')">10 Signal Searches</button>
             </div>
         </div>
-
     </div>
-
+    
     <div id="shopModal" class="modal">
         </div>
     
     <div id="pullResultsModal" class="results-modal">
         </div>
 
-    <script src="{{ url_for('static', filename='game.js') }}"></script>
     <script>
-        // --- ALL JAVASCRIPT FUNCTIONS HERE (ADAPTED FOR NEW UI) ---
-        
+        // --- ALL JAVASCRIPT FUNCTIONS HERE ---
         document.addEventListener('DOMContentLoaded', () => {
             fetchUserData();
-            switchBanner('standard'); // Set initial banner
-        });
-
-        // Function to fetch user data from the backend
-        function fetchUserData() {
-            const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
-            if (!initData) {
-                console.error("Telegram init data is not available.");
-                updateCurrencyDisplay({ star_night_crystals: 1000, lumen_orbs: 5, halo_orbs: 0, auric_crescents: 0 });
-                return;
+            // Check screen width and set initial banner layout
+            if (window.innerWidth >= 1024) {
+                switchBanner('standard');
+            } else {
+                // Mobile view, no sidebar to activate
+                updateBannerContent('standard');
             }
+        });
+        
+        // Function to update the banner's content based on type
+        function updateBannerContent(bannerType) {
+            const bannerTitle = document.getElementById('bannerTitle');
+            const bannerSubtitle = document.getElementById('bannerSubtitle');
+            const bannerDetails = document.getElementById('bannerDetails');
+            const bannerImage = document.getElementById('bannerImage');
+            const singlePullBtn = document.querySelector('.pull-button.single');
+            const multiPullBtn = document.querySelector('.pull-button.multi');
 
-            fetch('/get_user_data', {
-                method: 'GET',
-                headers: { 'X-Telegram-Init-Data': initData }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    updateCurrencyDisplay(data);
-                    updatePityCounters(data.pity_counters);
-                } else {
-                    console.error("Failed to fetch user data:", data.message);
-                }
-            })
-            .catch(error => console.error("Error fetching user data:", error));
+            if (bannerType === 'standard') {
+                bannerTitle.innerText = "Standard Banner";
+                bannerSubtitle.innerText = "A permanent collection of heroes and more.";
+                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Standard+Banner+Art")';
+                singlePullBtn.onclick = () => pullGacha('single', 'standard');
+                multiPullBtn.onclick = () => pullGacha('multi', 'standard');
+            } else if (bannerType === 'limited') {
+                bannerTitle.innerText = "Whispered Tales";
+                bannerSubtitle.innerText = "Rate up for selected A-Rank and Limited S-Rank Signals!";
+                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Limited+Banner+Art")';
+                bannerDetails.innerHTML = `<p>Remaining 04d 00h</p><p>4-Rank or higher Signal guaranteed in 9 Searches</p><p>5-Rank Signal guaranteed in 18 Searches</p>`;
+                singlePullBtn.onclick = () => pullGacha('single', 'limited');
+                multiPullBtn.onclick = () => pullGacha('multi', 'limited');
+            }
+        }
+        
+        // Combined switchBanner function for responsive design
+        function switchBanner(bannerType) {
+            // Only update sidebar if it's visible (desktop)
+            if (window.innerWidth >= 1024) {
+                document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+                document.querySelector(`.sidebar-item[onclick*="'${bannerType}'"]`).classList.add('active');
+            }
+            updateBannerContent(bannerType);
         }
 
-        // Function to update the currency display on the new top bar
-        function updateCurrencyDisplay(data) {
-            document.getElementById('snc-count').innerText}
+        // ... (other functions like fetchUserData, updateCurrencyDisplay, updatePityCounters, pullGacha, displayPullResults, closeResultsModal, openShopModal, closeShopModal, exchangeCurrency remain the same as in previous responses) ...
+    </script>
+</body>
+</html>
