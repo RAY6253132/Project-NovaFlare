@@ -14,82 +14,47 @@
             margin: 0;
             background-color: #1a1a2e;
             color: white;
-            overflow: hidden; /* Prevent scrolling on mobile */
+            overflow: hidden;
             position: relative;
         }
 
-        /* --- Global Grid Layout --- */
         .main-game-container {
-            display: grid;
-            grid-template-columns: 70px 1fr; /* Compact sidebar for mobile */
-            grid-template-rows: 50px 1fr;
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
-            gap: 0;
         }
         
-        /* Top Bar */
+        /* Standalone Back/Home Button */
+        .back-home-button {
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            z-index: 20;
+        }
+
+        /* Top Bar with User ID */
         .top-bar {
-            grid-column: 1 / -1;
-            grid-row: 1;
             display: flex;
-            justify-content: flex-start;
+            justify-content: flex-end;
             align-items: center;
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(5px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 0 0.5rem;
+            padding: 0.5rem;
             z-index: 20;
         }
+        .user-info {
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
 
-        /* Left Sidebar (Permanent) */
-        .left-sidebar {
-            grid-column: 1;
-            grid-row: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: rgba(26, 26, 46, 0.7);
-            backdrop-filter: blur(5px);
-            padding-top: 0.5rem;
-            z-index: 10;
-        }
-        .sidebar-item {
-            width: 50px;
-            height: 50px;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            font-size: 0.6rem;
-            background: linear-gradient(180deg, rgba(60, 60, 100, 0.5) 0%, rgba(42, 42, 68, 0.5) 100%);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-        .sidebar-item:hover, .sidebar-item.active {
-            border-color: #007BFF;
-            background: linear-gradient(180deg, rgba(0, 123, 255, 0.7) 0%, rgba(0, 100, 200, 0.7) 100%);
-        }
-        .sidebar-item .text-xl {
-            font-size: 1.1rem;
-        }
-        
-        /* Main Content */
+        /* Main Gacha Content Area (Banner Art) */
         .gacha-main-content {
-            grid-column: 2;
-            grid-row: 2;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
+            flex-grow: 1;
             position: relative;
             overflow: hidden;
             background-size: cover;
             background-position: center;
-            height: 100%;
         }
 
         /* Overlaid UI elements */
@@ -102,24 +67,19 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            align-items: center;
             padding: 0.5rem;
             box-sizing: border-box;
         }
-        
-        .overlay-top {
-            width: 100%;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-        .currency-display {
+
+        .currencies-top-right {
+            align-self: flex-end;
             display: flex;
             gap: 0.25rem;
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(5px);
             padding: 5px 10px;
             border-radius: 20px;
+            margin-top: 0.5rem;
         }
         .currency-item {
             display: flex;
@@ -135,62 +95,16 @@
             height: 14px;
             margin-right: 2px;
         }
-        .user-info {
-            font-size: 0.6rem;
-            margin-left: 0.5rem;
-        }
-        
-        .overlay-right-panel {
-            align-self: flex-end;
-            height: fit-content;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            padding: 0.75rem;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            width: calc(100% - 1rem);
-            max-width: 300px;
-            box-sizing: border-box;
-            margin-top: auto;
-        }
-        .overlay-right-panel h3 {
-            font-size: 1rem;
-            font-weight: bold;
-        }
-        .overlay-right-panel p {
-            font-size: 0.7rem;
-        }
-        .banner-details {
-            font-size: 0.7rem;
-            color: #ccc;
-        }
 
-        .overlay-bottom {
-            width: 100%;
+        .pull-buttons-bottom-right {
+            align-self: flex-end;
+            margin-top: auto;
             display: flex;
             flex-direction: column;
-            align-items: center;
-        }
-        .bottom-buttons {
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-        .bottom-buttons .pull-buttons {
-            display: flex;
-            gap: 0.25rem;
-            flex-grow: 1;
-        }
-        .bottom-buttons .utility-buttons {
-            display: flex;
             gap: 0.25rem;
         }
         .pull-button {
-            flex-grow: 1;
-            padding: 0.5rem 0.5rem;
+            padding: 0.5rem 1rem;
             font-size: 0.75rem;
             font-weight: bold;
             border-radius: 6px;
@@ -202,17 +116,29 @@
             transform: translateY(1px);
             box-shadow: none;
         }
-        .pull-button.single { 
-            background: linear-gradient(180deg, #457b9d 0%, #356a8e 100%); 
-            color: white; 
+        .pull-button.single {
+            background: linear-gradient(180deg, #457b9d 0%, #356a8e 100%);
+            color: white;
             box-shadow: 0 3px 0 #2a5573;
         }
-        .pull-button.multi { 
-            background: linear-gradient(180deg, #e63946 0%, #c42b37 100%); 
-            color: white; 
+        .pull-button.multi {
+            background: linear-gradient(180deg, #e63946 0%, #c42b37 100%);
+            color: white;
             box-shadow: 0 3px 0 #9c222e;
         }
         
+        /* Utility Buttons Below Banner */
+        .utility-buttons-container {
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 20;
+        }
         .utility-button {
             background: linear-gradient(180deg, #3a3a5e 0%, #2a2a44 100%);
             color: white;
@@ -220,186 +146,36 @@
             border-radius: 6px;
             font-size: 0.75rem;
             font-weight: bold;
+            flex-grow: 1;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        /* --- Desktop/Landscape Styles --- */
-        @media (min-width: 1024px) {
-            .main-game-container {
-                grid-template-columns: 100px 1fr; /* Wider sidebar for PC */
-                grid-template-rows: 60px 1fr;
-            }
-            .top-bar {
-                padding: 0 1rem;
-            }
-            .left-sidebar {
-                padding-top: 1rem;
-            }
-            .sidebar-item {
-                width: 80px;
-                height: 80px;
-                margin-bottom: 1rem;
-                font-size: 0.75rem;
-            }
-            .sidebar-item .text-xl {
-                font-size: 1.5rem;
-            }
-            .gacha-main-content {
-                padding: 1rem;
-            }
-            .overlay-container {
-                padding: 1rem;
-            }
-            .currency-display {
-                gap: 1rem;
-            }
-            .currency-item {
-                font-size: 0.8rem;
-                padding: 5px 10px;
-            }
-            .currency-item img {
-                width: 16px;
-                height: 16px;
-            }
-            .user-info {
-                font-size: 0.8rem;
-            }
-            .overlay-right-panel {
-                width: 350px;
-                height: calc(100% - 2rem);
-                padding: 1.5rem;
-                justify-content: space-between;
-                margin: auto 1rem 1rem auto;
-            }
-            .overlay-right-panel h3 {
-                font-size: 1.5rem;
-            }
-            .overlay-right-panel p {
-                font-size: 0.8rem;
-            }
-            .overlay-bottom {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: flex-end;
-                padding: 0 1rem 1rem;
-            }
-            .bottom-buttons {
-                width: auto;
-            }
-            .pull-buttons {
-                gap: 1rem;
-                order: 2;
-            }
-            .pull-button {
-                font-size: 0.9rem;
-                padding: 0.75rem 1rem;
-            }
-            .utility-buttons {
-                gap: 1rem;
-                order: 1;
-            }
-            .utility-button {
-                font-size: 0.8rem;
-                padding: 0.75rem 1rem;
-            }
-        }
-        
-        /* --- Pull Results Modal (Unchanged) --- */
-        .results-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-        .results-modal-content {
-            background-color: #2a2a44;
-            padding: 2rem;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-        .close-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .result-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #3a3a5e;
-            border-radius: 8px;
-            padding: 0.5rem;
-            position: relative;
-        }
-        .result-card .item-image {
-            width: 100%;
-            height: auto;
-            border-radius: 4px;
-        }
-        .result-card .item-name {
-            font-size: 0.8rem;
             text-align: center;
-            margin-top: 0.5rem;
         }
-        .result-card .item-count {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            background: rgba(0,0,0,0.7);
-            padding: 2px 6px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-        }
-        .result-card .new-badge {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background: #e63946;
-            color: white;
-            padding: 2px 5px;
-            border-radius: 5px;
-            font-size: 0.6rem;
-            font-weight: bold;
-        }
-        .rarity-label {
-            font-size: 0.7rem;
-            font-weight: bold;
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(0,0,0,0.7);
-            padding: 2px 5px;
-            border-radius: 5px;
-        }
-        .rarity-label.ssr { color: gold; }
-        .rarity-label.sr { color: #8a2be2; }
-        .rarity-label.r { color: #457b9d; }
-        .rarity-5 { box-shadow: 0 0 10px gold; }
-        .rarity-4 { box-shadow: 0 0 10px #8a2be2; }
 
-        /* --- Shop Modal (Unchanged) --- */
+        /* Banner Selector Buttons (Horizontal) */
+        .banner-selector-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 20;
+        }
+        .banner-selector-button {
+            padding: 0.5rem 1rem;
+            background: #3a3a5e;
+            border-radius: 6px;
+            font-weight: bold;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        .banner-selector-button.active, .banner-selector-button:hover {
+            background: #007BFF;
+            box-shadow: 0 0 10px #007BFF;
+        }
+
+        /* --- Shop Modal Styles --- */
         .modal {
             position: fixed;
             z-index: 200;
@@ -416,86 +192,101 @@
             background-color: #2a2a44;
             padding: 2rem;
             border-radius: 10px;
-            width: 80%;
-            max-width: 500px;
+            width: 90%;
+            max-width: 600px;
             text-align: center;
             position: relative;
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .shop-item {
+            background: #3a3a5e;
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .shop-item h4 {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .shop-item p {
+            font-size: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .shop-item button {
+            background-color: #007BFF;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="main-game-container">
-        
-        <div class="top-bar">
+        <div class="back-home-button">
             <a href="/" class="text-2xl">&#x2302;</a>
         </div>
 
-        <div class="left-sidebar">
-            <div class="sidebar-item active" onclick="switchBanner('standard_character')">
-                <span class="text-xl">&#x2728;</span>
-                <span>Standard</span>
+        <div class="top-bar">
+            <div class="banner-selector-buttons" id="bannerSelectorButtons">
+                <button class="banner-selector-button" onclick="switchBanner('limited_character_1')">Limited Character 1</button>
+                <button class="banner-selector-button" onclick="switchBanner('limited_character_2')">Limited Character 2</button>
+                <button class="banner-selector-button" onclick="switchBanner('standard_character')">Standard Character</button>
             </div>
-            <div class="sidebar-item" onclick="switchBanner('limited_character_1')">
-                <span class="text-xl">&#x1f525;</span>
-                <span>Limited</span>
-            </div>
-            <div class="sidebar-item" onclick="switchBanner('limited_character_2')">
-                <span class="text-xl">&#x1f525;</span>
-                <span>Limited</span>
-            </div>
-            <div class="sidebar-item" onclick="switchBanner('standard_weapon')">
-                <span class="text-xl">&#x2694;&#xfe0f;</span>
-                <span>Weapon</span>
+            <div class="user-info">
+                <span id="user-id">0000000</span>
             </div>
         </div>
 
         <div class="gacha-main-content" id="bannerImage">
             <div class="overlay-container">
-                <div class="overlay-top">
-                    <div class="currency-display" id="currencyDisplay">
-                        <div class="currency-item">
-                            <img src="{{ url_for('static', filename='snc_icon.png') }}" alt="SNC"> 
-                            <span id="snc-count">1000</span>
-                        </div>
-                        <div class="currency-item" id="lumen-currency-item">
-                            <img src="{{ url_for('static', filename='lumen_icon.png') }}" alt="Lumen"> 
-                            <span id="lumen-count">5</span>
-                        </div>
-                        <div class="currency-item" id="halo-currency-item">
-                            <img src="{{ url_for('static', filename='halo_icon.png') }}" alt="Halo"> 
-                            <span id="halo-count">0</span>
-                        </div>
+                <div class="currencies-top-right">
+                    <div class="currency-item">
+                        <img src="{{ url_for('static', filename='snc_icon.png') }}" alt="SNC"> 
+                        <span id="snc-count">1000</span>
                     </div>
-                    <div class="user-info">
-                        <span id="user-id">0000000</span>
+                    <div class="currency-item" id="lumen-currency-item">
+                        <img src="{{ url_for('static', filename='lumen_icon.png') }}" alt="Lumen"> 
+                        <span id="lumen-count">5</span>
                     </div>
-                </div>
-                
-                <div class="overlay-right-panel">
-                    <div>
-                        <h3 id="bannerTitle" class="font-bold">Standard Character Banner</h3>
-                        <p id="bannerSubtitle" class="text-gray-400">A permanent collection of heroes and more.</p>
-                    </div>
-                    <div id="bannerDetails" class="banner-details">
-                        </div>
-                </div>
-
-                <div class="overlay-bottom">
-                    <div class="bottom-buttons">
-                        <div class="utility-buttons">
-                            <button class="utility-button" onclick="openShopModal()">Shop</button>
-                            <button class="utility-button">Details</button>
-                            <button class="utility-button">History</button>
-                            <button class="utility-button" id="switchBannerBtn" onclick="switchToOtherBanner()">Switch To Weapon Banner</button>
-                        </div>
-                    </div>
-                    <div class="pull-buttons">
-                        <button class="pull-button single" onclick="pullGacha('single', currentBanner)">Single Signal Search (100 SNC)</button>
-                        <button class="pull-button multi" onclick="pullGacha('multi', currentBanner)">10 Signal Searches (10 Lumen Orbs)</button>
+                    <div class="currency-item" id="halo-currency-item">
+                        <img src="{{ url_for('static', filename='halo_icon.png') }}" alt="Halo"> 
+                        <span id="halo-count">0</span>
                     </div>
                 </div>
 
+                <div class="pull-buttons-bottom-right">
+                    <button class="pull-button single" onclick="pullGacha('single', currentBanner)">Pull x1</button>
+                    <button class="pull-button multi" onclick="pullGacha('multi', currentBanner)">Pull x10</button>
+                </div>
             </div>
+        </div>
+
+        <div class="utility-buttons-container">
+            <button class="utility-button" onclick="openShopModal()">Shop</button>
+            <button class="utility-button">Details</button>
+            <button class="utility-button">History</button>
+            <button class="utility-button" id="switchBannerBtn" onclick="switchToOtherBanner()">Switch To Weapon Banner</button>
         </div>
     </div>
     
@@ -503,9 +294,28 @@
         <div class="modal-content">
             <span onclick="closeShopModal()" class="close-button">&times;</span>
             <h2 class="text-xl font-bold mb-4">Shop</h2>
-            <p>Exchange Auric Crescents for Signals.</p>
-            <button class="bg-indigo-600 text-white p-2 rounded-md mt-4" onclick="exchangeCurrency('lumen')">10 Auric Crescents for 1 Lumen Orb</button>
-            <button class="bg-indigo-600 text-white p-2 rounded-md mt-4" onclick="exchangeCurrency('halo')">100 Auric Crescents for 1 Halo Orb</button>
+            <div class="shop-grid">
+                <div class="shop-item">
+                    <h4>Purchase Lumen Orbs</h4>
+                    <p>100 Auric Crescents for 1 Lumen Orb</p>
+                    <button onclick="exchangeCurrency('lumen')">Buy</button>
+                </div>
+                <div class="shop-item">
+                    <h4>Purchase Halo Orbs</h4>
+                    <p>1000 Auric Crescents for 1 Halo Orb</p>
+                    <button onclick="exchangeCurrency('halo')">Buy</button>
+                </div>
+                <div class="shop-item">
+                    <h4>Weekly Special</h4>
+                    <p>Limited-time offer! 10 Lumen Orbs for 900 SNC.</p>
+                    <button>Buy</button>
+                </div>
+                <div class="shop-item">
+                    <h4>Monthly Pack</h4>
+                    <p>A great value for regular players.</p>
+                    <button>Buy</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -519,7 +329,7 @@
     </div>
     
     <script>
-        let currentBanner = 'standard_character';
+        let currentBanner = 'limited_character_1'; // Set a default banner
         
         document.addEventListener('DOMContentLoaded', () => {
             fetchUserData();
@@ -551,19 +361,19 @@
             .catch(error => console.error("Error fetching user data:", error));
         }
 
-        // Function to update the currency display on the new top bar
+        // Function to update the currency display
         function updateCurrencyDisplay(data) {
             document.getElementById('snc-count').innerText = data.star_night_crystals;
             document.getElementById('lumen-count').innerText = data.lumen_orbs;
             document.getElementById('halo-count').innerText = data.halo_orbs;
         }
 
-        // Function to update pity counters display on the right info panel
+        // Function to update pity counters display
         function updatePityCounters(pity) {
             const bannerDetails = document.getElementById('bannerDetails');
-            const standardPityText5 = `5-Rank Signal guaranteed in ${90 - pity.standard['5_star']} Searches`;
-            const standardPityText4 = `4-Rank or higher Signal guaranteed in ${10 - pity.standard['4_star']} Searches`;
-            bannerDetails.innerHTML = `<p>${standardPityText5}</p><p>${standardPityText4}</p>`;
+            // This part needs to be dynamically updated based on the banner type
+            // For now, it's a placeholder
+            bannerDetails.innerHTML = `<p>Pity info for selected banner</p>`;
         }
 
         // Function to perform a gacha pull
@@ -590,6 +400,7 @@
                         halo_orbs: data.remaining_halo_orbs,
                         auric_crescents: data.remaining_auric_crescents
                     });
+                    // This needs to be updated with correct pity logic
                     updatePityCounters({
                         standard: { '4_star': data.pity_4_star, '5_star': data.pity_5_star }
                     });
@@ -638,77 +449,39 @@
             document.getElementById('pullResultsModal').style.display = 'none';
         }
 
-        // A new function to handle the dynamic display of currencies and button text
-        function updateDisplayForBanner(bannerType) {
-            const lumenCurrencyItem = document.getElementById('lumen-currency-item');
-            const haloCurrencyItem = document.getElementById('halo-currency-item');
-            const singlePullBtn = document.querySelector('.pull-button.single');
-            const multiPullBtn = document.querySelector('.pull-button.multi');
+        // Function to handle banner switching and UI updates
+        function switchBanner(bannerType) {
+            const bannerSelectorButtons = document.querySelectorAll('.banner-selector-button');
+            bannerSelectorButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[onclick="switchBanner('${bannerType}')"]`).classList.add('active');
+            
+            currentBanner = bannerType;
 
-            if (bannerType === 'standard_character' || bannerType === 'standard_weapon') {
-                lumenCurrencyItem.style.display = 'flex';
-                haloCurrencyItem.style.display = 'none';
-                singlePullBtn.innerText = "Single Signal Search (100 SNC)";
-                multiPullBtn.innerText = "10 Signal Searches (10 Lumen Orbs)";
-            } else if (bannerType === 'limited_character_1' || bannerType === 'limited_character_2') {
-                lumenCurrencyItem.style.display = 'none';
-                haloCurrencyItem.style.display = 'flex';
-                singlePullBtn.innerText = "Single Signal Search (100 SNC)";
-                multiPullBtn.innerText = "10 Signal Searches (10 Halo Orbs)";
-            }
-        }
-
-        function updateBannerContent(bannerType) {
-            const bannerTitle = document.querySelector('.overlay-right-panel h3');
-            const bannerSubtitle = document.querySelector('.overlay-right-panel p');
-            const bannerDetails = document.getElementById('bannerDetails');
             const bannerImage = document.getElementById('bannerImage');
             const switchBtn = document.getElementById('switchBannerBtn');
-            
-            if (bannerType === 'standard_character') {
-                bannerTitle.innerText = "Standard Character Banner";
-                bannerSubtitle.innerText = "A permanent collection of heroes and more.";
-                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Standard+Character+Banner+Art")';
-                bannerDetails.innerHTML = `<p>5-Rank Signal guaranteed in 90 Searches</p><p>4-Rank or higher Signal guaranteed in 10 Searches</p>`;
-                switchBtn.innerText = "Switch To Standard Weapon Banner";
-                switchBtn.onclick = () => switchBanner('standard_weapon');
-            } else if (bannerType === 'limited_character_1') {
-                bannerTitle.innerText = "Whispered Tales: Character 1";
-                bannerSubtitle.innerText = "Rate up for a selected A-Rank and Limited S-Rank Signals!";
-                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Limited+Character+1+Banner+Art")';
-                bannerDetails.innerHTML = `<p>Remaining 04d 00h</p><p>4-Rank or higher Signal guaranteed in 9 Searches</p><p>5-Rank Signal guaranteed in 18 Searches</p>`;
-                switchBtn.innerText = "Switch To Limited Weapon Banner";
-                switchBtn.onclick = () => switchBanner('standard_weapon'); // Assuming limited character banners share the same weapon banner
-            } else if (bannerType === 'limited_character_2') {
-                bannerTitle.innerText = "Whispered Tales: Character 2";
-                bannerSubtitle.innerText = "Rate up for a selected A-Rank and Limited S-Rank Signals!";
-                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Limited+Character+2+Banner+Art")';
-                bannerDetails.innerHTML = `<p>Remaining 04d 00h</p><p>4-Rank or higher Signal guaranteed in 9 Searches</p><p>5-Rank Signal guaranteed in 18 Searches</p>`;
-                switchBtn.innerText = "Switch To Limited Weapon Banner";
-                switchBtn.onclick = () => switchBanner('standard_weapon');
-            } else if (bannerType === 'standard_weapon') {
-                bannerTitle.innerText = "Standard Weapon Banner";
-                bannerSubtitle.innerText = "A permanent collection of weapons and more.";
-                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Standard+Weapon+Banner+Art")';
-                bannerDetails.innerHTML = `<p>5-Rank Signal guaranteed in 90 Searches</p><p>4-Rank or higher Signal guaranteed in 10 Searches</p>`;
-                switchBtn.innerText = "Switch To Standard Character Banner";
-                switchBtn.onclick = () => switchBanner('standard_character');
-            }
-            updateDisplayForBanner(bannerType);
-        }
+            const lumenCurrencyItem = document.getElementById('lumen-currency-item');
+            const haloCurrencyItem = document.getElementById('halo-currency-item');
 
-        function switchBanner(bannerType) {
-            currentBanner = bannerType;
-            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
-            document.querySelector(`.sidebar-item[onclick*="'${bannerType}'"]`).classList.add('active');
-            updateBannerContent(bannerType);
+            if (bannerType.includes('character')) {
+                lumenCurrencyItem.style.display = 'flex';
+                haloCurrencyItem.style.display = 'none';
+                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=' + bannerType + '")';
+                switchBtn.innerText = "Switch To Weapon Banner";
+            } else if (bannerType.includes('weapon')) {
+                lumenCurrencyItem.style.display = 'none';
+                haloCurrencyItem.style.display = 'flex';
+                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=' + bannerType + '")';
+                switchBtn.innerText = "Switch To Character Banner";
+            }
         }
         
         function switchToOtherBanner() {
-            if (currentBanner === 'standard_character' || currentBanner === 'limited_character_1' || currentBanner === 'limited_character_2') {
-                switchBanner('standard_weapon');
-            } else if (currentBanner === 'standard_weapon') {
-                switchBanner('standard_character');
+            const isCharacterBanner = currentBanner.includes('character');
+            
+            if (isCharacterBanner) {
+                switchBanner(currentBanner.replace('character', 'weapon'));
+            } else {
+                switchBanner(currentBanner.replace('weapon', 'character'));
             }
         }
         
