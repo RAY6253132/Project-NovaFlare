@@ -246,9 +246,10 @@
         </div>
 
         <div class="banner-selector-buttons" id="bannerSelectorButtons">
-            <button class="banner-selector-button" data-banner-group="limited_1" onclick="switchBanner('limited_character_1')">Limited Character 1</button>
-            <button class="banner-selector-button" data-banner-group="limited_2" onclick="switchBanner('limited_character_2')">Limited Character 2</button>
+            <button class="banner-selector-button" data-banner-group="limited" onclick="switchBanner('limited_character_1')">Limited Character 1</button>
+            <button class="banner-selector-button" data-banner-group="limited" onclick="switchBanner('limited_character_2')">Limited Character 2</button>
             <button class="banner-selector-button" data-banner-group="standard" onclick="switchBanner('standard_character')">Standard Character</button>
+            <button class="banner-selector-button" data-banner-group="weapon" onclick="switchBanner('weapon')">Standard Weapon</button>
         </div>
 
         <div class="gacha-main-content" id="bannerImage">
@@ -403,11 +404,13 @@
             const bannerSelectorButtons = document.querySelectorAll('.banner-selector-button');
             bannerSelectorButtons.forEach(btn => btn.classList.remove('active'));
 
-            // Determine the base banner group from the bannerType
-            const baseBannerGroup = bannerType.split('_')[0] + '_' + bannerType.split('_')[1];
-            
             // Find and activate the correct banner selector button
-            document.querySelector(`[data-banner-group="${baseBannerGroup}"]`).classList.add('active');
+            if (bannerType.includes('character')) {
+                document.querySelector(`[onclick="switchBanner('${bannerType}')"]`).classList.add('active');
+            } else {
+                // Special handling for the weapon banner as it's a single type
+                document.querySelector(`[onclick="switchBanner('weapon')"]`).classList.add('active');
+            }
             
             currentBanner = bannerType;
 
@@ -424,7 +427,7 @@
             } else if (bannerType.includes('weapon')) {
                 lumenCurrencyItem.style.display = 'none';
                 haloCurrencyItem.style.display = 'flex';
-                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=' + bannerType.replace(/_/g, ' ') + ' Banner")';
+                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=Standard Weapon Banner")';
                 switchBtn.innerText = "Switch To Character Banner";
             }
         }
@@ -433,9 +436,9 @@
             const isCharacterBanner = currentBanner.includes('character');
             
             if (isCharacterBanner) {
-                switchBanner(currentBanner.replace('character', 'weapon'));
+                switchBanner('weapon');
             } else {
-                switchBanner(currentBanner.replace('weapon', 'character'));
+                switchBanner('limited_character_1');
             }
         }
         
