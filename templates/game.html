@@ -329,16 +329,70 @@
             switchBanner(currentBanner);
         });
 
-        // Backend functions remain unchanged for this fix
-        function fetchUserData() { /* ... */ }
-        function updateCurrencyDisplay(data) { /* ... */ }
-        function pullGacha(pullType, bannerType) { /* ... */ }
-        function displayPullResults(items) { /* ... */ }
-        function openShopModal() { /* ... */ }
-        function closeShopModal() { /* ... */ }
-        function exchangeCurrency(exchangeType) { /* ... */ }
+        function fetchUserData() {
+            const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
+            if (!initData) {
+                console.error("Telegram init data is not available.");
+                updateCurrencyDisplay({ star_night_crystals: 1000, lumen_orbs: 5, halo_orbs: 0 });
+                document.getElementById('user-id').innerText = '0000000';
+                return;
+            }
+            fetch('/get_user_data', {
+                method: 'GET',
+                headers: { 'X-Telegram-Init-Data': initData }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    updateCurrencyDisplay(data);
+                    document.getElementById('user-id').innerText = data.user_id;
+                } else {
+                    console.error("Failed to fetch user data:", data.message);
+                }
+            })
+            .catch(error => console.error("Error fetching user data:", error));
+        }
 
-        // Corrected: Function to handle banner switching and UI updates
+        function updateCurrencyDisplay(data) {
+            document.getElementById('snc-count').innerText = data.star_night_crystals;
+            document.getElementById('lumen-count').innerText = data.lumen_orbs;
+            document.getElementById('halo-count').innerText = data.halo_orbs;
+        }
+
+        function pullGacha(pullType, bannerType) {
+            const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
+            if (!initData) {
+                alert("Please open this app inside Telegram to play.");
+                return;
+            }
+            fetch('/pull_gacha', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Telegram-Init-Data': initData
+                },
+                body: JSON.stringify({ pull_type: pullType, banner_type: bannerType })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    updateCurrencyDisplay({
+                        star_night_crystals: data.remaining_crystals,
+                        lumen_orbs: data.remaining_lumen_orbs,
+                        halo_orbs: data.remaining_halo_orbs
+                    });
+                    displayPullResults(data.pulled_items);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error("Error pulling gacha:", error));
+        }
+        
+        function displayPullResults(items) {
+            alert('Pulled: ' + items.map(item => item.name).join(', '));
+        }
+
         function switchBanner(bannerType) {
             const bannerSelectorButtons = document.querySelectorAll('.banner-selector-button');
             bannerSelectorButtons.forEach(btn => btn.classList.remove('active'));
@@ -350,7 +404,6 @@
             
             currentBanner = bannerType;
 
-            // Handle button activation and currency display
             if (bannerType.includes('limited')) {
                 haloCurrencyItem.style.display = 'flex';
                 lumenCurrencyItem.style.display = 'none';
@@ -359,12 +412,13 @@
                 haloCurrencyItem.style.display = 'none';
             }
 
-            // Set the correct banner image and utility button text based on the banner type
             if (bannerType.includes('character')) {
+                // Find the correct button using the banner type
                 document.querySelector(`[onclick="switchBanner('${bannerType}')"]`).classList.add('active');
                 bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=' + bannerType.replace(/_/g, ' ') + ' Banner")';
                 switchBtn.innerText = "Switch To Weapon Banner";
-            } else { // This handles weapon banners, including the new limited ones
+            } else {
+                // If it's a weapon banner, find the corresponding character banner button to activate
                 const correspondingCharacterBanner = bannerType.replace('weapon', 'character');
                 document.querySelector(`[onclick="switchBanner('${correspondingCharacterBanner}')"]`).classList.add('active');
                 bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=' + bannerType.replace(/_/g, ' ') + ' Banner")';
@@ -372,12 +426,10 @@
             }
         }
         
-        // Corrected: Function to switch between character and weapon banners
         function switchToOtherBanner() {
             const isCharacterBanner = currentBanner.includes('character');
             
             if (isCharacterBanner) {
-                // If on a character banner, switch to its corresponding weapon banner
                 if (currentBanner === 'limited_character_1') {
                     switchBanner('limited_weapon_1');
                 } else if (currentBanner === 'limited_character_2') {
@@ -386,7 +438,6 @@
                     switchBanner('standard_weapon');
                 }
             } else {
-                // If on a weapon banner, switch back to its corresponding character banner
                 if (currentBanner === 'limited_weapon_1') {
                     switchBanner('limited_character_1');
                 } else if (currentBanner === 'limited_weapon_2') {
@@ -395,6 +446,18 @@
                     switchBanner('standard_character');
                 }
             }
+        }
+        
+        function openShopModal() {
+            document.getElementById('shopModal').style.display = 'flex';
+        }
+
+        function closeShopModal() {
+            document.getElementById('shopModal').style.display = 'none';
+        }
+        
+        function exchangeCurrency(exchangeType) {
+            alert(`Exchanging for ${exchangeType}! (Backend logic not yet implemented)`);
         }
     </script>
 </body>
