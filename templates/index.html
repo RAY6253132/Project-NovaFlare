@@ -2,107 +2,78 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NovaFlare Gacha</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NovaFlare</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-
+        
         body {
             font-family: 'Inter', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
             margin: 0;
-            color: #fff;
+            background-color: #1a1a2e;
+            color: white;
+            overflow: hidden;
             position: relative;
-            background-color: #1a1a2e; /* Fallback color */
-            
-            /* Background Image styling */
-            background-image: url("{{ url_for('static', filename='novaflare_bg.png') }}");
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
+            background-image: url('https://via.placeholder.com/1080x1920?text=Background+Art');
         }
 
-        .homepage-container {
+        .main-app-container {
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+        }
+
+        /* --- Homescreen Styles --- */
+        .home-screen-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
             align-items: center;
-            width: 90%;
-            max-width: 500px;
-            min-height: 80vh; 
-            height: auto;
-            background: rgba(25, 25, 40, 0.75);
-            backdrop-filter: blur(8px);
-            border: 2px solid #3a3a5e;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            padding: 2rem;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
         }
-
-        @media (max-width: 768px) {
-            .homepage-container {
-                padding: 10px; /* Smaller padding on mobile */
-            }
-        }
-
-        .logo {
+        .home-title {
             font-size: 2.5rem;
             font-weight: bold;
-            color: #76c7c0;
-            text-shadow: 0 0 10px #76c7c0;
-            margin-top: 20px;
-            letter-spacing: 2px;
+            color: #00ffcc;
+            text-shadow: 0 0 15px #00ffcc;
+            margin-bottom: 2rem;
         }
-
-        .button-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+        .home-button-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
             width: 100%;
+            max-width: 300px;
         }
-
-        @media (max-width: 480px) {
-            .button-grid {
-                grid-template-columns: 1fr; /* Single column on very small screens */
-            }
-        }
-        
-        .menu-button {
-            background-color: #3a3a5e;
-            color: #fff;
-            padding: 15px 10px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
+        .home-button {
+            padding: 1.5rem 1rem;
+            border-radius: 8px;
+            font-size: 1.25rem;
             font-weight: bold;
+            color: white;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
             cursor: pointer;
-            transition: transform 0.2s ease, background-color 0.2s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
-
-        .menu-button:hover {
-            background-color: #4a4a7a;
+        .home-button:hover {
             transform: translateY(-2px);
         }
-
-        /* Gacha button special styling */
-        .gacha-button {
-            background-color: #e63946;
-            color: #fff;
-            grid-column: 1 / -1; /* Make it full width */
-            font-size: 1.2rem;
+        .home-button.gacha {
+            background: linear-gradient(180deg, #e63946 0%, #c42b37 100%);
+        }
+        .home-button.secondary {
+            background: linear-gradient(180deg, #3a3a5e 0%, #2a2a44 100%);
         }
 
-        .gacha-button:hover {
-            background-color: #c72c38;
-        }
-
-        /* Modal styling */
+        /* --- Modal styling --- */
         .modal {
             display: none;
             position: fixed;
@@ -117,7 +88,6 @@
             justify-content: center;
             align-items: center;
         }
-
         .modal-content {
             background-color: #2a2a44;
             padding: 30px;
@@ -127,12 +97,10 @@
             width: 80%;
             max-width: 400px;
         }
-
         .modal-content h3 {
             margin-top: 0;
             color: #e63946;
         }
-
         .modal-close {
             color: #aaa;
             float: right;
@@ -140,32 +108,30 @@
             font-weight: bold;
             cursor: pointer;
         }
-
         .modal-close:hover,
         .modal-close:focus {
             color: #fff;
             text-decoration: none;
             cursor: pointer;
         }
-
     </style>
 </head>
 <body>
-    <div class="homepage-container">
-        <h1 class="logo">NovaFlare</h1>
-        
-        <div class="button-grid">
-            <button class="menu-button gacha-button" onclick="launchGame()">Gacha</button>
-            <button class="menu-button" onclick="showDevelopmentMessage('Events')">Events</button>
-            <button class="menu-button" onclick="showDevelopmentMessage('Mail')">Mail</button>
-            <button class="menu-button" onclick="showDevelopmentMessage('Characters')">Characters</button>
-            <button class="menu-button" onclick="showDevelopmentMessage('Inventory')">Inventory</button>
-            <button class="menu-button" onclick="showDevelopmentMessage('Profile')">Profile</button>
-            <button class="menu-button" onclick="showDevelopmentMessage('Shop')">Shop</button>
+    <div class="main-app-container">
+        <div class="home-screen-container" id="homeScreen">
+            <h1 class="home-title">NovaFlare</h1>
+            <div class="home-button-list">
+                <button class="home-button gacha" onclick="launchGame()">Gacha</button>
+                <button class="home-button secondary" onclick="showDevelopmentMessage('Events')">Events</button>
+                <button class="home-button secondary" onclick="showDevelopmentMessage('Mail')">Mail</button>
+                <button class="home-button secondary" onclick="showDevelopmentMessage('Characters')">Characters</button>
+                <button class="home-button secondary" onclick="showDevelopmentMessage('Inventory')">Inventory</button>
+                <button class="home-button secondary" onclick="showDevelopmentMessage('Profile')">Profile</button>
+                <button class="home-button secondary" onclick="showDevelopmentMessage('Shop')">Shop</button>
+            </div>
         </div>
-        
     </div>
-
+    
     <div id="developmentModal" class="modal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal()">&times;</span>
@@ -176,28 +142,18 @@
     
     <script>
         function launchGame() {
-            // Check if running inside Telegram Web App and use a relative path
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.location.href = '/game';
-            } else {
-                // For direct browser access, still redirect but with a warning
-                alert("This app is designed to run within Telegram. Redirecting to the Gacha page...");
-                window.location.href = '/game';
-            }
+            window.location.href = '/game';
         }
         
-        // Function to show the custom modal
         function showDevelopmentMessage(featureName) {
             document.getElementById('modalTitle').innerText = featureName;
             document.getElementById('developmentModal').style.display = 'flex';
         }
 
-        // Function to close the custom modal
         function closeModal() {
             document.getElementById('developmentModal').style.display = 'none';
         }
         
-        // Close modal when user clicks outside the modal content
         window.onclick = function(event) {
             const modal = document.getElementById('developmentModal');
             if (event.target == modal) {

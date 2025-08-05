@@ -18,268 +18,248 @@
             position: relative;
         }
 
-        .main-game-container {
+        .main-app-container {
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-image: url('https://via.placeholder.com/1080x1920?text=Background+Art');
         }
-        
-        /* Top Status Bar with Back/Home and User ID */
-        .top-status-bar {
+
+        .top-header-bar {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             padding: 0.5rem;
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(5px);
             z-index: 20;
+            position: relative;
         }
-        .user-info {
-            font-size: 0.8rem;
+        .top-header-bar .title {
+            font-size: 1.5rem;
             font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            flex-grow: 1;
+            text-align: center;
         }
-
-        /* Banner Selector Buttons (Horizontal) */
-        .banner-selector-buttons {
+        .top-header-bar .nav-buttons {
+            position: absolute;
+            right: 0.5rem;
             display: flex;
-            justify-content: center;
             gap: 0.5rem;
-            padding: 0.5rem;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(5px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 20;
-        }
-        .banner-selector-button {
-            padding: 0.5rem 1rem;
-            background: #3a3a5e;
-            border-radius: 6px;
-            font-weight: bold;
-            color: white;
-            transition: all 0.2s ease;
-        }
-        .banner-selector-button.active, .banner-selector-button:hover {
-            background: #007BFF;
-            box-shadow: 0 0 10px #007BFF;
         }
 
-        /* Main Gacha Content Area (Banner Art) */
-        .gacha-main-content {
+        .gacha-screen-container {
+            flex-grow: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Vertical Sidebar Styles */
+        .sidebar-left {
+            width: 100px;
+            padding: 1rem 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+            z-index: 10;
+        }
+        .sidebar-button {
+            width: 80px;
+            height: 80px;
+            background-color: #3a3a5e;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .sidebar-button:hover, .sidebar-button.active {
+            background-color: #007BFF;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0,123,255,0.7);
+        }
+        .sidebar-button .icon {
+            font-size: 2rem;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Main Content Area */
+        .main-gacha-content {
             flex-grow: 1;
             position: relative;
-            overflow: hidden;
-            background-size: cover;
-            background-position: center;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-
-        /* Overlaid UI elements */
-        .overlay-container {
+        .main-gacha-content::before {
+            content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 0.5rem;
-            box-sizing: border-box;
-        }
-
-        /* Currencies over top-right of banner */
-        .currencies-top-right {
-            align-self: flex-end;
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(5px);
-            padding: 5px 10px;
-            border-radius: 10px;
-            margin-top: 0.5rem;
+            z-index: 1;
+        }
+
+        .top-info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+            padding: 0.5rem;
+            position: relative;
+        }
+        .currency-display {
+            display: flex;
+            gap: 0.5rem;
         }
         .currency-item {
             display: flex;
             align-items: center;
             background: linear-gradient(180deg, #3a3a5e 0%, #2a2a44 100%);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 0.85rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
         .currency-item img {
             width: 18px;
             height: 18px;
             margin-right: 5px;
         }
-
-        /* Pull Buttons at bottom-right of banner, horizontal */
-        .pull-buttons-bottom-right {
-            align-self: flex-end;
-            margin-top: auto;
-            display: flex;
-            flex-direction: row;
-            gap: 0.5rem;
+        .banner-info-box {
+            background: rgba(25, 25, 40, 0.7);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            margin: auto;
+            max-width: 400px;
+            z-index: 2;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .banner-info-box h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
             margin-bottom: 0.5rem;
         }
-        .pull-button {
-            padding: 0.75rem 1.5rem;
-            font-size: 0.9rem;
+
+        .bottom-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 2;
+            margin-top: auto;
+            padding-bottom: 1rem;
+        }
+        .utility-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        .utility-button, .pull-button {
+            padding: 0.75rem;
+            font-size: 0.8rem;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
             text-align: center;
             transition: transform 0.1s ease, box-shadow 0.1s ease;
         }
-        .pull-button:active {
-            transform: translateY(1px);
-            box-shadow: none;
+        .utility-button {
+            background: linear-gradient(180deg, #3a3a5e 0%, #2a2a44 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .pull-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
         }
         .pull-button.single {
             background: linear-gradient(180deg, #457b9d 0%, #356a8e 100%);
-            color: white;
             box-shadow: 0 3px 0 #2a5573;
         }
         .pull-button.multi {
             background: linear-gradient(180deg, #e63946 0%, #c42b37 100%);
-            color: white;
             box-shadow: 0 3px 0 #9c222e;
         }
-        
-        /* Utility Buttons Below Banner */
-        .utility-buttons-container {
-            padding: 1rem 0.5rem;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(5px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.5rem;
-            z-index: 20;
-        }
-        .utility-button {
-            background: linear-gradient(180deg, #3a3a5e 0%, #2a2a44 100%);
-            color: white;
-            padding: 0.75rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            flex-grow: 1;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-
-        /* --- Shop Modal Styles --- */
-        .modal {
-            position: fixed;
-            z-index: 200;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #2a2a44;
-            padding: 2rem;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 600px;
-            text-align: center;
-            position: relative;
-        }
-        .close-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        .shop-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .shop-item {
-            background: #3a3a5e;
-            padding: 1rem;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-        .shop-item h4 {
-            font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        .shop-item p {
-            font-size: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        .shop-item button {
-            background-color: #007BFF;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-weight: bold;
+        .pull-button:active {
+            transform: translateY(1px);
+            box-shadow: none;
         }
     </style>
 </head>
 <body>
-    <div class="main-game-container">
-        <div class="top-status-bar">
-            <a href="/" class="text-2xl">&#x2302;</a>
-            <div class="user-info">
-                <span id="user-id">0000000</span>
+    <div class="main-app-container" id="gachaAppContainer">
+        <div class="top-header-bar">
+            <a href="/" class="text-2xl" style="position: absolute; left: 0.5rem;">&#x2302;</a>
+            <div class="title">NovaFlare</div>
+        </div>
+
+        <div class="gacha-screen-container">
+            <div class="sidebar-left">
+                <button class="sidebar-button" data-banner-type="standard_character" onclick="switchBanner('standard_character')">
+                    <span class="icon">✨</span>Standard
+                </button>
+                <button class="sidebar-button active" data-banner-type="limited_character" onclick="switchBanner('limited_character')">
+                    <span class="icon">🔥</span>Limited
+                </button>
             </div>
-        </div>
 
-        <div class="banner-selector-buttons" id="bannerSelectorButtons">
-            <button class="banner-selector-button" data-banner-group="limited_1" onclick="switchBanner('limited_character_1')">Limited Character 1</button>
-            <button class="banner-selector-button" data-banner-group="limited_2" onclick="switchBanner('limited_character_2')">Limited Character 2</button>
-            <button class="banner-selector-button" data-banner-group="standard" onclick="switchBanner('standard_character')">Standard Character</button>
-        </div>
-
-        <div class="gacha-main-content" id="bannerImage">
-            <div class="overlay-container">
-                <div class="currencies-top-right">
-                    <div class="currency-item">
-                        <img src="{{ url_for('static', filename='snc_icon.png') }}" alt="SNC"> 
-                        <span id="snc-count">1000</span>
+            <div class="main-gacha-content">
+                <div class="top-info-bar">
+                    <div class="currency-display">
+                        <div class="currency-item">
+                            <img src="https://via.placeholder.com/18" alt="SNC"> 
+                            <span id="snc-count">1000</span>
+                        </div>
+                        <div class="currency-item" id="lumen-currency-item" style="display:none;">
+                            <img src="https://via.placeholder.com/18" alt="Lumen"> 
+                            <span id="lumen-count">5</span>
+                        </div>
+                        <div class="currency-item" id="halo-currency-item">
+                            <img src="https://via.placeholder.com/18" alt="Halo"> 
+                            <span id="halo-count">0</span>
+                        </div>
                     </div>
-                    <div class="currency-item" id="lumen-currency-item">
-                        <img src="{{ url_for('static', filename='lumen_icon.png') }}" alt="Lumen"> 
-                        <span id="lumen-count">5</span>
-                    </div>
-                    <div class="currency-item" id="halo-currency-item">
-                        <img src="{{ url_for('static', filename='halo_icon.png') }}" alt="Halo"> 
-                        <span id="halo-count">0</span>
+                    <div class="user-info">
+                        <span id="user-id">undefined</span>
                     </div>
                 </div>
 
-                <div class="pull-buttons-bottom-right">
-                    <button class="pull-button single" onclick="pullGacha('single', currentBanner)">Pull x1</button>
-                    <button class="pull-button multi" onclick="pullGacha('multi', currentBanner)">Pull x10</button>
+                <div class="banner-info-box">
+                    <h2 id="banner-title">Whispered Tales</h2>
+                    <p id="banner-description">Rate up for selected A-Rank and Limited S-Rank Signals!</p>
+                    <p class="mt-2 text-sm text-gray-400">5-Rank Signal guaranteed in 89 Searches</p>
+                    <p class="text-sm text-gray-400">4-Rank or higher Signal guaranteed in 9 Searches</p>
+                </div>
+                
+                <div class="bottom-buttons">
+                    <div class="utility-buttons">
+                        <button class="utility-button" onclick="openShopModal()">Signal Shop</button>
+                        <button class="utility-button">Details</button>
+                    </div>
+                    <div class="pull-buttons">
+                        <button class="pull-button single" onclick="pullGacha('single', currentBanner)">Single Signal Search (100)</button>
+                        <button class="pull-button multi" onclick="pullGacha('multi', currentBanner)">10 Signal Searches (10 Halo)</button>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="utility-buttons-container">
-            <button class="utility-button" onclick="openShopModal()">Shop</button>
-            <button class="utility-button">Details</button>
-            <button class="utility-button">History</button>
-            <button class="utility-button" id="switchBannerBtn" onclick="switchToOtherBanner()">Switch To Weapon Banner</button>
         </div>
     </div>
     
@@ -312,7 +292,7 @@
         </div>
     </div>
 
-    <div id="pullResultsModal" class="results-modal">
+    <div id="pullResultsModal" class="results-modal" style="display:none;">
         <div class="results-modal-content">
             <button onclick="closeResultsModal()" class="close-button">&times;</button>
             <h2 class="text-2xl font-bold mb-4">Draw Results</h2>
@@ -322,133 +302,85 @@
     </div>
     
     <script>
-        let currentBanner = 'limited_character_1'; // Set a default banner
+        let currentBanner = 'limited_character';
         
         document.addEventListener('DOMContentLoaded', () => {
             fetchUserData();
             switchBanner(currentBanner);
         });
 
-        // Function to fetch user data from the backend
+        const bannerData = {
+            'standard_character': {
+                title: 'Standard Banner',
+                description: 'A permanent collection of heroes and more.',
+                pity4: '4-Rank or higher Signal guaranteed in 10 Searches',
+                pity5: '5-Rank Signal guaranteed in 90 Searches',
+                pullButton1: 'Single Signal Search (100)',
+                pullButton10: '10 Signal Searches (10 Lumen)',
+                currency: 'lumen',
+            },
+            'limited_character': {
+                title: 'Whispered Tales',
+                description: 'Rate up for selected A-Rank and Limited S-Rank Signals!',
+                pity4: '4-Rank or higher Signal guaranteed in 9 Searches',
+                pity5: '5-Rank Signal guaranteed in 89 Searches',
+                pullButton1: 'Single Signal Search (100)',
+                pullButton10: '10 Signal Searches (10 Halo)',
+                currency: 'halo',
+            },
+        };
+
         function fetchUserData() {
-            const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
-            if (!initData) {
-                console.error("Telegram init data is not available.");
-                updateCurrencyDisplay({ star_night_crystals: 1000, lumen_orbs: 5, halo_orbs: 0 });
-                document.getElementById('user-id').innerText = '0000000';
-                return;
-            }
-            fetch('/get_user_data', {
-                method: 'GET',
-                headers: { 'X-Telegram-Init-Data': initData }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    updateCurrencyDisplay(data);
-                    document.getElementById('user-id').innerText = data.user_id;
-                } else {
-                    console.error("Failed to fetch user data:", data.message);
-                }
-            })
-            .catch(error => console.error("Error fetching user data:", error));
+            // Placeholder function
+            console.log("Fetching user data...");
+            const data = { star_night_crystals: 1000, lumen_orbs: 5, halo_orbs: 0, user_id: 'undefined' };
+            updateCurrencyDisplay(data);
+            document.getElementById('user-id').innerText = data.user_id;
         }
 
-        // Function to update the currency display
         function updateCurrencyDisplay(data) {
             document.getElementById('snc-count').innerText = data.star_night_crystals;
             document.getElementById('lumen-count').innerText = data.lumen_orbs;
             document.getElementById('halo-count').innerText = data.halo_orbs;
         }
 
-        // Function to perform a gacha pull
-        function pullGacha(pullType, bannerType) {
-            const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
-            if (!initData) {
-                alert("Please open this app inside Telegram to play.");
-                return;
-            }
-            fetch('/pull_gacha', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Telegram-Init-Data': initData
-                },
-                body: JSON.stringify({ pull_type: pullType, banner_type: bannerType })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    updateCurrencyDisplay({
-                        star_night_crystals: data.remaining_crystals,
-                        lumen_orbs: data.remaining_lumen_orbs,
-                        halo_orbs: data.remaining_halo_orbs
-                    });
-                    displayPullResults(data.pulled_items);
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error("Error pulling gacha:", error));
-        }
-        
-        // Function to display pull results (simplified)
-        function displayPullResults(items) {
-            // Simplified for brevity, will be expanded later
-            alert('Pulled: ' + items.map(item => item.name).join(', '));
-        }
-
-        // Function to handle banner switching and UI updates
         function switchBanner(bannerType) {
-            const bannerSelectorButtons = document.querySelectorAll('.banner-selector-button');
-            bannerSelectorButtons.forEach(btn => btn.classList.remove('active'));
+            const sidebarButtons = document.querySelectorAll('.sidebar-button');
+            sidebarButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-banner-type="${bannerType}"]`).classList.add('active');
 
-            // Determine the base banner group from the bannerType
-            const baseBannerGroup = bannerType.split('_')[0] + '_' + bannerType.split('_')[1];
-            
-            // Find and activate the correct banner selector button
-            document.querySelector(`[data-banner-group="${baseBannerGroup}"]`).classList.add('active');
-            
             currentBanner = bannerType;
+            const banner = bannerData[bannerType];
 
-            const bannerImage = document.getElementById('bannerImage');
-            const switchBtn = document.getElementById('switchBannerBtn');
+            document.getElementById('banner-title').innerText = banner.title;
+            document.getElementById('banner-description').innerText = banner.description;
+            document.querySelector('.pull-button.single').innerText = banner.pullButton1;
+            document.querySelector('.pull-button.multi').innerText = banner.pullButton10;
+            document.getElementById('pity5').innerText = banner.pity5;
+            document.getElementById('pity4').innerText = banner.pity4;
+            
             const lumenCurrencyItem = document.getElementById('lumen-currency-item');
             const haloCurrencyItem = document.getElementById('halo-currency-item');
-
-            if (bannerType.includes('character')) {
+            if (banner.currency === 'lumen') {
                 lumenCurrencyItem.style.display = 'flex';
                 haloCurrencyItem.style.display = 'none';
-                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=' + bannerType.replace(/_/g, ' ') + ' Banner")';
-                switchBtn.innerText = "Switch To Weapon Banner";
-            } else if (bannerType.includes('weapon')) {
+            } else {
                 lumenCurrencyItem.style.display = 'none';
                 haloCurrencyItem.style.display = 'flex';
-                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=' + bannerType.replace(/_/g, ' ') + ' Banner")';
-                switchBtn.innerText = "Switch To Character Banner";
             }
         }
         
-        function switchToOtherBanner() {
-            const isCharacterBanner = currentBanner.includes('character');
-            
-            if (isCharacterBanner) {
-                switchBanner(currentBanner.replace('character', 'weapon'));
-            } else {
-                switchBanner(currentBanner.replace('weapon', 'character'));
-            }
+        function pullGacha(pullType, bannerType) {
+            alert(`Performing a ${pullType} pull on the ${bannerType} banner!`);
+            // This is a placeholder. Your backend logic would go here.
         }
-        
+
         function openShopModal() {
             document.getElementById('shopModal').style.display = 'flex';
         }
 
         function closeShopModal() {
             document.getElementById('shopModal').style.display = 'none';
-        }
-        
-        function exchangeCurrency(exchangeType) {
-            alert(`Exchanging for ${exchangeType}! (Backend logic not yet implemented)`);
         }
     </script>
 </body>
