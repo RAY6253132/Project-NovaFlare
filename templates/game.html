@@ -118,7 +118,7 @@
             align-self: flex-end;
             margin-top: auto;
             display: flex;
-            flex-direction: row; /* Corrected to horizontal layout */
+            flex-direction: row;
             gap: 0.5rem;
             margin-bottom: 0.5rem;
         }
@@ -246,9 +246,9 @@
         </div>
 
         <div class="banner-selector-buttons" id="bannerSelectorButtons">
-            <button class="banner-selector-button" onclick="switchBanner('limited_character_1')">Limited Character 1</button>
-            <button class="banner-selector-button" onclick="switchBanner('limited_character_2')">Limited Character 2</button>
-            <button class="banner-selector-button" onclick="switchBanner('standard_character')">Standard Character</button>
+            <button class="banner-selector-button" data-banner-group="limited_1" onclick="switchBanner('limited_character_1')">Limited Character 1</button>
+            <button class="banner-selector-button" data-banner-group="limited_2" onclick="switchBanner('limited_character_2')">Limited Character 2</button>
+            <button class="banner-selector-button" data-banner-group="standard" onclick="switchBanner('standard_character')">Standard Character</button>
         </div>
 
         <div class="gacha-main-content" id="bannerImage">
@@ -384,10 +384,6 @@
                         lumen_orbs: data.remaining_lumen_orbs,
                         halo_orbs: data.remaining_halo_orbs
                     });
-                    // This needs to be updated with correct pity logic
-                    // updatePityCounters({
-                    //     standard: { '4_star': data.pity_4_star, '5_star': data.pity_5_star }
-                    // });
                     displayPullResults(data.pulled_items);
                 } else {
                     alert(data.message);
@@ -406,7 +402,12 @@
         function switchBanner(bannerType) {
             const bannerSelectorButtons = document.querySelectorAll('.banner-selector-button');
             bannerSelectorButtons.forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`[onclick="switchBanner('${bannerType}')"]`).classList.add('active');
+
+            // Determine the base banner group from the bannerType
+            const baseBannerGroup = bannerType.split('_')[0] + '_' + bannerType.split('_')[1];
+            
+            // Find and activate the correct banner selector button
+            document.querySelector(`[data-banner-group="${baseBannerGroup}"]`).classList.add('active');
             
             currentBanner = bannerType;
 
