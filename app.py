@@ -12,90 +12,137 @@ app = Flask(__name__)
 
 # Define the Signal/Character Pool
 GACHA_POOL = {
-    "standard": [
-        # 5-Star Items (Characters and Weapons)
+    # Standard banner pool
+    "standard_character": [
         {"name": "Nova Aethel", "rarity": 5, "type": "Character"},
-        {"name": "Starlight Aegis", "rarity": 5, "type": "Weapon"},
         {"name": "Kaelus", "rarity": 5, "type": "Character"},
-        {"name": "Voidwalker's Blade", "rarity": 5, "type": "Weapon"},
-        # 4-Star Items
         {"name": "Cyrus", "rarity": 4, "type": "Character"},
-        {"name": "Radiant Staff", "rarity": 4, "type": "Weapon"},
         {"name": "Lyra", "rarity": 4, "type": "Character"},
-        {"name": "Shadowstrike Bow", "rarity": 4, "type": "Weapon"},
-        # 3-Star Items
         {"name": "Common Sword", "rarity": 3, "type": "Weapon"},
         {"name": "Novice's Robe", "rarity": 3, "type": "Armor"},
+    ],
+    "standard_weapon": [
+        {"name": "Starlight Aegis", "rarity": 5, "type": "Weapon"},
+        {"name": "Voidwalker's Blade", "rarity": 5, "type": "Weapon"},
+        {"name": "Radiant Staff", "rarity": 4, "type": "Weapon"},
+        {"name": "Shadowstrike Bow", "rarity": 4, "type": "Weapon"},
+        {"name": "Common Sword", "rarity": 3, "type": "Weapon"},
         {"name": "Iron Dagger", "rarity": 3, "type": "Weapon"},
-    ]
+    ],
+    # Limited banner pools
+    "limited_character_1": [
+        {"name": "Limited Character A", "rarity": 5, "type": "Character", "is_limited": True},
+        {"name": "Limited Character B", "rarity": 4, "type": "Character", "is_limited": True},
+        {"name": "Nova Aethel", "rarity": 5, "type": "Character"},
+        {"name": "Cyrus", "rarity": 4, "type": "Character"},
+        {"name": "Common Sword", "rarity": 3, "type": "Weapon"},
+    ],
+    "limited_character_2": [
+        {"name": "Limited Character C", "rarity": 5, "type": "Character", "is_limited": True},
+        {"name": "Limited Character D", "rarity": 4, "type": "Character", "is_limited": True},
+        {"name": "Kaelus", "rarity": 5, "type": "Character"},
+        {"name": "Lyra", "rarity": 4, "type": "Character"},
+        {"name": "Iron Dagger", "rarity": 3, "type": "Weapon"},
+    ],
+    "limited_weapon_1": [
+        {"name": "Limited Weapon A", "rarity": 5, "type": "Weapon", "is_limited": True},
+        {"name": "Limited Weapon B", "rarity": 4, "type": "Weapon", "is_limited": True},
+        {"name": "Starlight Aegis", "rarity": 5, "type": "Weapon"},
+        {"name": "Radiant Staff", "rarity": 4, "type": "Weapon"},
+        {"name": "Common Sword", "rarity": 3, "type": "Weapon"},
+    ],
+    "limited_weapon_2": [
+        {"name": "Limited Weapon C", "rarity": 5, "type": "Weapon", "is_limited": True},
+        {"name": "Limited Weapon D", "rarity": 4, "type": "Weapon", "is_limited": True},
+        {"name": "Voidwalker's Blade", "rarity": 5, "type": "Weapon"},
+        {"name": "Shadowstrike Bow", "rarity": 4, "type": "Weapon"},
+        {"name": "Iron Dagger", "rarity": 3, "type": "Weapon"},
+    ],
 }
 
 # Define Gacha probabilities and pity system
 GACHA_RATES = {
-    "standard": {
+    # Standard banner rates
+    "standard_character": {
         5: {"base_rate": 0.006, "pity_start": 75, "hard_pity": 90},
         4: {"base_rate": 0.051, "hard_pity": 10},
         3: {"base_rate": 0.943},
-    }
+    },
+    "standard_weapon": {
+        5: {"base_rate": 0.006, "pity_start": 75, "hard_pity": 90},
+        4: {"base_rate": 0.051, "hard_pity": 10},
+        3: {"base_rate": 0.943},
+    },
+    # Limited banner rates (example, can be customized)
+    "limited_character_1": {
+        5: {"base_rate": 0.006, "pity_start": 75, "hard_pity": 90},
+        4: {"base_rate": 0.051, "hard_pity": 10},
+        3: {"base_rate": 0.943},
+    },
+    "limited_character_2": {
+        5: {"base_rate": 0.006, "pity_start": 75, "hard_pity": 90},
+        4: {"base_rate": 0.051, "hard_pity": 10},
+        3: {"base_rate": 0.943},
+    },
+    "limited_weapon_1": {
+        5: {"base_rate": 0.006, "pity_start": 75, "hard_pity": 90},
+        4: {"base_rate": 0.051, "hard_pity": 10},
+        3: {"base_rate": 0.943},
+    },
+    "limited_weapon_2": {
+        5: {"base_rate": 0.006, "pity_start": 75, "hard_pity": 90},
+        4: {"base_rate": 0.051, "hard_pity": 10},
+        3: {"base_rate": 0.943},
+    },
 }
 
 # In-memory database for user data (for this example)
-# In a real application, this would be a persistent database like Firestore or PostgreSQL
 user_data = {}
 
 # Your Telegram Bot Token (GET THIS FROM BOTFATHER)
-# For local testing, you might skip full validation, but for deployment, it's crucial.
-BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN_HERE" # <--- IMPORTANT: Replace with your actual bot token
+BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN_HERE" 
 
 # --- UTILITY FUNCTIONS ---
 
 def show_message(text):
-    """Helper to display messages to the user (frontend will handle this)"""
     return jsonify({"status": "error", "message": text})
 
 def validate_telegram_init_data(init_data):
-    """
-    Validates the Telegram Web App's init data cryptographically.
-    NOTE: For a real application, you would need to get your bot's token.
-    For this example, we will skip the cryptographic validation and just parse the data.
-    """
     try:
         data_dict = {}
-        # Parse the query string into a dictionary
         for item in init_data.split('&'):
             key, value = item.split('=', 1)
             data_dict[key] = unquote(value)
 
-        # Simplified validation for development (REMOVE FOR PRODUCTION)
         user_info = json.loads(data_dict['user'])
         return user_info['id'], data_dict
     except (KeyError, json.JSONDecodeError, AttributeError):
         return None, None
 
 def get_or_create_user(user_id):
-    """
-    Retrieves a user's data or creates a new user if one doesn't exist.
-    """
     if user_id not in user_data:
-        # Initialize a new user with starting currency and pity counters
         user_data[user_id] = {
             "star_night_crystals": 1000,
             "lumen_orbs": 5,
             "halo_orbs": 0,
             "auric_crescents": 0,
             "pity_counters": {
-                "standard": {"4_star": 0, "5_star": 0},
-                "limited": {"4_star": 0, "5_star": 0},
+                "standard_character": {"4_star": 0, "5_star": 0},
+                "standard_weapon": {"4_star": 0, "5_star": 0},
+                "limited_character_1": {"4_star": 0, "5_star": 0},
+                "limited_character_2": {"4_star": 0, "5_star": 0},
+                "limited_weapon_1": {"4_star": 0, "5_star": 0},
+                "limited_weapon_2": {"4_star": 0, "5_star": 0},
             },
             "inventory": []
         }
     return user_data[user_id]
 
 def get_pull_result(banner_type, pity_4, pity_5):
-    """
-    Calculates the outcome of a single gacha pull based on probabilities and pity.
-    """
-    pool = list(GACHA_POOL[banner_type])
+    pool = list(GACHA_POOL.get(banner_type, []))
+
+    if not pool:
+        return {"name": "Error", "rarity": 0, "type": "Error"} # Should not happen with validation
 
     if pity_5 >= GACHA_RATES[banner_type][5]["hard_pity"] - 1:
         return random.choice([item for item in pool if item["rarity"] == 5])
@@ -132,6 +179,7 @@ def get_user_data():
 
     return jsonify({
         "status": "success",
+        "user_id": user_id,
         "star_night_crystals": user["star_night_crystals"],
         "lumen_orbs": user["lumen_orbs"],
         "halo_orbs": user["halo_orbs"],
@@ -153,6 +201,7 @@ def pull_gacha():
     pull_type = data.get('pull_type')
     banner_type = data.get('banner_type')
 
+    # The issue was here: The banner type was not in your GACHA_POOL
     if banner_type not in GACHA_POOL:
         return show_message(f"Invalid banner type: {banner_type}.")
 
@@ -161,10 +210,14 @@ def pull_gacha():
     cost_orb = 10 if pull_type == 'multi' else 1
     cost_snc = 595 if pull_type == 'multi' else 70
     num_pulls = 10 if pull_type == 'multi' else 1
-    orb_type = "lumen_orbs" if banner_type == "standard" else "halo_orbs"
-
-    if banner_type == "limited":
-        return show_message("The Limited Banner is currently unavailable.")
+    
+    # Updated logic to select the correct currency based on banner type
+    if 'standard' in banner_type:
+        orb_type = "lumen_orbs"
+    elif 'limited' in banner_type:
+        orb_type = "halo_orbs"
+    else:
+        return show_message("Invalid banner type for currency check.")
 
     if user[orb_type] >= cost_orb:
         user[orb_type] -= cost_orb
@@ -269,12 +322,10 @@ def exchange_shop():
 
 @app.route('/')
 def serve_index_html():
-    """Serves the main HTML file (homepage)."""
     return render_template('index.html')
 
 @app.route('/game')
 def serve_game_html():
-    """Serves the main HTML file for the gacha game."""
     return render_template('game.html')
 
 if __name__ == '__main__':
