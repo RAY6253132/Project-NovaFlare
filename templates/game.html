@@ -413,12 +413,10 @@
             }
 
             if (bannerType.includes('character')) {
-                // Find the correct button using the banner type
                 document.querySelector(`[onclick="switchBanner('${bannerType}')"]`).classList.add('active');
                 bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=' + bannerType.replace(/_/g, ' ') + ' Banner")';
                 switchBtn.innerText = "Switch To Weapon Banner";
             } else {
-                // If it's a weapon banner, find the corresponding character banner button to activate
                 const correspondingCharacterBanner = bannerType.replace('weapon', 'character');
                 document.querySelector(`[onclick="switchBanner('${correspondingCharacterBanner}')"]`).classList.add('active');
                 bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=' + bannerType.replace(/_/g, ' ') + ' Banner")';
