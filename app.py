@@ -3,8 +3,9 @@ import json
 import hashlib
 import hmac
 import sqlite3
+import random # Added random import
 from urllib.parse import unquote
-from flask import Flask, request, jsonify, render_template, session, redirect, url_for
+from flask import Flask, request, jsonify, render_template, session, redirect, url_for, g
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -12,6 +13,27 @@ app.secret_key = os.urandom(24) # A strong secret key for session management
 
 # --- Database Configuration ---
 DATABASE = 'novaflare.db'
+
+# --- Default User Data (MOVED TO TOP) ---
+DEFAULT_USER_DATA = {
+    'star_night_crystals': 1000,
+    'lumen_orbs': 5,
+    'halo_orbs': 0,
+    'auric_crescents': 0,
+    'inventory': [],
+    'pity_counters': { # Initialize pity counters for all banners
+        "standard_character": {"4_star": 0, "5_star": 0},
+        "standard_weapon": {"4_star": 0, "5_star": 0},
+        "limited_character_1": {"4_star": 0, "5_star": 0},
+        "limited_character_2": {"4_star": 0, "5_star": 0},
+        "limited_weapon_1": {"4_star": 0, "5_star": 0},
+        "limited_weapon_2": {"4_star": 0, "5_star": 0},
+    },
+    'monthly_exchanges': {
+        'exchange_lumen': 0,
+        'exchange_halo': 0
+    }
+}
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -80,7 +102,7 @@ def init_db():
 with app.app_context():
     init_db()
 
-# --- Gacha Configuration and Item Pool (Same as before) ---
+# --- Gacha Configuration and Item Pool ---
 # Define costs for shop and gacha pulls
 COST_MAP = {
     # Gacha pull costs (per pull)
@@ -100,37 +122,37 @@ COST_MAP = {
     'exchange_halo': {'cost_type': 'auric_crescents', 'cost_amount': 20, 'reward_type': 'halo_orbs', 'reward_amount': 1, 'limit': 10}
 }
 
-# Define Gacha probabilities and item pool (expanded with item details)
+# Define Gacha probabilities and item pool (UPDATED for rarity rules)
 GACHA_RATES = {
     "standard_character": {
         5: {"base_rate": 0.006, "pity_start": 75, "hard_pity": 90},
         4: {"base_rate": 0.051, "hard_pity": 10},
-        3: {"base_rate": 0.943},
+        # No 3-star for characters
     },
     "standard_weapon": {
         5: {"base_rate": 0.006, "pity_start": 75, "hard_pity": 90},
         4: {"base_rate": 0.051, "hard_pity": 10},
-        3: {"base_rate": 0.943},
+        3: {"base_rate": 0.943}, # 3-star for weapons
     },
     "limited_character_1": {
         5: {"base_rate": 0.006, "pity_start": 75, "hard_pity": 90},
         4: {"base_rate": 0.051, "hard_pity": 10},
-        3: {"base_rate": 0.943},
+        # No 3-star for characters
     },
     "limited_character_2": {
         5: {"base_rate": 0.006, "pity_start": 75, "hard_pity": 90},
         4: {"base_rate": 0.051, "hard_pity": 10},
-        3: {"base_rate": 0.943},
+        # No 3-star for characters
     },
     "limited_weapon_1": {
         5: {"base_rate": 0.006, "pity_start": 75, "hard_pity": 90},
         4: {"base_rate": 0.051, "hard_pity": 10},
-        3: {"base_rate": 0.943},
+        3: {"base_rate": 0.943}, # 3-star for weapons
     },
     "limited_weapon_2": {
         5: {"base_rate": 0.006, "pity_start": 75, "hard_pity": 90},
         4: {"base_rate": 0.051, "hard_pity": 10},
-        3: {"base_rate": 0.943},
+        3: {"base_rate": 0.943}, # 3-star for weapons
     },
 }
 
@@ -140,8 +162,7 @@ GACHA_POOL = {
         {"name": "Kaelus", "rarity": 5, "type": "Character", "image": "char_kaelus_5.png"},
         {"name": "Cyrus", "rarity": 4, "type": "Character", "image": "char_cyrus_4.png"},
         {"name": "Lyra", "rarity": 4, "type": "Character", "image": "char_lyra_4.png"},
-        {"name": "Common Sword", "rarity": 3, "type": "Weapon", "image": "weapon_common_sword_3.png"},
-        {"name": "Novice's Robe", "rarity": 3, "type": "Armor", "image": "armor_novice_robe_3.png"},
+        # Removed 3-star character items
     ],
     "standard_weapon": [
         {"name": "Starlight Aegis", "rarity": 5, "type": "Weapon", "image": "weapon_starlight_aegis_5.png"},
@@ -156,14 +177,14 @@ GACHA_POOL = {
         {"name": "Limited Char B", "rarity": 4, "type": "Character", "is_limited": True, "image": "char_limited_b_4.png"},
         {"name": "Nova Aethel", "rarity": 5, "type": "Character", "image": "char_nova_aethel_5.png"},
         {"name": "Cyrus", "rarity": 4, "type": "Character", "image": "char_cyrus_4.png"},
-        {"name": "Common Sword", "rarity": 3, "type": "Weapon", "image": "weapon_common_sword_3.png"},
+        # Removed 3-star character items
     ],
     "limited_character_2": [
         {"name": "Limited Char C", "rarity": 5, "type": "Character", "is_limited": True, "image": "char_limited_c_5.png"},
         {"name": "Limited Char D", "rarity": 4, "type": "Character", "is_limited": True, "image": "char_limited_d_4.png"},
         {"name": "Kaelus", "rarity": 5, "type": "Character", "image": "char_kaelus_5.png"},
         {"name": "Lyra", "rarity": 4, "type": "Character", "image": "char_lyra_4.png"},
-        {"name": "Iron Dagger", "rarity": 3, "type": "Weapon", "image": "weapon_iron_dagger_3.png"},
+        # Removed 3-star character items
     ],
     "limited_weapon_1": [
         {"name": "Limited Weapon A", "rarity": 5, "type": "Weapon", "is_limited": True, "image": "weapon_limited_a_5.png"},
@@ -182,17 +203,26 @@ GACHA_POOL = {
 }
 
 def get_pull_result(banner_type, pity_4, pity_5):
-    import random # Ensure random is imported locally if not global
     pool = list(GACHA_POOL.get(banner_type, []))
     if not pool:
         return {"name": "Error", "rarity": 0, "type": "Error", "image": "error.png"}
 
+    # Filter pool based on banner type to ensure correct rarities are pulled
+    if "character" in banner_type:
+        # Characters only have 4-star and 5-star
+        valid_rarities = [4, 5]
+    else: # Weapon banners
+        # Weapons have 3-star, 4-star, and 5-star
+        valid_rarities = [3, 4, 5]
+    
+    filtered_pool = [item for item in pool if item["rarity"] in valid_rarities]
+
     # Check for hard pity first
     if pity_5 >= GACHA_RATES[banner_type][5]["hard_pity"] - 1:
-        return random.choice([item for item in pool if item["rarity"] == 5])
+        return random.choice([item for item in filtered_pool if item["rarity"] == 5])
     
     if pity_4 >= GACHA_RATES[banner_type][4]["hard_pity"] - 1:
-        return random.choice([item for item in pool if item["rarity"] == 4])
+        return random.choice([item for item in filtered_pool if item["rarity"] == 4])
 
     # Calculate soft pity rate for 5-star
     roll_rate_5 = GACHA_RATES[banner_type][5]["base_rate"]
@@ -202,12 +232,16 @@ def get_pull_result(banner_type, pity_4, pity_5):
 
     roll = random.random()
 
-    if roll < roll_rate_5:
-        return random.choice([item for item in pool if item["rarity"] == 5])
-    elif roll < (GACHA_RATES[banner_type][4]["base_rate"] + roll_rate_5):
-        return random.choice([item for item in pool if item["rarity"] == 4])
-    else:
-        return random.choice([item for item in pool if item["rarity"] == 3])
+    # Determine rarity based on roll and available rarities
+    if roll < roll_rate_5 and 5 in valid_rarities:
+        return random.choice([item for item in filtered_pool if item["rarity"] == 5])
+    elif roll < (GACHA_RATES[banner_type][4]["base_rate"] + roll_rate_5) and 4 in valid_rarities:
+        return random.choice([item for item in filtered_pool if item["rarity"] == 4])
+    elif 3 in valid_rarities: # Only pull 3-star if it's a weapon banner
+        return random.choice([item for item in filtered_pool if item["rarity"] == 3])
+    else: # Fallback if somehow no valid rarity is found (shouldn't happen with correct pool setup)
+        return random.choice(filtered_pool)
+
 
 # --- Telegram Web App Validation ---
 # Replace with your actual bot token
@@ -239,11 +273,9 @@ def validate_telegram_data(init_data):
     return False, None
 
 # --- User Management (Database-backed) ---
-from flask import g # Import g for application context
-
 def get_user_data_from_db(user_id):
-    db = get_db()
-    cursor = db.cursor()
+    db_conn = get_db()
+    cursor = db_conn.cursor()
     cursor.execute("SELECT * FROM user_data WHERE user_id = ?", (user_id,))
     user_row = cursor.fetchone()
 
@@ -277,12 +309,12 @@ def get_user_data_from_db(user_id):
             json.dumps(new_user_data['pity_counters']),
             json.dumps(new_user_data['monthly_exchanges'])
         ))
-        db.commit()
+        db_conn.commit()
         return new_user_data
 
 def save_user_data_to_db(user_id, data):
-    db = get_db()
-    cursor = db.cursor()
+    db_conn = get_db()
+    cursor = db_conn.cursor()
     cursor.execute('''
         UPDATE user_data SET 
             star_night_crystals = ?, 
@@ -303,7 +335,7 @@ def save_user_data_to_db(user_id, data):
         json.dumps(data['monthly_exchanges']),
         user_id
     ))
-    db.commit()
+    db_conn.commit()
 
 # --- Authentication Routes ---
 @app.route('/login')
@@ -373,20 +405,19 @@ def get_user_data():
     init_data = request.headers.get('X-Telegram-Init-Data')
     is_valid, telegram_user_id = validate_telegram_data(init_data)
 
-    if not is_valid:
-        # If Telegram data is invalid, check Flask session for logged-in user
-        if 'user_id' in session:
-            user_id = str(session['user_id'])
-        else:
-            return jsonify({'status': 'error', 'message': 'Invalid Telegram data and not logged in.'}), 401
-    else:
-        # If Telegram data is valid, use Telegram user ID
-        user_id = telegram_user_id
+    user_id_to_fetch = None
+    if is_valid:
+        user_id_to_fetch = telegram_user_id
+    elif 'user_id' in session:
+        user_id_to_fetch = str(session['user_id'])
     
-    user = get_user_data_from_db(user_id)
+    if not user_id_to_fetch:
+        return jsonify({'status': 'error', 'message': 'Not authenticated.'}), 401
+
+    user = get_user_data_from_db(user_id_to_fetch)
     return jsonify({
         'status': 'success',
-        'user_id': user_id,
+        'user_id': user_id_to_fetch, # Return the ID that was actually used
         'star_night_crystals': user['star_night_crystals'],
         'lumen_orbs': user['lumen_orbs'],
         'halo_orbs': user['halo_orbs'],
@@ -399,13 +430,15 @@ def get_user_data():
 def pull_gacha():
     init_data = request.headers.get('X-Telegram-Init-Data')
     is_valid, telegram_user_id = validate_telegram_data(init_data)
-    if not is_valid:
-        if 'user_id' in session:
-            user_id = str(session['user_id'])
-        else:
-            return jsonify({'status': 'error', 'message': 'Invalid Telegram data and not logged in.'}), 401
-    else:
-        user_id = telegram_user_id
+    
+    user_id_to_process = None
+    if is_valid:
+        user_id_to_process = telegram_user_id
+    elif 'user_id' in session:
+        user_id_to_process = str(session['user_id'])
+    
+    if not user_id_to_process:
+        return jsonify({'status': 'error', 'message': 'Not authenticated.'}), 401
 
     data = request.get_json()
     pull_type = data.get('pull_type')
@@ -414,7 +447,7 @@ def pull_gacha():
     if banner_type not in GACHA_POOL:
         return jsonify({'status': 'error', 'message': f'Invalid banner type: {banner_type}.'}), 400
 
-    user = get_user_data_from_db(user_id)
+    user = get_user_data_from_db(user_id_to_process)
     
     num_pulls = 10 if pull_type == 'multi' else 1
     
@@ -440,8 +473,8 @@ def pull_gacha():
         return jsonify({'status': 'error', 'message': 'Insufficient currency for this pull.'}), 400
 
     pulled_items = []
-    pity_4 = user['pity_counters'][banner_type]['4_star']
-    pity_5 = user['pity_counters'][banner_type]['5_star']
+    pity_4 = user['pity_counters'].get(banner_type, {}).get('4_star', 0)
+    pity_5 = user['pity_counters'].get(banner_type, {}).get('5_star', 0)
 
     for _ in range(num_pulls):
         pity_4 += 1
@@ -457,10 +490,13 @@ def pull_gacha():
             pity_5 = 0
             pity_4 = 0 
 
+    # Ensure the banner_type key exists in pity_counters before assigning
+    if banner_type not in user['pity_counters']:
+        user['pity_counters'][banner_type] = {}
     user['pity_counters'][banner_type]['4_star'] = pity_4
     user['pity_counters'][banner_type]['5_star'] = pity_5
 
-    save_user_data_to_db(user_id, user)
+    save_user_data_to_db(user_id_to_process, user)
 
     return jsonify({
         'status': 'success',
@@ -477,18 +513,20 @@ def pull_gacha():
 def exchange_shop():
     init_data = request.headers.get('X-Telegram-Init-Data')
     is_valid, telegram_user_id = validate_telegram_data(init_data)
-    if not is_valid:
-        if 'user_id' in session:
-            user_id = str(session['user_id'])
-        else:
-            return jsonify({'status': 'error', 'message': 'Invalid Telegram data and not logged in.'}), 401
-    else:
-        user_id = telegram_user_id
+    
+    user_id_to_process = None
+    if is_valid:
+        user_id_to_process = telegram_user_id
+    elif 'user_id' in session:
+        user_id_to_process = str(session['user_id'])
+    
+    if not user_id_to_process:
+        return jsonify({'status': 'error', 'message': 'Not authenticated.'}), 401
 
     data = request.get_json()
     exchange_type = data.get('exchange_type')
 
-    user = get_user_data_from_db(user_id)
+    user = get_user_data_from_db(user_id_to_process)
     exchange_info = COST_MAP.get(exchange_type)
     
     if not exchange_info:
@@ -511,7 +549,7 @@ def exchange_shop():
         if limit is not None:
             user['monthly_exchanges'][exchange_type] = user['monthly_exchanges'].get(exchange_type, 0) + 1
 
-        save_user_data_to_db(user_id, user)
+        save_user_data_to_db(user_id_to_process, user)
         return jsonify({
             'status': 'success',
             'message': f'Successfully purchased {reward_amount} {reward_type}.',
@@ -524,7 +562,5 @@ def exchange_shop():
         return jsonify({'status': 'error', 'message': f'Insufficient {cost_type.replace("_", " ").title()} to make this purchase.'}), 400
 
 if __name__ == '__main__':
-    from flask import g # Import g here for local run context
-    import random # Ensure random is imported
     init_db() # Initialize database when running directly
     app.run(host='0.0.0.0', port=5000, debug=True)
