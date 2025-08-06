@@ -6,7 +6,7 @@ import sqlite3
 import random
 from urllib.parse import unquote
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for, g
-from werkzeug.security import generate_password_hash, check_password_hash # Added this import
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24) # A strong secret key for session management
@@ -243,7 +243,6 @@ def get_pull_result(banner_type, pity_4, pity_5):
     elif 3 in valid_rarities: # Only pull 3-star if it's a weapon banner
         return random.choice([item for item in filtered_pool if item["rarity"] == 3])
     else: # Fallback if somehow no valid rarity is found (shouldn't happen with correct pool setup)
-        # This fallback ensures something is always returned, even if rates don't add up perfectly.
         # In a real system, rates should sum to 1.0 for all valid rarities.
         return random.choice(filtered_pool)
 
@@ -516,6 +515,17 @@ def pull_gacha():
         if result['rarity'] == 5:
             pity_5 = 0
             pity_4 = 0 # 5-star resets 4-star pity too
+
+        # Check for Spectra (duplicate characters) for Auric Crescents
+        # This is a simplified check. In a real game, you'd track character ownership
+        # and check if the pulled character is already owned.
+        # For now, we'll assume any 4-star or 5-star character pull *could* be a duplicate
+        # and award AC for Spectra if it's a character.
+        if result['type'] == 'Character' and (result['rarity'] == 4 or result['rarity'] == 5):
+            # This is a placeholder logic. You'd need a system to track owned characters
+            # and detect actual duplicates to award 50 AC per Spectra.
+            # For now, I'll add 50 AC if it's a character of 4* or 5* as a placeholder for "Spectra".
+            user['auric_crescents'] += 50 # Add 50 AC for potential Spectra (duplicate character)
 
     # Ensure the banner_type key exists in pity_counters before assigning
     if banner_type not in user['pity_counters']:

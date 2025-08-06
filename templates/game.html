@@ -400,10 +400,10 @@
     <div class="bottom-nav-bar">
         <a href="/" class="nav-item">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>Home</span>
-        </a>
-        <a href="/shop" class="nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                <span>Home</span>
+            </a>
+            <a href="/shop" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
                 <span>Shop</span>
             </a>
             <a href="/game" class="nav-item active">
@@ -458,6 +458,7 @@
             fetchUserData();
             // Call switchBanner after fetchUserData to ensure currency display is updated based on initial banner
             // and the active class is set.
+            // Initial call to switchBanner will set the default and update UI
             switchBanner(currentBanner); 
         });
 
@@ -477,15 +478,15 @@
 
         function fetchUserData() {
             const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
-            if (!initData) {
-                console.error("Telegram init data is not available.");
-                updateCurrencyDisplay({ star_night_crystals: 1000, lumen_orbs: 5, halo_orbs: 0, auric_crescents: 0, orbital_jewels: 0 });
-                document.getElementById('user-id').innerText = '0000000';
-                return;
+            // Prepare headers for the fetch request
+            const headers = {};
+            if (initData) {
+                headers['X-Telegram-Init-Data'] = initData;
             }
+
             fetch('/get_user_data', {
                 method: 'GET',
-                headers: { 'X-Telegram-Init-Data': initData }
+                headers: headers
             })
             .then(response => response.json())
             .then(data => {
@@ -543,9 +544,12 @@
 
         function pullGacha(pullType, bannerType) {
             const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
-            if (!initData) {
-                showGlobalNotification("Please open this app inside Telegram to play.");
-                return;
+            // Prepare headers for the fetch request
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (initData) {
+                headers['X-Telegram-Init-Data'] = initData;
             }
             
             // Disable pull buttons to prevent multiple clicks
@@ -553,10 +557,7 @@
 
             fetch('/pull_gacha', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Telegram-Init-Data': initData
-                },
+                headers: headers,
                 body: JSON.stringify({ pull_type: pullType, banner_type: bannerType })
             })
             .then(response => response.json())

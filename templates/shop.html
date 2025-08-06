@@ -194,31 +194,39 @@
         .bottom-nav-bar {
             display: flex;
             justify-content: space-around;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding: 0.5rem 0;
             z-index: 100;
             position: fixed;
             bottom: 0;
             width: 100%;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.5);
         }
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 0.7rem;
+            font-size: 0.75rem; /* Slightly larger font */
             color: #ccc;
             text-decoration: none;
             cursor: pointer;
-            padding: 0.25rem 0.5rem;
+            padding: 0.5rem 0.25rem; /* More padding for touch targets */
+            transition: color 0.2s ease, background-color 0.2s ease;
+            border-radius: 8px;
+        }
+        .nav-item:hover {
+            color: #a78bfa; /* Purple hover */
+            background-color: rgba(255, 255, 255, 0.05);
         }
         .nav-item.active {
-            color: #007BFF;
+            color: #818cf8; /* Blue-purple active color */
+            font-weight: bold;
         }
-        .nav-item-icon {
-            width: 24px;
-            height: 24px;
+        .nav-item svg { /* Styling for Lucide-like SVG icons */
+            width: 28px;
+            height: 28px;
             margin-bottom: 4px;
         }
 
@@ -362,16 +370,21 @@
         }
         
         function fetchUserData() {
-            const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
-            if (!initData) {
-                console.error("Telegram init data is not available.");
-                updateCurrencyDisplay({ star_night_crystals: 1000, lumen_orbs: 5, halo_orbs: 0, auric_crescents: 0, orbital_jewels: 0 });
-                return;
+            // Check for Telegram WebApp initData first
+            let initData = null;
+            if (window.Telegram && window.Telegram.WebApp) {
+                initData = window.Telegram.WebApp.initData;
+            }
+
+            // Prepare headers for the fetch request
+            const headers = {};
+            if (initData) {
+                headers['X-Telegram-Init-Data'] = initData;
             }
 
             fetch('/get_user_data', {
                 method: 'GET',
-                headers: { 'X-Telegram-Init-Data': initData }
+                headers: headers
             })
             .then(response => response.json())
             .then(data => {
@@ -494,18 +507,23 @@
         }
 
         function buyItem(exchangeType) {
-            const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
-            if (!initData) {
-                showGlobalNotification("Please open this app inside Telegram to make a purchase.");
-                return;
+            // Check for Telegram WebApp initData first
+            let initData = null;
+            if (window.Telegram && window.Telegram.WebApp) {
+                initData = window.Telegram.WebApp.initData;
+            }
+
+            // Prepare headers for the fetch request
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (initData) {
+                headers['X-Telegram-Init-Data'] = initData;
             }
 
             fetch('/exchange_shop', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Telegram-Init-Data': initData
-                },
+                headers: headers,
                 body: JSON.stringify({ exchange_type: exchangeType })
             })
             .then(response => response.json())
