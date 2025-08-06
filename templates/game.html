@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        
+
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
@@ -29,7 +29,7 @@
             backdrop-filter: blur(5px);
             padding-bottom: 5rem;
         }
-        
+
         /* Top Status Bar with Back/Home and User ID */
         .top-status-bar {
             display: flex;
@@ -168,7 +168,7 @@
             color: white;
             box-shadow: 0 3px 0 #9c222e;
         }
-        
+
         /* Utility Buttons Below Banner */
         .utility-buttons-container {
             padding: 1rem 0.5rem;
@@ -193,7 +193,7 @@
             text-align: center;
             cursor: pointer;
         }
-        
+
         /* Bottom Navigation Bar */
         .bottom-nav-bar {
             display: flex;
@@ -280,7 +280,7 @@
             border-radius: 8px;
             text-align: center;
         }
-        
+
         .result-item img {
             width: 80px;
             height: 80px;
@@ -288,7 +288,7 @@
             object-fit: cover;
             margin-bottom: 5px;
         }
-        
+
         .result-item-name {
             font-size: 0.8rem;
             overflow: hidden;
@@ -347,9 +347,9 @@
         </div>
 
         <div class="banner-selector-buttons" id="bannerSelectorButtons">
-            <button class="banner-selector-button" onclick="switchBanner('limited_character_1')">Limited Character 1</button>
-            <button class="banner-selector-button" onclick="switchBanner('limited_character_2')">Limited Character 2</button>
-            <button class="banner-selector-button" onclick="switchBanner('standard_character')">Standard Character</button>
+            <button class="banner-selector-button" data-banner-type="limited_character_1">Limited Character 1</button>
+            <button class="banner-selector-button" data-banner-type="limited_character_2">Limited Character 2</button>
+            <button class="banner-selector-button" data-banner-type="standard_character">Standard Character</button>
         </div>
 
         <div class="gacha-main-content" id="bannerImage">
@@ -360,24 +360,23 @@
                 </div>
                 <div class="currencies-top-right">
                     <div class="currency-item">
-                        <img src="{{ url_for('static', filename='snc_icon.png') }}" alt="Star Night Crystals"> 
+                        <img src="{{ url_for('static', filename='snc_icon.png') }}" alt="Star Night Crystals">
                         <span id="snc-count">1000</span>
                     </div>
                     <div class="currency-item" id="lumen-currency-item" style="display: none;">
-                        <img src="{{ url_for('static', filename='lumen_icon.png') }}" alt="Lumen Orbs"> 
+                        <img src="{{ url_for('static', filename='lumen_icon.png') }}" alt="Lumen Orbs">
                         <span id="lumen-count">0</span>
                     </div>
                     <div class="currency-item" id="halo-currency-item" style="display: none;">
-                        <img src="{{ url_for('static', filename='halo_icon.png') }}" alt="Halo Orbs"> 
+                        <img src="{{ url_for('static', filename='halo_icon.png') }}" alt="Halo Orbs">
                         <span id="halo-count">0</span>
                     </div>
-                    <!-- New currencies -->
                     <div class="currency-item">
-                        <img src="https://placehold.co/18x18/FFD700/000000?text=OJ" alt="Orbital Jewels"> 
+                        <img src="https://placehold.co/18x18/FFD700/000000?text=OJ" alt="Orbital Jewels">
                         <span id="orbital-jewels-count">0</span>
                     </div>
                     <div class="currency-item">
-                        <img src="https://placehold.co/18x18/FFA07A/000000?text=AC" alt="Auric Crescents"> 
+                        <img src="https://placehold.co/18x18/FFA07A/000000?text=AC" alt="Auric Crescents">
                         <span id="auric-crescents-count">0</span>
                     </div>
                 </div>
@@ -396,275 +395,283 @@
             <button class="utility-button" id="switchBannerBtn" onclick="switchToOtherBanner()">Switch To Weapon Banner</button>
         </div>
     </div>
-    
+
     <div class="bottom-nav-bar">
         <a href="/" class="nav-item">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                <span>Home</span>
-            </a>
-            <a href="/shop" class="nav-item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-                <span>Shop</span>
-            </a>
-            <a href="/game" class="nav-item active">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                <span>Gacha</span>
-            </a>
-            <a href="#" class="nav-item" onclick="showDevelopmentMessage('Characters')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <span>Characters</span>
-            </a>
-            <a href="#" class="nav-item" onclick="showDevelopmentMessage('Inventory')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-backpack"><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M2 10v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6"/><path d="M10 18v-2a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v2"/></svg>
-                <span>Inventory</span>
-            </a>
+            <span>Home</span>
+        </a>
+        <a href="/shop" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+            <span>Shop</span>
+        </a>
+        <a href="/game" class="nav-item active">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Gacha</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showDevelopmentMessage('Characters')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Characters</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showDevelopmentMessage('Inventory')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-backpack"><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M2 10v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6"/><path d="M10 18v-2a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v2"/></svg>
+            <span>Inventory</span>
+        </a>
+    </div>
+</div>
+
+<div id="pullResultsModal" class="results-modal">
+    <div class="results-modal-content">
+        <button onclick="closeResultsModal()" class="close-button">&times;</button>
+        <h2 class="text-2xl font-bold mb-4">Draw Results</h2>
+        <div id="resultsGrid" class="results-grid">
         </div>
     </div>
-    
-    <div id="pullResultsModal" class="results-modal">
-        <div class="results-modal-content">
-            <button onclick="closeResultsModal()" class="close-button">&times;</button>
-            <h2 class="text-2xl font-bold mb-4">Draw Results</h2>
-            <div id="resultsGrid" class="results-grid">
-                <!-- Pulled items will be displayed here -->
-            </div>
-        </div>
-    </div>
+</div>
 
-    <!-- Global Notification Element -->
-    <div id="globalNotification" class="global-notification"></div>
-    
-    <script>
-        let currentBanner = 'limited_character_1'; 
-        let userPityData = {};
+<div id="globalNotification" class="global-notification"></div>
 
-        // Mapping banner types to display names and image URLs
-        const bannerDisplayInfo = {
-            'limited_character_1': { name: 'Limited Character 1', image: '/static/banner_limited_char_1.png' },
-            'limited_character_2': { name: 'Limited Character 2', image: '/static/banner_limited_char_2.png' },
-            'standard_character': { name: 'Standard Character', image: '/static/banner_standard_char.png' },
-            'limited_weapon_1': { name: 'Limited Weapon 1', image: '/static/banner_limited_weapon_1.png' },
-            'limited_weapon_2': { name: 'Limited Weapon 2', image: '/static/banner_limited_weapon_2.png' },
-            'standard_weapon': { name: 'Standard Weapon', image: '/static/banner_standard_weapon.png' },
-        };
+<script>
+    let currentBanner = 'limited_character_1';
+    let userPityData = {};
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.Telegram && window.Telegram.WebApp) {
-                Telegram.WebApp.ready();
-                Telegram.WebApp.setBackgroundColor('#1a1a2e');
-                Telegram.WebApp.setHeaderColor('secondary_bg_color');
-                Telegram.WebApp.closeButton.show();
-            }
-            fetchUserData();
-            // Call switchBanner after fetchUserData to ensure currency display is updated based on initial banner
-            // and the active class is set.
-            // Initial call to switchBanner will set the default and update UI
-            switchBanner(currentBanner); 
+    // Mapping banner types to display names and image URLs
+    const bannerDisplayInfo = {
+        'limited_character_1': { name: 'Limited Character 1', image: '/static/banner_limited_char_1.png', currency: 'halo' },
+        'limited_character_2': { name: 'Limited Character 2', image: '/static/banner_limited_char_2.png', currency: 'halo' },
+        'standard_character': { name: 'Standard Character', image: '/static/banner_standard_char.png', currency: 'lumen' },
+        'limited_weapon_1': { name: 'Limited Weapon 1', image: '/static/banner_limited_weapon_1.png', currency: 'halo' },
+        'limited_weapon_2': { name: 'Limited Weapon 2', image: '/static/banner_limited_weapon_2.png', currency: 'halo' },
+        'standard_weapon': { name: 'Standard Weapon', image: '/static/banner_standard_weapon.png', currency: 'lumen' },
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.Telegram && window.Telegram.WebApp) {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.setBackgroundColor('#1a1a2e');
+            Telegram.WebApp.setHeaderColor('secondary_bg_color');
+            Telegram.WebApp.closeButton.show();
+        }
+        fetchUserData();
+
+        // Add event listeners for the banner selector buttons
+        document.querySelectorAll('.banner-selector-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const bannerType = button.getAttribute('data-banner-type');
+                if (bannerType) {
+                    switchBanner(bannerType);
+                }
+            });
         });
+    });
 
-        // Function to show a custom notification (replaces alert)
-        function showGlobalNotification(message, duration = 3000) {
-            const notification = document.getElementById('globalNotification');
-            notification.textContent = message;
-            notification.classList.add('show');
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, duration);
+    // Function to show a custom notification (replaces alert)
+    function showGlobalNotification(message, duration = 3000) {
+        const notification = document.getElementById('globalNotification');
+        notification.textContent = message;
+        notification.classList.add('show');
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, duration);
+    }
+
+    function showDevelopmentMessage(featureName) {
+        showGlobalNotification(`${featureName} feature is currently in development.`);
+    }
+
+    function fetchUserData() {
+        const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
+        const headers = {};
+        if (initData) {
+            headers['X-Telegram-Init-Data'] = initData;
         }
 
-        function showDevelopmentMessage(featureName) {
-            showGlobalNotification(`${featureName} feature is currently in development.`);
-        }
-
-        function fetchUserData() {
-            const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
-            // Prepare headers for the fetch request
-            const headers = {};
-            if (initData) {
-                headers['X-Telegram-Init-Data'] = initData;
-            }
-
-            fetch('/get_user_data', {
-                method: 'GET',
-                headers: headers
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    updateCurrencyDisplay(data);
-                    userPityData = data.pity_counters;
-                    updatePityDisplay();
-                    document.getElementById('user-id').innerText = data.user_id;
-                    // Ensure correct currency display based on the initially selected banner
-                    updateCurrencyVisibility(currentBanner); 
-                } else {
-                    console.error("Failed to fetch user data:", data.message);
-                    showGlobalNotification(`Error: ${data.message}`);
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching user data:", error);
-                showGlobalNotification("Network error or server unreachable. Please try again.");
-            });
-        }
-
-        function updateCurrencyDisplay(data) {
-            document.getElementById('snc-count').innerText = data.star_night_crystals;
-            document.getElementById('lumen-count').innerText = data.lumen_orbs;
-            document.getElementById('halo-count').innerText = data.halo_orbs;
-            document.getElementById('orbital-jewels-count').innerText = data.orbital_jewels; // Update OJ
-            document.getElementById('auric-crescents-count').innerText = data.auric_crescents; // Update AC
-        }
-
-        // New function to handle currency visibility
-        function updateCurrencyVisibility(bannerType) {
-            const lumenCurrencyItem = document.getElementById('lumen-currency-item');
-            const haloCurrencyItem = document.getElementById('halo-currency-item');
-
-            if (bannerType.includes('limited')) {
-                haloCurrencyItem.style.display = 'flex';
-                lumenCurrencyItem.style.display = 'none';
+        fetch('/get_user_data', {
+            method: 'GET',
+            headers: headers
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                updateCurrencyDisplay(data);
+                userPityData = data.pity_counters;
+                document.getElementById('user-id').innerText = data.user_id;
+                // Only call switchBanner here after data is loaded
+                switchBanner(currentBanner);
             } else {
-                lumenCurrencyItem.style.display = 'flex';
-                haloCurrencyItem.style.display = 'none';
+                console.error("Failed to fetch user data:", data.message);
+                showGlobalNotification(`Error: ${data.message}`);
             }
+        })
+        .catch(error => {
+            console.error("Error fetching user data:", error);
+            showGlobalNotification("Network error or server unreachable. Please try again.");
+        });
+    }
+
+    function updateCurrencyDisplay(data) {
+        document.getElementById('snc-count').innerText = data.star_night_crystals;
+        document.getElementById('lumen-count').innerText = data.lumen_orbs;
+        document.getElementById('halo-count').innerText = data.halo_orbs;
+        document.getElementById('orbital-jewels-count').innerText = data.orbital_jewels;
+        document.getElementById('auric-crescents-count').innerText = data.auric_crescents;
+    }
+
+    function updateCurrencyVisibility(bannerType) {
+        const bannerInfo = bannerDisplayInfo[bannerType];
+        const lumenCurrencyItem = document.getElementById('lumen-currency-item');
+        const haloCurrencyItem = document.getElementById('halo-currency-item');
+
+        if (bannerInfo.currency === 'lumen') {
+            lumenCurrencyItem.style.display = 'flex';
+            haloCurrencyItem.style.display = 'none';
+        } else if (bannerInfo.currency === 'halo') {
+            haloCurrencyItem.style.display = 'flex';
+            lumenCurrencyItem.style.display = 'none';
+        }
+    }
+
+    function updatePityDisplay() {
+        const pityContainer = document.getElementById('pityCounters');
+        const pity = userPityData[currentBanner];
+        if (pity) {
+            document.getElementById('pity-4-star').innerText = pity["4_star"];
+            document.getElementById('pity-5-star').innerText = pity["5_star"];
+            pityContainer.style.display = 'block';
+        } else {
+            pityContainer.style.display = 'none';
+        }
+    }
+
+    function pullGacha(pullType, bannerType) {
+        const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        if (initData) {
+            headers['X-Telegram-Init-Data'] = initData;
         }
 
-        function updatePityDisplay() {
-            const pityContainer = document.getElementById('pityCounters');
-            const pity = userPityData[currentBanner];
-            if (pity) {
-                document.getElementById('pity-4-star').innerText = pity["4_star"];
-                document.getElementById('pity-5-star').innerText = pity["5_star"];
-                pityContainer.style.display = 'block';
+        document.querySelectorAll('.pull-button').forEach(button => button.disabled = true);
+
+        fetch('/pull_gacha', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ pull_type: pullType, banner_type: bannerType })
+        })
+        .then(async response => {
+            if (!response.ok) {
+                const errorText = await response.text();
+                try {
+                    const errorData = JSON.parse(errorText);
+                    throw new Error(errorData.message || `Server error: ${response.status}`);
+                } catch (e) {
+                    throw new Error(`Server responded with an error (${response.status}) and no valid error message.`);
+                }
+            }
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                return await response.json();
             } else {
-                pityContainer.style.display = 'none';
+                throw new Error("Invalid response from server: Not JSON.");
             }
-        }
+        })
+        .then(data => {
+            document.querySelectorAll('.pull-button').forEach(button => button.disabled = false);
 
-        function pullGacha(pullType, bannerType) {
-            const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
-            // Prepare headers for the fetch request
-            const headers = {
-                'Content-Type': 'application/json'
-            };
-            if (initData) {
-                headers['X-Telegram-Init-Data'] = initData;
-            }
-            
-            // Disable pull buttons to prevent multiple clicks
-            document.querySelectorAll('.pull-button').forEach(button => button.disabled = true);
-
-            fetch('/pull_gacha', {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify({ pull_type: pullType, banner_type: bannerType })
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Re-enable pull buttons
-                document.querySelectorAll('.pull-button').forEach(button => button.disabled = false);
-
-                if (data.status === "success") {
-                    updateCurrencyDisplay(data);
-                    // Update userPityData with the new pity counts from the backend
-                    userPityData[bannerType]["4_star"] = data.pity_4_star;
-                    userPityData[bannerType]["5_star"] = data.pity_5_star;
-                    updatePityDisplay();
-                    displayPullResults(data.pulled_items);
-                } else {
-                    showGlobalNotification(data.message);
-                }
-            })
-            .catch(error => {
-                console.error("Error pulling gacha:", error);
-                // Re-enable pull buttons even on error
-                document.querySelectorAll('.pull-button').forEach(button => button.disabled = false);
-                showGlobalNotification("Network error or server unreachable. Please try again.");
-            });
-        }
-        
-        function displayPullResults(items) {
-            const resultsGrid = document.getElementById('resultsGrid');
-            resultsGrid.innerHTML = ''; // Clear previous results
-            
-            items.forEach(item => {
-                const itemDiv = document.createElement('div');
-                // Use the rarity directly for the class, as defined in CSS
-                itemDiv.className = `result-item rarity-${item.rarity}`;
-                
-                // Construct image URL using the 'image' property from the item data
-                const imageUrl = `/static/item_images/${item.image}`; 
-                // Fallback to placeholder if image is not defined or found
-                const fallbackImageUrl = `https://placehold.co/80x80/1a1a2e/ffffff?text=${item.name.replace(/\s/g, '+')}`;
-
-                itemDiv.innerHTML = `
-                    <img src="${imageUrl}" onerror="this.onerror=null;this.src='${fallbackImageUrl}';" alt="${item.name}">
-                    <span class="result-item-name">${item.name}</span>
-                `;
-                resultsGrid.appendChild(itemDiv);
-            });
-            document.getElementById('pullResultsModal').style.display = 'flex';
-        }
-
-        function closeResultsModal() {
-            document.getElementById('pullResultsModal').style.display = 'none';
-        }
-
-        function switchBanner(bannerType) {
-            const bannerSelectorButtons = document.querySelectorAll('.banner-selector-button');
-            bannerSelectorButtons.forEach(btn => btn.classList.remove('active'));
-
-            currentBanner = bannerType;
-            
-            // Find the button that corresponds to the current banner and set it active
-            const activeBannerButton = document.querySelector(`.banner-selector-buttons button[onclick*="switchBanner('${bannerType}')"]`);
-            if (activeBannerButton) {
-                activeBannerButton.classList.add('active');
-            }
-
-            const switchBtn = document.getElementById('switchBannerBtn');
-            const bannerImage = document.getElementById('bannerImage');
-            
-            // Update currency visibility based on the new banner type
-            updateCurrencyVisibility(bannerType);
-
-            // Update banner image and switch button text based on the new banner type
-            const currentBannerInfo = bannerDisplayInfo[currentBanner];
-            if (currentBannerInfo) {
-                bannerImage.style.backgroundImage = `url("${currentBannerInfo.image}")`;
-                // Adjust switch button text based on whether it's a character or weapon banner
-                if (currentBanner.includes('character')) {
-                    switchBtn.innerText = "Switch To Weapon Banner";
-                } else {
-                    switchBtn.innerText = "Switch To Character Banner";
-                }
-            }
-            
-            updatePityDisplay();
-        }
-        
-        function switchToOtherBanner() {
-            const isCharacterBanner = currentBanner.includes('character');
-            
-            if (isCharacterBanner) {
-                if (currentBanner === 'limited_character_1') {
-                    switchBanner('limited_weapon_1');
-                } else if (currentBanner === 'limited_character_2') {
-                    switchBanner('limited_weapon_2');
-                } else if (currentBanner === 'standard_character') {
-                    switchBanner('standard_weapon');
-                }
+            if (data.status === "success") {
+                updateCurrencyDisplay(data);
+                userPityData[bannerType]["4_star"] = data.pity_4_star;
+                userPityData[bannerType]["5_star"] = data.pity_5_star;
+                updatePityDisplay();
+                displayPullResults(data.pulled_items);
             } else {
-                if (currentBanner === 'limited_weapon_1') {
-                    switchBanner('limited_character_1');
-                } else if (currentBanner === 'limited_weapon_2') {
-                    switchBanner('limited_character_2');
-                } else if (currentBanner === 'standard_weapon') {
-                    switchBanner('standard_character');
-                }
+                showGlobalNotification(data.message || "An unknown error occurred.");
+            }
+        })
+        .catch(error => {
+            console.error("Error pulling gacha:", error);
+            document.querySelectorAll('.pull-button').forEach(button => button.disabled = false);
+            showGlobalNotification(error.message);
+        });
+    }
+
+    function displayPullResults(items) {
+        const resultsGrid = document.getElementById('resultsGrid');
+        resultsGrid.innerHTML = '';
+        items.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = `result-item rarity-${item.rarity}`;
+
+            const imageUrl = `/static/item_images/${item.image}`;
+            const fallbackImageUrl = `https://placehold.co/80x80/1a1a2e/ffffff?text=${item.name.replace(/\s/g, '+')}`;
+
+            itemDiv.innerHTML = `
+                <img src="${imageUrl}" onerror="this.onerror=null;this.src='${fallbackImageUrl}';" alt="${item.name}">
+                <span class="result-item-name">${item.name}</span>
+            `;
+            resultsGrid.appendChild(itemDiv);
+        });
+        document.getElementById('pullResultsModal').style.display = 'flex';
+    }
+
+    function closeResultsModal() {
+        document.getElementById('pullResultsModal').style.display = 'none';
+    }
+
+    function switchBanner(bannerType) {
+        const bannerSelectorButtons = document.querySelectorAll('.banner-selector-button');
+        bannerSelectorButtons.forEach(btn => btn.classList.remove('active'));
+
+        currentBanner = bannerType;
+
+        // Find the button with the data-banner-type attribute and set it active
+        const activeBannerButton = document.querySelector(`.banner-selector-button[data-banner-type="${bannerType}"]`);
+        if (activeBannerButton) {
+            activeBannerButton.classList.add('active');
+        }
+
+        const switchBtn = document.getElementById('switchBannerBtn');
+        const bannerImage = document.getElementById('bannerImage');
+
+        updateCurrencyVisibility(bannerType);
+
+        const currentBannerInfo = bannerDisplayInfo[currentBanner];
+        if (currentBannerInfo) {
+            bannerImage.style.backgroundImage = `url("${currentBannerInfo.image}")`;
+            if (currentBanner.includes('character')) {
+                switchBtn.innerText = "Switch To Weapon Banner";
+            } else {
+                switchBtn.innerText = "Switch To Character Banner";
             }
         }
-    </script>
+
+        updatePityDisplay();
+    }
+
+    function switchToOtherBanner() {
+        const isCharacterBanner = currentBanner.includes('character');
+        const isLimited = currentBanner.includes('limited');
+        const isLimited1 = currentBanner.includes('limited_1');
+
+        if (isCharacterBanner) {
+            if (isLimited && isLimited1) {
+                switchBanner('limited_weapon_1');
+            } else if (isLimited) {
+                switchBanner('limited_weapon_2');
+            } else {
+                switchBanner('standard_weapon');
+            }
+        } else {
+            if (isLimited && isLimited1) {
+                switchBanner('limited_character_1');
+            } else if (isLimited) {
+                switchBanner('limited_character_2');
+            } else {
+                switchBanner('standard_character');
+            }
+        }
+    }
+</script>
 </body>
 </html>
