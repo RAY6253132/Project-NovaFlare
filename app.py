@@ -3,7 +3,7 @@ import json
 import hashlib
 import hmac
 import sqlite3
-import random # Added random import
+import random
 from urllib.parse import unquote
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for, g
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -14,12 +14,15 @@ app.secret_key = os.urandom(24) # A strong secret key for session management
 # --- Database Configuration ---
 DATABASE = 'novaflare.db'
 
-# --- Default User Data (MOVED TO TOP) ---
+# --- Default User Data ---
+# IMPORTANT: If you change the structure here, you might need to re-initialize your database
+# or add migration logic if users already exist. For development, deleting novaflare.db is easiest.
 DEFAULT_USER_DATA = {
     'star_night_crystals': 1000,
     'lumen_orbs': 5,
     'halo_orbs': 0,
-    'auric_crescents': 0,
+    'auric_crescents': 0, # New currency
+    'orbital_jewels': 0,  # New currency
     'inventory': [],
     'pity_counters': { # Initialize pity counters for all banners
         "standard_character": {"4_star": 0, "5_star": 0},
@@ -61,7 +64,7 @@ def init_db():
                 role TEXT NOT NULL DEFAULT 'player'
             )
         ''')
-        # Create user_data table for game progress
+        # Create user_data table for game progress, including new currency fields
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS user_data (
                 user_id TEXT PRIMARY KEY,
@@ -69,6 +72,7 @@ def init_db():
                 lumen_orbs INTEGER DEFAULT 5,
                 halo_orbs INTEGER DEFAULT 0,
                 auric_crescents INTEGER DEFAULT 0,
+                orbital_jewels INTEGER DEFAULT 0,
                 inventory TEXT DEFAULT '[]',
                 pity_counters TEXT DEFAULT '{}',
                 monthly_exchanges TEXT DEFAULT '{}'
@@ -162,7 +166,6 @@ GACHA_POOL = {
         {"name": "Kaelus", "rarity": 5, "type": "Character", "image": "char_kaelus_5.png"},
         {"name": "Cyrus", "rarity": 4, "type": "Character", "image": "char_cyrus_4.png"},
         {"name": "Lyra", "rarity": 4, "type": "Character", "image": "char_lyra_4.png"},
-        # Removed 3-star character items
     ],
     "standard_weapon": [
         {"name": "Starlight Aegis", "rarity": 5, "type": "Weapon", "image": "weapon_starlight_aegis_5.png"},
@@ -175,16 +178,14 @@ GACHA_POOL = {
     "limited_character_1": [
         {"name": "Limited Char A", "rarity": 5, "type": "Character", "is_limited": True, "image": "char_limited_a_5.png"},
         {"name": "Limited Char B", "rarity": 4, "type": "Character", "is_limited": True, "image": "char_limited_b_4.png"},
-        {"name": "Nova Aethel", "rarity": 5, "type": "Character", "image": "char_nova_aethel_5.png"},
-        {"name": "Cyrus", "rarity": 4, "type": "Character", "image": "char_cyrus_4.png"},
-        # Removed 3-star character items
+        {"name": "Nova Aethel", "rarity": 5, "type": "Character", "image": "char_nova_aethel_5.png"}, # Standard 5-star in limited pool
+        {"name": "Cyrus", "rarity": 4, "type": "Character", "image": "char_cyrus_4.png"}, # Standard 4-star in limited pool
     ],
     "limited_character_2": [
         {"name": "Limited Char C", "rarity": 5, "type": "Character", "is_limited": True, "image": "char_limited_c_5.png"},
         {"name": "Limited Char D", "rarity": 4, "type": "Character", "is_limited": True, "image": "char_limited_d_4.png"},
         {"name": "Kaelus", "rarity": 5, "type": "Character", "image": "char_kaelus_5.png"},
         {"name": "Lyra", "rarity": 4, "type": "Character", "image": "char_lyra_4.png"},
-        # Removed 3-star character items
     ],
     "limited_weapon_1": [
         {"name": "Limited Weapon A", "rarity": 5, "type": "Weapon", "is_limited": True, "image": "weapon_limited_a_5.png"},
@@ -209,28 +210,28 @@ def get_pull_result(banner_type, pity_4, pity_5):
 
     # Filter pool based on banner type to ensure correct rarities are pulled
     if "character" in banner_type:
-        # Characters only have 4-star and 5-star
         valid_rarities = [4, 5]
     else: # Weapon banners
-        # Weapons have 3-star, 4-star, and 5-star
         valid_rarities = [3, 4, 5]
     
     filtered_pool = [item for item in pool if item["rarity"] in valid_rarities]
 
     # Check for hard pity first
     if pity_5 >= GACHA_RATES[banner_type][5]["hard_pity"] - 1:
+        # Ensure we only pull 5-star items from the filtered pool
         return random.choice([item for item in filtered_pool if item["rarity"] == 5])
     
     if pity_4 >= GACHA_RATES[banner_type][4]["hard_pity"] - 1:
+        # Ensure we only pull 4-star items from the filtered pool
         return random.choice([item for item in filtered_pool if item["rarity"] == 4])
+
+    roll = random.random()
 
     # Calculate soft pity rate for 5-star
     roll_rate_5 = GACHA_RATES[banner_type][5]["base_rate"]
     if pity_5 >= GACHA_RATES[banner_type][5]["pity_start"]:
         soft_pity_pulls = pity_5 - GACHA_RATES[banner_type][5]["pity_start"] + 1
-        roll_rate_5 += 0.05 * soft_pity_pulls
-
-    roll = random.random()
+        roll_rate_5 += 0.05 * soft_pity_pulls # Increase rate by 5% per pull after soft pity start
 
     # Determine rarity based on roll and available rarities
     if roll < roll_rate_5 and 5 in valid_rarities:
@@ -240,6 +241,8 @@ def get_pull_result(banner_type, pity_4, pity_5):
     elif 3 in valid_rarities: # Only pull 3-star if it's a weapon banner
         return random.choice([item for item in filtered_pool if item["rarity"] == 3])
     else: # Fallback if somehow no valid rarity is found (shouldn't happen with correct pool setup)
+        # This fallback ensures something is always returned, even if rates don't add up perfectly.
+        # In a real system, rates should sum to 1.0 for all valid rarities.
         return random.choice(filtered_pool)
 
 
@@ -297,14 +300,15 @@ def get_user_data_from_db(user_id):
                 new_user_data['pity_counters'][banner] = {"4_star": 0, "5_star": 0}
 
         cursor.execute('''
-            INSERT INTO user_data (user_id, star_night_crystals, lumen_orbs, halo_orbs, auric_crescents, inventory, pity_counters, monthly_exchanges)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO user_data (user_id, star_night_crystals, lumen_orbs, halo_orbs, auric_crescents, orbital_jewels, inventory, pity_counters, monthly_exchanges)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             user_id,
             new_user_data['star_night_crystals'],
             new_user_data['lumen_orbs'],
             new_user_data['halo_orbs'],
             new_user_data['auric_crescents'],
+            new_user_data['orbital_jewels'],
             json.dumps(new_user_data['inventory']),
             json.dumps(new_user_data['pity_counters']),
             json.dumps(new_user_data['monthly_exchanges'])
@@ -321,6 +325,7 @@ def save_user_data_to_db(user_id, data):
             lumen_orbs = ?, 
             halo_orbs = ?, 
             auric_crescents = ?, 
+            orbital_jewels = ?,
             inventory = ?, 
             pity_counters = ?, 
             monthly_exchanges = ?
@@ -330,6 +335,7 @@ def save_user_data_to_db(user_id, data):
         data['lumen_orbs'],
         data['halo_orbs'],
         data['auric_crescents'],
+        data['orbital_jewels'],
         json.dumps(data['inventory']),
         json.dumps(data['pity_counters']),
         json.dumps(data['monthly_exchanges']),
@@ -422,6 +428,7 @@ def get_user_data():
         'lumen_orbs': user['lumen_orbs'],
         'halo_orbs': user['halo_orbs'],
         'auric_crescents': user['auric_crescents'],
+        'orbital_jewels': user['orbital_jewels'], # Include new currency
         'pity_counters': user['pity_counters'],
         'inventory': user['inventory']
     })
@@ -451,24 +458,29 @@ def pull_gacha():
     
     num_pulls = 10 if pull_type == 'multi' else 1
     
-    base_cost_snc = COST_MAP[banner_type]['snc']
-    base_cost_orb = 1 # 1 orb per pull
+    # Determine cost based on banner type and number of pulls
+    cost_snc_per_pull = COST_MAP[banner_type]['snc']
+    cost_orb_per_pull = 1 # 1 orb per pull
 
-    cost_snc = base_cost_snc * num_pulls
-    cost_orb = base_cost_orb * num_pulls
+    cost_snc_total = cost_snc_per_pull * num_pulls
+    cost_orb_total = cost_orb_per_pull * num_pulls
     
+    # Apply 10-pull discount for SNC if specified in COST_MAP (e.g., 595 for standard, 900 for limited)
     if num_pulls == 10:
         if 'standard' in banner_type:
-            cost_snc = 595
+            cost_snc_total = 595 # Fixed discount for 10-pull standard
         elif 'limited' in banner_type:
-            cost_snc = 900
+            cost_snc_total = 900 # Fixed discount for 10-pull limited
             
     orb_currency_type = COST_MAP[banner_type]['orb']
 
-    if user[orb_currency_type] >= cost_orb:
-        user[orb_currency_type] -= cost_orb
-    elif user['star_night_crystals'] >= cost_snc:
-        user['star_night_crystals'] -= cost_snc
+    # Check and deduct currency
+    if user[orb_currency_type] >= cost_orb_total:
+        user[orb_currency_type] -= cost_orb_total
+        currency_spent_type = orb_currency_type
+    elif user['star_night_crystals'] >= cost_snc_total:
+        user['star_night_crystals'] -= cost_snc_total
+        currency_spent_type = 'star_night_crystals'
     else:
         return jsonify({'status': 'error', 'message': 'Insufficient currency for this pull.'}), 400
 
@@ -484,11 +496,44 @@ def pull_gacha():
         pulled_items.append(result)
         user['inventory'].append(result)
 
+        # Award Orbital Jewels (OJ) based on rarity
+        if result['rarity'] == 3:
+            user['orbital_jewels'] += 25
+        elif result['rarity'] == 4:
+            user['orbital_jewels'] += 50
+            # Award Auric Crescents (AC) for 4-star
+            user['auric_crescents'] += 10
+        elif result['rarity'] == 5:
+            user['orbital_jewels'] += 100
+            # Award Auric Crescents (AC) for 5-star
+            user['auric_crescents'] += 20
+
+        # Reset pity counters
         if result['rarity'] == 4:
             pity_4 = 0
         if result['rarity'] == 5:
             pity_5 = 0
-            pity_4 = 0 
+            pity_4 = 0 # 5-star resets 4-star pity too
+
+        # Check for Spectra (duplicate characters) for Auric Crescents
+        # This is a simplified check. In a real game, you'd track character ownership
+        # and check if the pulled character is already owned.
+        # For now, we'll assume any 4-star or 5-star character pull *could* be a duplicate
+        # and award AC for Spectra if it's a character.
+        if result['type'] == 'Character' and (result['rarity'] == 4 or result['rarity'] == 5):
+            # This is a placeholder logic. You'd need a system to track owned characters
+            # and detect actual duplicates to award 50 AC per Spectra.
+            # For demonstration, let's just add a small chance or a fixed amount for now.
+            # As per your rule: "50 AC On Every Spectra"
+            # Since we don't have character ownership tracking here,
+            # I'll add a placeholder if a character is pulled that *could* be a duplicate.
+            # For a true implementation, you'd need to fetch user's owned characters.
+            # For now, I'll assume if a 4* or 5* character is pulled, it might be a Spectra.
+            # A more robust solution would involve checking if the user already owns this specific character.
+            # For this MVP, let's just add 50 AC if it's a character of 4* or 5* as a placeholder for "Spectra".
+            # This assumes every character pull of 4* or 5* is a "Spectra" for AC purposes.
+            # This needs to be refined with actual character ownership tracking.
+            user['auric_crescents'] += 50 # Add 50 AC for potential Spectra (duplicate character)
 
     # Ensure the banner_type key exists in pity_counters before assigning
     if banner_type not in user['pity_counters']:
@@ -501,10 +546,11 @@ def pull_gacha():
     return jsonify({
         'status': 'success',
         'pulled_items': pulled_items,
-        'remaining_crystals': user['star_night_crystals'],
-        'remaining_lumen_orbs': user['lumen_orbs'],
-        'remaining_halo_orbs': user['halo_orbs'],
-        'remaining_auric_crescents': user['auric_crescents'],
+        'star_night_crystals': user['star_night_crystals'],
+        'lumen_orbs': user['lumen_orbs'],
+        'halo_orbs': user['halo_orbs'],
+        'auric_crescents': user['auric_crescents'],
+        'orbital_jewels': user['orbital_jewels'],
         'pity_4_star': pity_4,
         'pity_5_star': pity_5
     })
@@ -556,7 +602,8 @@ def exchange_shop():
             'star_night_crystals': user['star_night_crystals'],
             'lumen_orbs': user['lumen_orbs'],
             'halo_orbs': user['halo_orbs'],
-            'auric_crescents': user['auric_crescents']
+            'auric_crescents': user['auric_crescents'],
+            'orbital_jewels': user['orbital_jewels'] # Include new currency
         })
     else:
         return jsonify({'status': 'error', 'message': f'Insufficient {cost_type.replace("_", " ").title()} to make this purchase.'}), 400

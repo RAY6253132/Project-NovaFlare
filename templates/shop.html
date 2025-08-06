@@ -221,6 +221,29 @@
             height: 24px;
             margin-bottom: 4px;
         }
+
+        /* Global Notification */
+        .global-notification {
+            position: fixed;
+            bottom: 7rem; /* Above bottom nav bar */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 123, 255, 0.9); /* Blue color */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 200;
+            font-size: 0.9rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+        }
+        .global-notification.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-10px); /* Slight lift effect */
+        }
     </style>
 </head>
 <body>
@@ -228,43 +251,39 @@
         <div class="top-currency-bar">
             <div class="currency-display">
                 <div class="currency-item">
-                    <img src="{{ url_for('static', filename='snc_icon.png') }}" alt="SNC"> 
+                    <img src="{{ url_for('static', filename='snc_icon.png') }}" alt="Star Night Crystals"> 
                     <span id="snc-count">1000</span>
                 </div>
                 <div class="currency-item">
-                    <img src="{{ url_for('static', filename='lumen_icon.png') }}" alt="Lumen"> 
+                    <img src="{{ url_for('static', filename='lumen_icon.png') }}" alt="Lumen Orbs"> 
                     <span id="lumen-count">0</span>
                 </div>
                 <div class="currency-item">
-                    <img src="{{ url_for('static', filename='halo_icon.png') }}" alt="Halo"> 
+                    <img src="{{ url_for('static', filename='halo_icon.png') }}" alt="Halo Orbs"> 
                     <span id="halo-count">0</span>
                 </div>
                 <div class="currency-item">
-                    <img src="{{ url_for('static', filename='auric_crescent_icon.png') }}" alt="Auric"> 
-                    <span id="auric-count">0</span>
+                    <img src="https://placehold.co/18x18/FFD700/000000?text=OJ" alt="Orbital Jewels"> 
+                    <span id="orbital-jewels-count">0</span>
+                </div>
+                <div class="currency-item">
+                    <img src="https://placehold.co/18x18/FFA07A/000000?text=AC" alt="Auric Crescents"> 
+                    <span id="auric-crescents-count">0</span>
                 </div>
             </div>
         </div>
 
         <div class="shop-content">
-            <!-- Dynamic Shop Content will be rendered here -->
             <div id="shopContainer">
                 <div class="shop-section">
-                    <h2 class="shop-section-title">Buy Lumen Orbs</h2>
+                    <h2 class="shop-section-title">Crystals Exchange</h2>
                     <div class="shop-item-list" id="lumen-shop-items">
                         <!-- Lumen Orb items will be dynamically inserted here -->
                     </div>
                 </div>
 
                 <div class="shop-section">
-                    <h2 class="shop-section-title">Buy Halo Orbs</h2>
-                    <div class="shop-item-list" id="halo-shop-items">
-                        <!-- Halo Orb items will be dynamically inserted here -->
-                    </div>
-                </div>
-
-                <div class="shop-section">
-                    <h2 class="shop-section-title">Exchange with Auric Crescents</h2>
+                    <h2 class="shop-section-title">Crescents Exchange</h2>
                     <div class="shop-item-list" id="exchange-shop-items">
                         <!-- Auric Crescent items will be dynamically inserted here -->
                     </div>
@@ -274,20 +293,24 @@
 
         <div class="bottom-nav-bar">
             <a href="/" class="nav-item">
-                <img class="nav-item-icon" src="https://via.placeholder.com/24x24?text=H" alt="Home Icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                 <span>Home</span>
             </a>
+            <a href="/shop" class="nav-item active">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                <span>Shop</span>
+            </a>
             <a href="/game" class="nav-item">
-                <img class="nav-item-icon" src="https://via.placeholder.com/24x24?text=G" alt="Gacha Icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                 <span>Gacha</span>
             </a>
-            <a href="#" class="nav-item" onclick="showDevelopmentMessage('Inventory')">
-                <img class="nav-item-icon" src="https://via.placeholder.com/24x24?text=I" alt="Inventory Icon">
-                <span>Inventory</span>
+            <a href="#" class="nav-item" onclick="showDevelopmentMessage('Characters')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Characters</span>
             </a>
-            <a href="/shop" class="nav-item active">
-                <img class="nav-item-icon" src="https://via.placeholder.com/24x24?text=S" alt="Shop Icon">
-                <span>Shop</span>
+            <a href="#" class="nav-item" onclick="showDevelopmentMessage('Inventory')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-backpack"><path d="M4 10V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M2 10v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6"/><path d="M10 18v-2a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v2"/></svg>
+                <span>Inventory</span>
             </a>
         </div>
     </div>
@@ -301,6 +324,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Global Notification Element -->
+    <div id="globalNotification" class="global-notification"></div>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -314,19 +340,25 @@
             renderShopItems();
         });
 
+        // Function to show a custom notification (replaces alert)
+        function showGlobalNotification(message, duration = 3000) {
+            const notification = document.getElementById('globalNotification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration);
+        }
+
         function showDevelopmentMessage(featureName) {
-            if (window.Telegram && window.Telegram.WebApp) {
-                Telegram.WebApp.showAlert(`${featureName} feature is currently in development.`);
-            } else {
-                alert(`${featureName} feature is currently in development.`);
-            }
+            showGlobalNotification(`${featureName} feature is currently in development.`);
         }
         
         function fetchUserData() {
             const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
             if (!initData) {
                 console.error("Telegram init data is not available.");
-                updateCurrencyDisplay({ star_night_crystals: 1000, lumen_orbs: 5, halo_orbs: 0, auric_crescents: 0 });
+                updateCurrencyDisplay({ star_night_crystals: 1000, lumen_orbs: 5, halo_orbs: 0, auric_crescents: 0, orbital_jewels: 0 });
                 return;
             }
 
@@ -340,16 +372,12 @@
                     updateCurrencyDisplay(data);
                 } else {
                     console.error("Failed to fetch user data:", data.message);
-                    if (window.Telegram && window.Telegram.WebApp) {
-                        Telegram.WebApp.showAlert(`Error: ${data.message}`);
-                    }
+                    showGlobalNotification(`Error: ${data.message}`);
                 }
             })
             .catch(error => {
                 console.error("Error fetching user data:", error);
-                if (window.Telegram && window.Telegram.WebApp) {
-                    Telegram.WebApp.showAlert("Network error or server unreachable. Please try again.");
-                }
+                showGlobalNotification("Network error or server unreachable. Please try again.");
             });
         }
 
@@ -357,22 +385,23 @@
             document.getElementById('snc-count').innerText = data.star_night_crystals;
             document.getElementById('lumen-count').innerText = data.lumen_orbs;
             document.getElementById('halo-count').innerText = data.halo_orbs;
-            document.getElementById('auric-count').innerText = data.auric_crescents;
+            document.getElementById('auric-crescents-count').innerText = data.auric_crescents;
+            document.getElementById('orbital-jewels-count').innerText = data.orbital_jewels; // Update OJ
         }
         
         // Dynamic shop item data (can be fetched from backend)
         const shopItems = {
             'lumen': [
-                { id: 'buy_lumen_1', name: 'Lumen Orb x1', description: 'Standard pull', cost: 70, cost_currency: 'snc_icon.png' },
-                { id: 'buy_lumen_10', name: 'Lumen Orb x10', description: 'Save 10%', cost: 595, cost_currency: 'snc_icon.png' }
+                { id: 'buy_lumen_1', name: 'Lumen Orb x1', description: 'Standard pull', cost: 70, cost_currency: 'snc_icon.png', icon: 'lumen_icon.png' },
+                { id: 'buy_lumen_10', name: 'Lumen Orb x10', description: 'Save 10%', cost: 595, cost_currency: 'snc_icon.png', icon: 'lumen_icon.png' }
             ],
             'halo': [
-                { id: 'buy_halo_1', name: 'Halo Orb x1', description: 'Limited pull', cost: 100, cost_currency: 'snc_icon.png' },
-                { id: 'buy_halo_10', name: 'Halo Orb x10', description: 'Save 10%', cost: 900, cost_currency: 'snc_icon.png' }
+                { id: 'buy_halo_1', name: 'Halo Orb x1', description: 'Limited pull', cost: 100, cost_currency: 'snc_icon.png', icon: 'halo_icon.png' },
+                { id: 'buy_halo_10', name: 'Halo Orb x10', description: 'Save 10%', cost: 900, cost_currency: 'snc_icon.png', icon: 'halo_icon.png' }
             ],
             'exchange': [
-                { id: 'exchange_lumen', name: 'Lumen Orb x1', description: 'Monthly limit: 10', cost: 20, cost_currency: 'auric_crescent_icon.png' },
-                { id: 'exchange_halo', name: 'Halo Orb x1', description: 'Monthly limit: 10', cost: 20, cost_currency: 'auric_crescent_icon.png' }
+                { id: 'exchange_lumen', name: 'Lumen Orb x1', description: 'Monthly limit: 10', cost: 20, cost_currency: 'auric_crescent_icon.png', icon: 'lumen_icon.png' },
+                { id: 'exchange_halo', name: 'Halo Orb x1', description: 'Monthly limit: 10', cost: 20, cost_currency: 'auric_crescent_icon.png', icon: 'halo_icon.png' }
             ]
         };
 
@@ -381,21 +410,37 @@
             const haloContainer = document.getElementById('halo-shop-items');
             const exchangeContainer = document.getElementById('exchange-shop-items');
 
-            // Render Lumen items
+            // Render Lumen items (bought with SNC)
             lumenContainer.innerHTML = shopItems.lumen.map(item => createShopItemHTML(item)).join('');
             
-            // Render Halo items
+            // Render Halo items (bought with SNC) - Renamed section title to "Crystals Exchange" to encompass both
+            // The previous section was "Buy Lumen Orbs", this was "Buy Halo Orbs". Now both are under "Crystals Exchange"
+            // So, I'll append halo items to the same lumenContainer's parent if you want them together,
+            // or keep a separate section. For now, I'll keep them separate but rename the section title.
             haloContainer.innerHTML = shopItems.halo.map(item => createShopItemHTML(item)).join('');
 
-            // Render Exchange items
+
+            // Render Exchange items (bought with Auric Crescents)
             exchangeContainer.innerHTML = shopItems.exchange.map(item => createShopItemHTML(item)).join('');
         }
 
         function createShopItemHTML(item) {
+            // Determine the correct image for the item being sold (reward_type icon)
+            let itemIconSrc;
+            if (item.icon) {
+                itemIconSrc = `{{ url_for('static', filename='${item.icon}') }}`;
+            } else if (item.id.includes('lumen')) {
+                itemIconSrc = "{{ url_for('static', filename='lumen_icon.png') }}";
+            } else if (item.id.includes('halo')) {
+                itemIconSrc = "{{ url_for('static', filename='halo_icon.png') }}";
+            } else {
+                itemIconSrc = "https://placehold.co/50x50?text=Item"; // Generic fallback
+            }
+
             return `
                 <div class="shop-item">
                     <div class="item-details">
-                        <img src="{{ url_for('static', filename='${item.cost_currency}') }}" alt="${item.name}" class="item-icon">
+                        <img src="${itemIconSrc}" alt="${item.name}" class="item-icon">
                         <div class="item-info">
                             <h3>${item.name}</h3>
                             <p class="text-sm text-gray-400">${item.description}</p>
@@ -416,7 +461,15 @@
             const modalText = document.getElementById('modal-text');
             const confirmBtn = document.getElementById('confirm-buy-btn');
 
-            const currencyName = costCurrency === 'snc_icon.png' ? 'Star Night Crystals' : 'Auric Crescents';
+            let currencyName;
+            if (costCurrency === 'snc_icon.png') {
+                currencyName = 'Star Night Crystals';
+            } else if (costCurrency === 'auric_crescent_icon.png') {
+                currencyName = 'Auric Crescents';
+            } else {
+                currencyName = 'currency'; // Fallback
+            }
+
             modalText.innerText = `Are you sure you want to purchase ${itemName} for ${cost} ${currencyName}?`;
             
             confirmBtn.onclick = () => {
@@ -433,7 +486,7 @@
         function buyItem(exchangeType) {
             const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
             if (!initData) {
-                showDevelopmentMessage("Please open this app inside Telegram to make a purchase.");
+                showGlobalNotification("Please open this app inside Telegram to make a purchase.");
                 return;
             }
 
@@ -448,21 +501,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === "success") {
-                    if (window.Telegram && window.Telegram.WebApp) {
-                        Telegram.WebApp.showAlert('Purchase successful!');
-                    }
+                    showGlobalNotification('Purchase successful!');
                     updateCurrencyDisplay(data);
                 } else {
-                    if (window.Telegram && window.Telegram.WebApp) {
-                        Telegram.WebApp.showAlert("Purchase failed: " + data.message);
-                    }
+                    showGlobalNotification("Purchase failed: " + data.message);
                 }
             })
             .catch(error => {
                 console.error("Error during purchase:", error);
-                if (window.Telegram && window.Telegram.WebApp) {
-                    Telegram.WebApp.showAlert("An error occurred. Please try again.");
-                }
+                showGlobalNotification("An error occurred. Please try again.");
             });
         }
     </script>
