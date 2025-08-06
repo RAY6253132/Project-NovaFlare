@@ -79,7 +79,6 @@
             overflow: hidden;
             background-size: cover;
             background-position: center;
-            /* Removed background-image here to allow dynamic setting by JS */
             background-color: rgba(0, 0, 0, 0.2); /* A subtle overlay for the banner area itself */
         }
 
@@ -417,7 +416,9 @@
                 Telegram.WebApp.closeButton.show();
             }
             fetchUserData();
-            switchBanner(currentBanner); // Initialize with default banner
+            // Call switchBanner after fetchUserData to ensure currency display is updated based on initial banner
+            // and the active class is set.
+            switchBanner(currentBanner); 
         });
 
         function showDevelopmentMessage(featureName) {
@@ -447,9 +448,10 @@
                     userPityData = data.pity_counters;
                     updatePityDisplay();
                     document.getElementById('user-id').innerText = data.user_id;
+                    // Ensure correct currency display based on the initially selected banner
+                    updateCurrencyVisibility(currentBanner); 
                 } else {
                     console.error("Failed to fetch user data:", data.message);
-                    // Show Telegram alert for the error
                     if (window.Telegram && window.Telegram.WebApp) {
                         Telegram.WebApp.showAlert(`Error: ${data.message}`);
                     }
@@ -467,6 +469,20 @@
             document.getElementById('snc-count').innerText = data.star_night_crystals;
             document.getElementById('lumen-count').innerText = data.lumen_orbs;
             document.getElementById('halo-count').innerText = data.halo_orbs;
+        }
+
+        // New function to handle currency visibility
+        function updateCurrencyVisibility(bannerType) {
+            const lumenCurrencyItem = document.getElementById('lumen-currency-item');
+            const haloCurrencyItem = document.getElementById('halo-currency-item');
+
+            if (bannerType.includes('limited')) {
+                haloCurrencyItem.style.display = 'flex';
+                lumenCurrencyItem.style.display = 'none';
+            } else {
+                lumenCurrencyItem.style.display = 'flex';
+                haloCurrencyItem.style.display = 'none';
+            }
         }
 
         function updatePityDisplay() {
@@ -487,6 +503,10 @@
                 showDevelopmentMessage("Please open this app inside Telegram to play.");
                 return;
             }
+            
+            // Disable pull buttons to prevent multiple clicks
+            document.querySelectorAll('.pull-button').forEach(button => button.disabled = true);
+
             fetch('/pull_gacha', {
                 method: 'POST',
                 headers: {
@@ -497,6 +517,9 @@
             })
             .then(response => response.json())
             .then(data => {
+                // Re-enable pull buttons
+                document.querySelectorAll('.pull-button').forEach(button => button.disabled = false);
+
                 if (data.status === "success") {
                     updateCurrencyDisplay(data);
                     // Update userPityData with the new pity counts from the backend
@@ -514,6 +537,8 @@
             })
             .catch(error => {
                 console.error("Error pulling gacha:", error);
+                // Re-enable pull buttons even on error
+                document.querySelectorAll('.pull-button').forEach(button => button.disabled = false);
                 if (window.Telegram && window.Telegram.WebApp) {
                     Telegram.WebApp.showAlert("Network error or server unreachable. Please try again.");
                 } else {
@@ -528,7 +553,6 @@
             
             items.forEach(item => {
                 const itemDiv = document.createElement('div');
-                // Use the rarity directly for the class, as defined in CSS
                 itemDiv.className = `result-item rarity-${item.rarity}`;
                 
                 // Construct image URL using the 'image' property from the item data
@@ -556,24 +580,18 @@
             currentBanner = bannerType;
             
             // Find the button that corresponds to the current banner and set it active
-            // Note: The text on the buttons is now fixed, so we match by the bannerType passed to the function
-            const activeBannerButton = document.querySelector(`.banner-selector-buttons button[onclick*="${bannerType}"]`);
+            // We'll use a data attribute or a more robust way to match buttons if their text changes
+            // For now, matching by the onclick attribute string
+            const activeBannerButton = document.querySelector(`.banner-selector-buttons button[onclick*="switchBanner('${bannerType}')"]`);
             if (activeBannerButton) {
                 activeBannerButton.classList.add('active');
             }
 
             const switchBtn = document.getElementById('switchBannerBtn');
-            const lumenCurrencyItem = document.getElementById('lumen-currency-item');
-            const haloCurrencyItem = document.getElementById('halo-currency-item');
             const bannerImage = document.getElementById('bannerImage');
             
-            if (bannerType.includes('limited')) {
-                haloCurrencyItem.style.display = 'flex';
-                lumenCurrencyItem.style.display = 'none';
-            } else {
-                lumenCurrencyItem.style.display = 'flex';
-                haloCurrencyItem.style.display = 'none';
-            }
+            // Update currency visibility based on the new banner type
+            updateCurrencyVisibility(bannerType);
 
             // Update banner image and switch button text based on the new banner type
             const currentBannerInfo = bannerDisplayInfo[currentBanner];
