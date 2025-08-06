@@ -16,12 +16,18 @@
             color: white;
             overflow: hidden;
             position: relative;
+            background-size: cover;
+            background-position: center;
+            background-image: url('/static/novaflare_bg.png');
         }
 
         .main-game-container {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            padding-bottom: 5rem;
         }
         
         /* Top Status Bar with Back/Home and User ID */
@@ -49,6 +55,8 @@
             backdrop-filter: blur(5px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 20;
+            overflow-x: auto;
+            white-space: nowrap;
         }
         .banner-selector-button {
             padding: 0.5rem 1rem;
@@ -57,6 +65,7 @@
             font-weight: bold;
             color: white;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
         .banner-selector-button.active, .banner-selector-button:hover {
             background: #007BFF;
@@ -111,6 +120,19 @@
             width: 18px;
             height: 18px;
             margin-right: 5px;
+        }
+
+        /* Pity Counter */
+        .pity-counters-top-left {
+            align-self: flex-start;
+            margin-top: 0.5rem;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: none; /* Hidden by default, shown when user data is loaded */
         }
 
         /* Pull Buttons at bottom-right of banner, horizontal */
@@ -168,71 +190,126 @@
             flex-grow: 1;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             text-align: center;
+            cursor: pointer;
         }
-
-        /* --- Shop Modal Styles --- */
-        .modal {
+        
+        /* Bottom Navigation Bar */
+        .bottom-nav-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 0;
+            z-index: 100;
             position: fixed;
-            z-index: 200;
+            bottom: 0;
+            width: 100%;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.7rem;
+            color: #ccc;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+        }
+        .nav-item.active {
+            color: #007BFF;
+        }
+        .nav-item-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+        }
+        /* Results Modal */
+        .results-modal {
+            display: none;
+            position: fixed;
+            z-index: 101;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            display: none;
-            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            overflow: auto;
             align-items: center;
+            justify-content: center;
         }
-        .modal-content {
-            background-color: #2a2a44;
-            padding: 2rem;
+
+        .results-modal-content {
+            background: rgba(42, 42, 68, 0.9);
+            padding: 20px;
             border-radius: 10px;
             width: 90%;
             max-width: 600px;
-            text-align: center;
             position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
         }
+
         .close-button {
             position: absolute;
             top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
+            right: 20px;
+            font-size: 30px;
+            font-weight: bold;
             color: white;
-            font-size: 1.5rem;
             cursor: pointer;
+            background: transparent;
+            border: none;
         }
-        .shop-grid {
+
+        .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
             margin-top: 1rem;
         }
-        .shop-item {
-            background: #3a3a5e;
-            padding: 1rem;
-            border-radius: 8px;
+
+        .result-item {
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 5px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
-        .shop-item h4 {
-            font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
+        
+        .result-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            object-fit: cover;
+            margin-bottom: 5px;
         }
-        .shop-item p {
-            font-size: 0.75rem;
-            margin-bottom: 1rem;
+        
+        .result-item-name {
+            font-size: 0.8rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
         }
-        .shop-item button {
-            background-color: #007BFF;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-weight: bold;
+
+        /* Star rating animation */
+        .rarity-5 .result-item {
+            border: 2px solid #FFD700; /* Gold */
+            box-shadow: 0 0 15px #FFD700;
+        }
+
+        .rarity-4 .result-item {
+            border: 2px solid #C0C0C0; /* Silver */
+            box-shadow: 0 0 10px #C0C0C0;
+        }
+
+        .rarity-3 .result-item {
+            border: 2px solid #CD7F32; /* Bronze */
+            box-shadow: 0 0 5px #CD7F32;
         }
     </style>
 </head>
@@ -249,10 +326,15 @@
             <button class="banner-selector-button" onclick="switchBanner('limited_character_1')">Limited Character 1</button>
             <button class="banner-selector-button" onclick="switchBanner('limited_character_2')">Limited Character 2</button>
             <button class="banner-selector-button" onclick="switchBanner('standard_character')">Standard Character</button>
+            <button class="banner-selector-button" onclick="showDevelopmentMessage('Weapon Banners')">Weapon Banners</button>
         </div>
 
         <div class="gacha-main-content" id="bannerImage">
             <div class="overlay-container">
+                <div class="pity-counters-top-left" id="pityCounters">
+                    <span>4★ Pity: <span id="pity-4-star">0</span></span><br>
+                    <span>5★ Pity: <span id="pity-5-star">0</span></span>
+                </div>
                 <div class="currencies-top-right">
                     <div class="currency-item">
                         <img src="{{ url_for('static', filename='snc_icon.png') }}" alt="SNC"> 
@@ -276,42 +358,32 @@
         </div>
 
         <div class="utility-buttons-container">
-            <button class="utility-button" onclick="openShopModal()">Shop</button>
-            <button class="utility-button">Details</button>
-            <button class="utility-button">History</button>
+            <a href="/shop" class="utility-button">Shop</a>
+            <button class="utility-button" onclick="showDevelopmentMessage('Details')">Details</button>
+            <button class="utility-button" onclick="showDevelopmentMessage('History')">History</button>
             <button class="utility-button" id="switchBannerBtn" onclick="switchToOtherBanner()">Switch To Weapon Banner</button>
         </div>
     </div>
     
-    <div id="shopModal" class="modal">
-        <div class="modal-content">
-            <span onclick="closeShopModal()" class="close-button">&times;</span>
-            <h2 class="text-xl font-bold mb-4">Shop</h2>
-            <div class="shop-grid">
-                <div class="shop-item">
-                    <h4>Purchase Lumen Orbs</h4>
-                    <p>100 Auric Crescents for 1 Lumen Orb</p>
-                    <button onclick="exchangeCurrency('lumen')">Buy</button>
-                </div>
-                <div class="shop-item">
-                    <h4>Purchase Halo Orbs</h4>
-                    <p>1000 Auric Crescents for 1 Halo Orb</p>
-                    <button onclick="exchangeCurrency('halo')">Buy</button>
-                </div>
-                <div class="shop-item">
-                    <h4>Weekly Special</h4>
-                    <p>Limited-time offer! 10 Lumen Orbs for 900 SNC.</p>
-                    <button>Buy</button>
-                </div>
-                <div class="shop-item">
-                    <h4>Monthly Pack</h4>
-                    <p>A great value for regular players.</p>
-                    <button>Buy</button>
-                </div>
-            </div>
-        </div>
+    <div class="bottom-nav-bar">
+        <a href="/" class="nav-item">
+            <img class="nav-item-icon" src="https://via.placeholder.com/24x24?text=H" alt="Home Icon">
+            <span>Home</span>
+        </a>
+        <a href="/game" class="nav-item active">
+            <img class="nav-item-icon" src="https://via.placeholder.com/24x24?text=G" alt="Gacha Icon">
+            <span>Gacha</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showDevelopmentMessage('Inventory')">
+            <img class="nav-item-icon" src="https://via.placeholder.com/24x24?text=I" alt="Inventory Icon">
+            <span>Inventory</span>
+        </a>
+        <a href="/shop" class="nav-item">
+            <img class="nav-item-icon" src="https://via.placeholder.com/24x24?text=S" alt="Shop Icon">
+            <span>Shop</span>
+        </a>
     </div>
-
+    
     <div id="pullResultsModal" class="results-modal">
         <div class="results-modal-content">
             <button onclick="closeResultsModal()" class="close-button">&times;</button>
@@ -323,11 +395,26 @@
     
     <script>
         let currentBanner = 'limited_character_1'; 
-        
+        let userPityData = {};
+
         document.addEventListener('DOMContentLoaded', () => {
+            if (window.Telegram && window.Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.setBackgroundColor('#1a1a2e');
+                Telegram.WebApp.setHeaderColor('secondary_bg_color');
+                Telegram.WebApp.closeButton.show();
+            }
             fetchUserData();
             switchBanner(currentBanner);
         });
+
+        function showDevelopmentMessage(featureName) {
+            if (window.Telegram && window.Telegram.WebApp) {
+                Telegram.WebApp.showAlert(`${featureName} feature is currently in development.`);
+            } else {
+                alert(`${featureName} feature is currently in development.`);
+            }
+        }
 
         function fetchUserData() {
             const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
@@ -345,6 +432,8 @@
             .then(data => {
                 if (data.status === "success") {
                     updateCurrencyDisplay(data);
+                    userPityData = data.pity_counters;
+                    updatePityDisplay();
                     document.getElementById('user-id').innerText = data.user_id;
                 } else {
                     console.error("Failed to fetch user data:", data.message);
@@ -359,10 +448,22 @@
             document.getElementById('halo-count').innerText = data.halo_orbs;
         }
 
+        function updatePityDisplay() {
+            const pityContainer = document.getElementById('pityCounters');
+            const pity = userPityData[currentBanner];
+            if (pity) {
+                document.getElementById('pity-4-star').innerText = pity["4_star"];
+                document.getElementById('pity-5-star').innerText = pity["5_star"];
+                pityContainer.style.display = 'block';
+            } else {
+                pityContainer.style.display = 'none';
+            }
+        }
+
         function pullGacha(pullType, bannerType) {
             const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
             if (!initData) {
-                alert("Please open this app inside Telegram to play.");
+                showDevelopmentMessage("Please open this app inside Telegram to play.");
                 return;
             }
             fetch('/pull_gacha', {
@@ -376,34 +477,58 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === "success") {
-                    updateCurrencyDisplay({
-                        star_night_crystals: data.remaining_crystals,
-                        lumen_orbs: data.remaining_lumen_orbs,
-                        halo_orbs: data.remaining_halo_orbs
-                    });
+                    updateCurrencyDisplay(data);
+                    userPityData[currentBanner]["4_star"] = data.pity_4_star;
+                    userPityData[currentBanner]["5_star"] = data.pity_5_star;
+                    updatePityDisplay();
                     displayPullResults(data.pulled_items);
                 } else {
-                    alert(data.message);
+                    showDevelopmentMessage(data.message);
                 }
             })
             .catch(error => console.error("Error pulling gacha:", error));
         }
         
         function displayPullResults(items) {
-            alert('Pulled: ' + items.map(item => item.name).join(', '));
+            const resultsGrid = document.getElementById('resultsGrid');
+            resultsGrid.innerHTML = ''; // Clear previous results
+            
+            items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `result-item rarity-${item.rarity}`;
+                
+                // You'll need to update this part to use actual image URLs
+                // For now, using a placeholder based on item name and rarity
+                const imageUrl = `/static/item_images/${item.name.replace(/\s/g, '_')}_${item.rarity}.png` || `https://via.placeholder.com/80x80?text=${item.name}`;
+
+                itemDiv.innerHTML = `
+                    <img src="${imageUrl}" alt="${item.name}">
+                    <span class="result-item-name">${item.name}</span>
+                `;
+                resultsGrid.appendChild(itemDiv);
+            });
+            document.getElementById('pullResultsModal').style.display = 'flex';
+        }
+
+        function closeResultsModal() {
+            document.getElementById('pullResultsModal').style.display = 'none';
         }
 
         function switchBanner(bannerType) {
             const bannerSelectorButtons = document.querySelectorAll('.banner-selector-button');
             bannerSelectorButtons.forEach(btn => btn.classList.remove('active'));
 
+            currentBanner = bannerType;
+            const correspondingBtn = document.querySelector(`[onclick="switchBanner('${bannerType}')"]`);
+            if (correspondingBtn) {
+                correspondingBtn.classList.add('active');
+            }
+
             const switchBtn = document.getElementById('switchBannerBtn');
             const lumenCurrencyItem = document.getElementById('lumen-currency-item');
             const haloCurrencyItem = document.getElementById('halo-currency-item');
             const bannerImage = document.getElementById('bannerImage');
             
-            currentBanner = bannerType;
-
             if (bannerType.includes('limited')) {
                 haloCurrencyItem.style.display = 'flex';
                 lumenCurrencyItem.style.display = 'none';
@@ -412,16 +537,22 @@
                 haloCurrencyItem.style.display = 'none';
             }
 
-            if (bannerType.includes('character')) {
-                document.querySelector(`[onclick="switchBanner('${bannerType}')"]`).classList.add('active');
-                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=' + bannerType.replace(/_/g, ' ') + ' Banner")';
-                switchBtn.innerText = "Switch To Weapon Banner";
-            } else {
-                const correspondingCharacterBanner = bannerType.replace('weapon', 'character');
-                document.querySelector(`[onclick="switchBanner('${correspondingCharacterBanner}')"]`).classList.add('active');
-                bannerImage.style.backgroundImage = 'url("https://via.placeholder.com/1000x500?text=' + bannerType.replace(/_/g, ' ') + ' Banner")';
-                switchBtn.innerText = "Switch To Character Banner";
+            const bannerMap = {
+                'limited_character_1': {image: 'https://via.placeholder.com/1000x500?text=Limited Character Banner 1', label: 'Switch To Weapon Banner'},
+                'limited_character_2': {image: 'https://via.placeholder.com/1000x500?text=Limited Character Banner 2', label: 'Switch To Weapon Banner'},
+                'standard_character': {image: 'https://via.placeholder.com/1000x500?text=Standard Character Banner', label: 'Switch To Weapon Banner'},
+                'limited_weapon_1': {image: 'https://via.placeholder.com/1000x500?text=Limited Weapon Banner 1', label: 'Switch To Character Banner'},
+                'limited_weapon_2': {image: 'https://via.placeholder.com/1000x500?text=Limited Weapon Banner 2', label: 'Switch To Character Banner'},
+                'standard_weapon': {image: 'https://via.placeholder.com/1000x500?text=Standard Weapon Banner', label: 'Switch To Character Banner'},
+            };
+            
+            const bannerInfo = bannerMap[currentBanner];
+            if (bannerInfo) {
+                bannerImage.style.backgroundImage = `url("${bannerInfo.image}")`;
+                switchBtn.innerText = bannerInfo.label;
             }
+            
+            updatePityDisplay();
         }
         
         function switchToOtherBanner() {
@@ -444,18 +575,6 @@
                     switchBanner('standard_character');
                 }
             }
-        }
-        
-        function openShopModal() {
-            document.getElementById('shopModal').style.display = 'flex';
-        }
-
-        function closeShopModal() {
-            document.getElementById('shopModal').style.display = 'none';
-        }
-        
-        function exchangeCurrency(exchangeType) {
-            alert(`Exchanging for ${exchangeType}! (Backend logic not yet implemented)`);
         }
     </script>
 </body>

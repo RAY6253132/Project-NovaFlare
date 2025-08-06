@@ -18,13 +18,14 @@
             position: relative;
             background-size: cover;
             background-position: center;
-            background-image: url('/static/novaflare_bg.png'); /* Use your actual background file */
+            background-image: url('/static/novaflare_bg.png');
         }
 
         .main-app-container {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            padding-bottom: 5rem;
         }
 
         .home-screen-container {
@@ -35,7 +36,7 @@
             align-items: center;
             padding: 2rem;
             text-align: center;
-            background: rgba(0, 0, 0, 0.4); /* Make the overall container a bit transparent to show the background */
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(5px);
         }
 
@@ -74,20 +75,52 @@
             transition: all 0.2s ease;
             box-shadow: 0 4px 10px rgba(0,0,0,0.4);
             cursor: pointer;
-            backdrop-filter: blur(5px); /* Add blur to the button itself */
-            background-color: rgba(42, 42, 68, 0.5); /* Transparent background */
-            border: 2px solid rgba(255, 255, 255, 0.2); /* Subtle border */
+            backdrop-filter: blur(5px);
+            background-color: rgba(42, 42, 68, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
 
         .home-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(0,0,0,0.6);
-            background-color: rgba(42, 42, 68, 0.8); /* Slightly less transparent on hover */
+            background-color: rgba(42, 42, 68, 0.8);
         }
 
         .home-button.gacha {
-            background-color: rgba(230, 57, 70, 0.6); /* Red transparent background */
+            background-color: rgba(230, 57, 70, 0.6);
             border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 0;
+            z-index: 100;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.7rem;
+            color: #ccc;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+        }
+        .nav-item.active {
+            color: #007BFF;
+        }
+        .nav-item-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
         }
     </style>
 </head>
@@ -96,9 +129,9 @@
         <div class="home-screen-container" id="homeScreen">
             <h1 class="home-title">NovaFlare</h1>
             <div class="home-button-list">
-                <button class="home-button gacha" onclick="launchGame()">
+                <a href="/game" class="home-button gacha">
                     Gacha
-                </button>
+                </a>
                 <button class="home-button secondary" onclick="showDevelopmentMessage('Events')">
                     Events
                 </button>
@@ -114,20 +147,48 @@
                 <button class="home-button secondary" onclick="showDevelopmentMessage('Profile')">
                     Profile
                 </button>
-                <button class="home-button secondary" onclick="showDevelopmentMessage('Shop')">
+                <a href="/shop" class="home-button secondary">
                     Shop
-                </button>
+                </a>
             </div>
         </div>
     </div>
+
+    <div class="bottom-nav-bar">
+        <a href="/" class="nav-item active">
+            <img class="nav-item-icon" src="https://via.placeholder.com/24x24?text=H" alt="Home Icon">
+            <span>Home</span>
+        </a>
+        <a href="/game" class="nav-item">
+            <img class="nav-item-icon" src="https://via.placeholder.com/24x24?text=G" alt="Gacha Icon">
+            <span>Gacha</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showDevelopmentMessage('Inventory')">
+            <img class="nav-item-icon" src="https://via.placeholder.com/24x24?text=I" alt="Inventory Icon">
+            <span>Inventory</span>
+        </a>
+        <a href="/shop" class="nav-item">
+            <img class="nav-item-icon" src="https://via.placeholder.com/24x24?text=S" alt="Shop Icon">
+            <span>Shop</span>
+        </a>
+    </div>
     
     <script>
-        function launchGame() {
-            window.location.href = '/game';
+        // Check if Telegram WebApp is available
+        if (window.Telegram && window.Telegram.WebApp) {
+            Telegram.WebApp.ready();
+            // Set the background color to match your app's theme
+            Telegram.WebApp.setBackgroundColor('#1a1a2e');
+            // Hide the bottom app close button as we have our own navigation
+            Telegram.WebApp.closeButton.hide();
         }
-        
+
         function showDevelopmentMessage(featureName) {
-            alert(`${featureName} feature is currently in development.`);
+            if (window.Telegram && window.Telegram.WebApp) {
+                Telegram.WebApp.showAlert(`${featureName} feature is currently in development.`);
+            } else {
+                alert(`${featureName} feature is currently in development.`);
+            }
         }
     </script>
 </body>
