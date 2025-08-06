@@ -5,8 +5,14 @@ import hmac
 import sqlite3
 import random
 from urllib.parse import unquote
-from flask import Flask, request, jsonify, render_template, session, redirect, url_for, g
+
+from flask import (
+    Flask, request, jsonify, render_template,
+    session, redirect, url_for, g
+)
+
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24) # A strong secret key for session management
