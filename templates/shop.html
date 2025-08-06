@@ -247,23 +247,27 @@
         </div>
 
         <div class="shop-content">
+            <!-- Dynamic Shop Content will be rendered here -->
             <div id="shopContainer">
                 <div class="shop-section">
                     <h2 class="shop-section-title">Buy Lumen Orbs</h2>
                     <div class="shop-item-list" id="lumen-shop-items">
-                        </div>
+                        <!-- Lumen Orb items will be dynamically inserted here -->
+                    </div>
                 </div>
 
                 <div class="shop-section">
                     <h2 class="shop-section-title">Buy Halo Orbs</h2>
                     <div class="shop-item-list" id="halo-shop-items">
-                        </div>
+                        <!-- Halo Orb items will be dynamically inserted here -->
+                    </div>
                 </div>
 
                 <div class="shop-section">
                     <h2 class="shop-section-title">Exchange with Auric Crescents</h2>
                     <div class="shop-item-list" id="exchange-shop-items">
-                        </div>
+                        <!-- Auric Crescent items will be dynamically inserted here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -336,9 +340,17 @@
                     updateCurrencyDisplay(data);
                 } else {
                     console.error("Failed to fetch user data:", data.message);
+                    if (window.Telegram && window.Telegram.WebApp) {
+                        Telegram.WebApp.showAlert(`Error: ${data.message}`);
+                    }
                 }
             })
-            .catch(error => console.error("Error fetching user data:", error));
+            .catch(error => {
+                console.error("Error fetching user data:", error);
+                if (window.Telegram && window.Telegram.WebApp) {
+                    Telegram.WebApp.showAlert("Network error or server unreachable. Please try again.");
+                }
+            });
         }
 
         function updateCurrencyDisplay(data) {
@@ -351,16 +363,16 @@
         // Dynamic shop item data (can be fetched from backend)
         const shopItems = {
             'lumen': [
-                { id: 'buy_lumen_1', name: 'Lumen Orb x1', description: 'Standard pull currency', cost: 70, cost_currency: 'snc_icon.png' },
+                { id: 'buy_lumen_1', name: 'Lumen Orb x1', description: 'Standard pull', cost: 70, cost_currency: 'snc_icon.png' },
                 { id: 'buy_lumen_10', name: 'Lumen Orb x10', description: 'Save 10%', cost: 595, cost_currency: 'snc_icon.png' }
             ],
             'halo': [
-                { id: 'buy_halo_1', name: 'Halo Orb x1', description: 'Limited pull currency', cost: 100, cost_currency: 'snc_icon.png' },
+                { id: 'buy_halo_1', name: 'Halo Orb x1', description: 'Limited pull', cost: 100, cost_currency: 'snc_icon.png' },
                 { id: 'buy_halo_10', name: 'Halo Orb x10', description: 'Save 10%', cost: 900, cost_currency: 'snc_icon.png' }
             ],
             'exchange': [
-                { id: 'exchange_lumen', name: 'Lumen Orb x1', description: 'Limited to 10 per month', cost: 20, cost_currency: 'auric_crescent_icon.png' },
-                { id: 'exchange_halo', name: 'Halo Orb x1', description: 'Limited to 10 per month', cost: 20, cost_currency: 'auric_crescent_icon.png' }
+                { id: 'exchange_lumen', name: 'Lumen Orb x1', description: 'Monthly limit: 10', cost: 20, cost_currency: 'auric_crescent_icon.png' },
+                { id: 'exchange_halo', name: 'Halo Orb x1', description: 'Monthly limit: 10', cost: 20, cost_currency: 'auric_crescent_icon.png' }
             ]
         };
 
@@ -421,7 +433,7 @@
         function buyItem(exchangeType) {
             const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
             if (!initData) {
-                alert("Please open this app inside Telegram to make a purchase.");
+                showDevelopmentMessage("Please open this app inside Telegram to make a purchase.");
                 return;
             }
 

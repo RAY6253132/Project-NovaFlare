@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NovaFlare Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: #1a1a2e;
+            color: white;
+            overflow: hidden;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-image: url('/static/novaflare_bg.png');
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .login-title {
+            font-size: 2.25rem;
+            font-weight: bold;
+            color: #00ffcc;
+            text-shadow: 0 0 15px #00ffcc;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: #ccc;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid #3a3a5e;
+            background-color: #2a2a44;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #007BFF;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(180deg, #e63946 0%, #c42b37 100%);
+            color: white;
+            font-size: 1.25rem;
+            font-weight: bold;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #9c222e;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+
+        .login-button:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1 class="login-title">NovaFlare Login</h1>
+        <form action="/login" method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="login-button">Login</button>
+        </form>
+        {% if error %}
+            <p class="error-message">{{ error }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>

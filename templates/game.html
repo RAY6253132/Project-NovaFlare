@@ -18,14 +18,14 @@
             position: relative;
             background-size: cover;
             background-position: center;
-            background-image: url('/static/novaflare_bg.png');
+            background-image: url('/static/novaflare_bg.png'); /* Global background for the game */
         }
 
         .main-game-container {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.6); /* Overlay for the whole game container */
             backdrop-filter: blur(5px);
             padding-bottom: 5rem;
         }
@@ -79,6 +79,8 @@
             overflow: hidden;
             background-size: cover;
             background-position: center;
+            /* Removed background-image here to allow dynamic setting by JS */
+            background-color: rgba(0, 0, 0, 0.2); /* A subtle overlay for the banner area itself */
         }
 
         /* Overlaid UI elements */
@@ -296,18 +298,18 @@
             width: 100%;
         }
 
-        /* Star rating animation */
-        .rarity-5 .result-item {
+        /* Star rarity styling */
+        .rarity-5 { /* SSR */
             border: 2px solid #FFD700; /* Gold */
             box-shadow: 0 0 15px #FFD700;
         }
 
-        .rarity-4 .result-item {
+        .rarity-4 { /* SR */
             border: 2px solid #C0C0C0; /* Silver */
             box-shadow: 0 0 10px #C0C0C0;
         }
 
-        .rarity-3 .result-item {
+        .rarity-3 { /* R */
             border: 2px solid #CD7F32; /* Bronze */
             box-shadow: 0 0 5px #CD7F32;
         }
@@ -323,10 +325,9 @@
         </div>
 
         <div class="banner-selector-buttons" id="bannerSelectorButtons">
-            <button class="banner-selector-button" onclick="switchBanner('limited_character_1')">Limited Character 1</button>
-            <button class="banner-selector-button" onclick="switchBanner('limited_character_2')">Limited Character 2</button>
-            <button class="banner-selector-button" onclick="switchBanner('standard_character')">Standard Character</button>
-            <button class="banner-selector-button" onclick="showDevelopmentMessage('Weapon Banners')">Weapon Banners</button>
+            <button class="banner-selector-button" onclick="switchBanner('limited_character_1')">Limited Banner 1</button>
+            <button class="banner-selector-button" onclick="switchBanner('limited_character_2')">Limited Banner 2</button>
+            <button class="banner-selector-button" onclick="switchBanner('standard_character')">Standard Banner</button>
         </div>
 
         <div class="gacha-main-content" id="bannerImage">
@@ -389,13 +390,24 @@
             <button onclick="closeResultsModal()" class="close-button">&times;</button>
             <h2 class="text-2xl font-bold mb-4">Draw Results</h2>
             <div id="resultsGrid" class="results-grid">
-                </div>
+                <!-- Pulled items will be displayed here -->
+            </div>
         </div>
     </div>
     
     <script>
         let currentBanner = 'limited_character_1'; 
         let userPityData = {};
+
+        // Mapping banner types to display names and image URLs
+        const bannerDisplayInfo = {
+            'limited_character_1': { name: 'Limited Banner 1', image: '/static/banner_limited_char_1.png' },
+            'limited_character_2': { name: 'Limited Banner 2', image: '/static/banner_limited_char_2.png' },
+            'standard_character': { name: 'Standard Banner', image: '/static/banner_standard_char.png' },
+            'limited_weapon_1': { name: 'Limited Weapon Banner 1', image: '/static/banner_limited_weapon_1.png' },
+            'limited_weapon_2': { name: 'Limited Weapon Banner 2', image: '/static/banner_limited_weapon_2.png' },
+            'standard_weapon': { name: 'Standard Weapon Banner', image: '/static/banner_standard_weapon.png' },
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
             if (window.Telegram && window.Telegram.WebApp) {
@@ -405,7 +417,7 @@
                 Telegram.WebApp.closeButton.show();
             }
             fetchUserData();
-            switchBanner(currentBanner);
+            switchBanner(currentBanner); // Initialize with default banner
         });
 
         function showDevelopmentMessage(featureName) {
@@ -420,7 +432,7 @@
             const initData = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.initData : null;
             if (!initData) {
                 console.error("Telegram init data is not available.");
-                updateCurrencyDisplay({ star_night_crystals: 1000, lumen_orbs: 5, halo_orbs: 0 });
+                updateCurrencyDisplay({ star_night_crystals: 1000, lumen_orbs: 5, halo_orbs: 0, auric_crescents: 0 });
                 document.getElementById('user-id').innerText = '0000000';
                 return;
             }
@@ -437,9 +449,18 @@
                     document.getElementById('user-id').innerText = data.user_id;
                 } else {
                     console.error("Failed to fetch user data:", data.message);
+                    // Show Telegram alert for the error
+                    if (window.Telegram && window.Telegram.WebApp) {
+                        Telegram.WebApp.showAlert(`Error: ${data.message}`);
+                    }
                 }
             })
-            .catch(error => console.error("Error fetching user data:", error));
+            .catch(error => {
+                console.error("Error fetching user data:", error);
+                if (window.Telegram && window.Telegram.WebApp) {
+                    Telegram.WebApp.showAlert("Network error or server unreachable. Please try again.");
+                }
+            });
         }
 
         function updateCurrencyDisplay(data) {
@@ -478,15 +499,27 @@
             .then(data => {
                 if (data.status === "success") {
                     updateCurrencyDisplay(data);
-                    userPityData[currentBanner]["4_star"] = data.pity_4_star;
-                    userPityData[currentBanner]["5_star"] = data.pity_5_star;
+                    // Update userPityData with the new pity counts from the backend
+                    userPityData[bannerType]["4_star"] = data.pity_4_star;
+                    userPityData[bannerType]["5_star"] = data.pity_5_star;
                     updatePityDisplay();
                     displayPullResults(data.pulled_items);
                 } else {
-                    showDevelopmentMessage(data.message);
+                    if (window.Telegram && window.Telegram.WebApp) {
+                        Telegram.WebApp.showAlert(data.message);
+                    } else {
+                        alert(data.message);
+                    }
                 }
             })
-            .catch(error => console.error("Error pulling gacha:", error));
+            .catch(error => {
+                console.error("Error pulling gacha:", error);
+                if (window.Telegram && window.Telegram.WebApp) {
+                    Telegram.WebApp.showAlert("Network error or server unreachable. Please try again.");
+                } else {
+                    alert("Network error or server unreachable. Please try again.");
+                }
+            });
         }
         
         function displayPullResults(items) {
@@ -495,14 +528,16 @@
             
             items.forEach(item => {
                 const itemDiv = document.createElement('div');
+                // Use the rarity directly for the class, as defined in CSS
                 itemDiv.className = `result-item rarity-${item.rarity}`;
                 
-                // You'll need to update this part to use actual image URLs
-                // For now, using a placeholder based on item name and rarity
-                const imageUrl = `/static/item_images/${item.name.replace(/\s/g, '_')}_${item.rarity}.png` || `https://via.placeholder.com/80x80?text=${item.name}`;
+                // Construct image URL using the 'image' property from the item data
+                const imageUrl = `/static/item_images/${item.image}`; 
+                // Fallback to placeholder if image is not defined or found
+                const fallbackImageUrl = `https://placehold.co/80x80/1a1a2e/ffffff?text=${item.name.replace(/\s/g, '+')}`;
 
                 itemDiv.innerHTML = `
-                    <img src="${imageUrl}" alt="${item.name}">
+                    <img src="${imageUrl}" onerror="this.onerror=null;this.src='${fallbackImageUrl}';" alt="${item.name}">
                     <span class="result-item-name">${item.name}</span>
                 `;
                 resultsGrid.appendChild(itemDiv);
@@ -519,9 +554,12 @@
             bannerSelectorButtons.forEach(btn => btn.classList.remove('active'));
 
             currentBanner = bannerType;
-            const correspondingBtn = document.querySelector(`[onclick="switchBanner('${bannerType}')"]`);
-            if (correspondingBtn) {
-                correspondingBtn.classList.add('active');
+            
+            // Find the button that corresponds to the current banner and set it active
+            // Note: The text on the buttons is now fixed, so we match by the bannerType passed to the function
+            const activeBannerButton = document.querySelector(`.banner-selector-buttons button[onclick*="${bannerType}"]`);
+            if (activeBannerButton) {
+                activeBannerButton.classList.add('active');
             }
 
             const switchBtn = document.getElementById('switchBannerBtn');
@@ -537,19 +575,16 @@
                 haloCurrencyItem.style.display = 'none';
             }
 
-            const bannerMap = {
-                'limited_character_1': {image: 'https://via.placeholder.com/1000x500?text=Limited Character Banner 1', label: 'Switch To Weapon Banner'},
-                'limited_character_2': {image: 'https://via.placeholder.com/1000x500?text=Limited Character Banner 2', label: 'Switch To Weapon Banner'},
-                'standard_character': {image: 'https://via.placeholder.com/1000x500?text=Standard Character Banner', label: 'Switch To Weapon Banner'},
-                'limited_weapon_1': {image: 'https://via.placeholder.com/1000x500?text=Limited Weapon Banner 1', label: 'Switch To Character Banner'},
-                'limited_weapon_2': {image: 'https://via.placeholder.com/1000x500?text=Limited Weapon Banner 2', label: 'Switch To Character Banner'},
-                'standard_weapon': {image: 'https://via.placeholder.com/1000x500?text=Standard Weapon Banner', label: 'Switch To Character Banner'},
-            };
-            
-            const bannerInfo = bannerMap[currentBanner];
-            if (bannerInfo) {
-                bannerImage.style.backgroundImage = `url("${bannerInfo.image}")`;
-                switchBtn.innerText = bannerInfo.label;
+            // Update banner image and switch button text based on the new banner type
+            const currentBannerInfo = bannerDisplayInfo[currentBanner];
+            if (currentBannerInfo) {
+                bannerImage.style.backgroundImage = `url("${currentBannerInfo.image}")`;
+                // Adjust switch button text based on whether it's a character or weapon banner
+                if (currentBanner.includes('character')) {
+                    switchBtn.innerText = "Switch To Weapon Banner";
+                } else {
+                    switchBtn.innerText = "Switch To Character Banner";
+                }
             }
             
             updatePityDisplay();
