@@ -276,16 +276,23 @@
         <div class="shop-content">
             <div id="shopContainer">
                 <div class="shop-section">
-                    <h2 class="shop-section-title">Crystals Exchange</h2>
-                    <div class="shop-item-list" id="lumen-shop-items">
-                        <!-- Lumen Orb items will be dynamically inserted here -->
+                    <h2 class="shop-section-title">Orb Exchange (Crystals)</h2>
+                    <div class="shop-item-list" id="orb-shop-items">
+                        <!-- Lumen Orb and Halo Orb items will be dynamically inserted here -->
                     </div>
                 </div>
 
                 <div class="shop-section">
                     <h2 class="shop-section-title">Crescents Exchange</h2>
-                    <div class="shop-item-list" id="exchange-shop-items">
+                    <div class="shop-item-list" id="auric-exchange-items">
                         <!-- Auric Crescent items will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <div class="shop-section">
+                    <h2 class="shop-section-title">Jewel Exchange</h2>
+                    <div class="shop-item-list" id="jewel-exchange-items">
+                        <!-- Orbital Jewel items will be dynamically inserted here -->
                     </div>
                 </div>
             </div>
@@ -391,37 +398,29 @@
         
         // Dynamic shop item data (can be fetched from backend)
         const shopItems = {
-            'lumen': [
+            'orb_exchange': [ // Combined Lumen and Halo into one section
                 { id: 'buy_lumen_1', name: 'Lumen Orb x1', description: 'Standard pull', cost: 70, cost_currency: 'snc_icon.png', icon: 'lumen_icon.png' },
-                { id: 'buy_lumen_10', name: 'Lumen Orb x10', description: 'Save 10%', cost: 595, cost_currency: 'snc_icon.png', icon: 'lumen_icon.png' }
-            ],
-            'halo': [
+                { id: 'buy_lumen_10', name: 'Lumen Orb x10', description: 'Save 10%', cost: 595, cost_currency: 'snc_icon.png', icon: 'lumen_icon.png' },
                 { id: 'buy_halo_1', name: 'Halo Orb x1', description: 'Limited pull', cost: 100, cost_currency: 'snc_icon.png', icon: 'halo_icon.png' },
                 { id: 'buy_halo_10', name: 'Halo Orb x10', description: 'Save 10%', cost: 900, cost_currency: 'snc_icon.png', icon: 'halo_icon.png' }
             ],
-            'exchange': [
+            'auric_exchange': [
                 { id: 'exchange_lumen', name: 'Lumen Orb x1', description: 'Monthly limit: 10', cost: 20, cost_currency: 'auric_crescent_icon.png', icon: 'lumen_icon.png' },
                 { id: 'exchange_halo', name: 'Halo Orb x1', description: 'Monthly limit: 10', cost: 20, cost_currency: 'auric_crescent_icon.png', icon: 'halo_icon.png' }
+            ],
+            'jewel_exchange': [ // New section for Orbital Jewel exchange
+                { id: 'exchange_snc_with_oj', name: 'Star Night Crystals x1000', description: 'Exchange 100 Orbital Jewels. Monthly limit: 5', cost: 100, cost_currency: 'orbital_jewels_icon.png', icon: 'snc_icon.png' }
             ]
         };
 
         function renderShopItems() {
-            const lumenContainer = document.getElementById('lumen-shop-items');
-            const haloContainer = document.getElementById('halo-shop-items');
-            const exchangeContainer = document.getElementById('exchange-shop-items');
+            const orbContainer = document.getElementById('orb-shop-items');
+            const auricContainer = document.getElementById('auric-exchange-items');
+            const jewelContainer = document.getElementById('jewel-exchange-items');
 
-            // Render Lumen items (bought with SNC)
-            lumenContainer.innerHTML = shopItems.lumen.map(item => createShopItemHTML(item)).join('');
-            
-            // Render Halo items (bought with SNC) - Renamed section title to "Crystals Exchange" to encompass both
-            // The previous section was "Buy Lumen Orbs", this was "Buy Halo Orbs". Now both are under "Crystals Exchange"
-            // So, I'll append halo items to the same lumenContainer's parent if you want them together,
-            // or keep a separate section. For now, I'll keep them separate but rename the section title.
-            haloContainer.innerHTML = shopItems.halo.map(item => createShopItemHTML(item)).join('');
-
-
-            // Render Exchange items (bought with Auric Crescents)
-            exchangeContainer.innerHTML = shopItems.exchange.map(item => createShopItemHTML(item)).join('');
+            orbContainer.innerHTML = shopItems.orb_exchange.map(item => createShopItemHTML(item)).join('');
+            auricContainer.innerHTML = shopItems.auric_exchange.map(item => createShopItemHTML(item)).join('');
+            jewelContainer.innerHTML = shopItems.jewel_exchange.map(item => createShopItemHTML(item)).join('');
         }
 
         function createShopItemHTML(item) {
@@ -429,18 +428,27 @@
             let itemIconSrc;
             if (item.icon) {
                 itemIconSrc = `{{ url_for('static', filename='${item.icon}') }}`;
-            } else if (item.id.includes('lumen')) {
-                itemIconSrc = "{{ url_for('static', filename='lumen_icon.png') }}";
-            } else if (item.id.includes('halo')) {
-                itemIconSrc = "{{ url_for('static', filename='halo_icon.png') }}";
             } else {
                 itemIconSrc = "https://placehold.co/50x50?text=Item"; // Generic fallback
             }
 
+            // Determine the correct image for the cost currency
+            let costCurrencyIconSrc;
+            if (item.cost_currency === 'orbital_jewels_icon.png') {
+                costCurrencyIconSrc = "https://placehold.co/20x20/FFD700/000000?text=OJ"; // Placeholder for OJ
+            } else if (item.cost_currency === 'auric_crescent_icon.png') {
+                costCurrencyIconSrc = "{{ url_for('static', filename='auric_crescent_icon.png') }}";
+            } else if (item.cost_currency === 'snc_icon.png') {
+                costCurrencyIconSrc = "{{ url_for('static', filename='snc_icon.png') }}";
+            } else {
+                costCurrencyIconSrc = "https://placehold.co/20x20?text=Cost"; // Generic fallback
+            }
+
+
             return `
                 <div class="shop-item">
                     <div class="item-details">
-                        <img src="${itemIconSrc}" alt="${item.name}" class="item-icon">
+                        <img src="${itemIconSrc}" onerror="this.onerror=null;this.src='https://placehold.co/50x50?text=Item';" alt="${item.name}" class="item-icon">
                         <div class="item-info">
                             <h3>${item.name}</h3>
                             <p class="text-sm text-gray-400">${item.description}</p>
@@ -449,7 +457,7 @@
                     <button class="buy-button" onclick="showPurchaseModal('${item.id}', '${item.name}', ${item.cost}, '${item.cost_currency}')">
                         <div class="cost">
                             <span>${item.cost}</span>
-                            <img src="{{ url_for('static', filename='${item.cost_currency}') }}" alt="Cost">
+                            <img src="${costCurrencyIconSrc}" onerror="this.onerror=null;this.src='https://placehold.co/20x20?text=Cost';" alt="Cost">
                         </div>
                     </button>
                 </div>
@@ -466,6 +474,8 @@
                 currencyName = 'Star Night Crystals';
             } else if (costCurrency === 'auric_crescent_icon.png') {
                 currencyName = 'Auric Crescents';
+            } else if (costCurrency === 'orbital_jewels_icon.png') {
+                currencyName = 'Orbital Jewels';
             } else {
                 currencyName = 'currency'; // Fallback
             }

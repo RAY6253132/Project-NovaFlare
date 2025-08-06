@@ -6,7 +6,7 @@ import sqlite3
 import random
 from urllib.parse import unquote
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for, g
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash # Added this import
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24) # A strong secret key for session management
@@ -34,7 +34,8 @@ DEFAULT_USER_DATA = {
     },
     'monthly_exchanges': {
         'exchange_lumen': 0,
-        'exchange_halo': 0
+        'exchange_halo': 0,
+        'exchange_snc_with_oj': 0 # New monthly limit for OJ exchange
     }
 }
 
@@ -123,7 +124,8 @@ COST_MAP = {
     'buy_halo_1': {'cost_type': 'star_night_crystals', 'cost_amount': 100, 'reward_type': 'halo_orbs', 'reward_amount': 1},
     'buy_halo_10': {'cost_type': 'star_night_crystals', 'cost_amount': 900, 'reward_type': 'halo_orbs', 'reward_amount': 10},
     'exchange_lumen': {'cost_type': 'auric_crescents', 'cost_amount': 20, 'reward_type': 'lumen_orbs', 'reward_amount': 1, 'limit': 10},
-    'exchange_halo': {'cost_type': 'auric_crescents', 'cost_amount': 20, 'reward_type': 'halo_orbs', 'reward_amount': 1, 'limit': 10}
+    'exchange_halo': {'cost_type': 'auric_crescents', 'cost_amount': 20, 'reward_type': 'halo_orbs', 'reward_amount': 1, 'limit': 10},
+    'exchange_snc_with_oj': {'cost_type': 'orbital_jewels', 'cost_amount': 100, 'reward_type': 'star_night_crystals', 'reward_amount': 1000, 'limit': 5} # New OJ exchange
 }
 
 # Define Gacha probabilities and item pool (UPDATED for rarity rules)
@@ -514,26 +516,6 @@ def pull_gacha():
         if result['rarity'] == 5:
             pity_5 = 0
             pity_4 = 0 # 5-star resets 4-star pity too
-
-        # Check for Spectra (duplicate characters) for Auric Crescents
-        # This is a simplified check. In a real game, you'd track character ownership
-        # and check if the pulled character is already owned.
-        # For now, we'll assume any 4-star or 5-star character pull *could* be a duplicate
-        # and award AC for Spectra if it's a character.
-        if result['type'] == 'Character' and (result['rarity'] == 4 or result['rarity'] == 5):
-            # This is a placeholder logic. You'd need a system to track owned characters
-            # and detect actual duplicates to award 50 AC per Spectra.
-            # For demonstration, let's just add a small chance or a fixed amount for now.
-            # As per your rule: "50 AC On Every Spectra"
-            # Since we don't have character ownership tracking here,
-            # I'll add a placeholder if a character is pulled that *could* be a duplicate.
-            # For a true implementation, you'd need to fetch user's owned characters.
-            # For now, I'll assume if a 4* or 5* character is pulled, it might be a Spectra.
-            # A more robust solution would involve checking if the user already owns this specific character.
-            # For this MVP, let's just add 50 AC if it's a character of 4* or 5* as a placeholder for "Spectra".
-            # This assumes every character pull of 4* or 5* is a "Spectra" for AC purposes.
-            # This needs to be refined with actual character ownership tracking.
-            user['auric_crescents'] += 50 # Add 50 AC for potential Spectra (duplicate character)
 
     # Ensure the banner_type key exists in pity_counters before assigning
     if banner_type not in user['pity_counters']:
